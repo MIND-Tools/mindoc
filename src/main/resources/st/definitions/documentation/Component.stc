@@ -1,0 +1,373 @@
+template st.definitions.documentation.Component : st.definitions.documentation.Helper {
+ 
+$${
+/**
+ \file st/definitions/documentation/Component.stc
+ \brief The template for the HTML documentation of a component 
+
+
+ <B>
+ \n
+ This file is part of the Platform 2012 program,
+ a cooperation between STMicroelectronics and CEA.\n
+ Redistribution of this file to outside parties is
+ strictly prohibited without the written consent
+ of the module owner indicated below.\n
+ </B>
+
+ \par  Module owner: michel.metzger@st.com
+
+
+ \par  Copyright (C) 2009 STMicroelectronics
+
+ \par  Authors: michel.metzger@st.com
+
+ \par  Id: $Id$
+ \par  Date: $Date$
+ \par  Revision: $Rev$
+
+ */
+
+
+isCollection ::= [ "collection" : "true" ]
+
+ComponentDocumentation(definition, anchors, links, pathToRoot, sectionAnchors) ::= <<
+$HtmlHeader(def = definition, pathToRoot = pathToRoot)$
+<body>
+<hr/>
+$navBar(sectionAnchors = sectionAnchors, pathToRoot = pathToRoot)$
+<hr/>
+$DefinitionSection(definition = definition)$	
+<hr/>
+$ComponentCommentSection(definition = definition, anchors = anchors)$
+
+$dataSection(definition = definition)$
+
+$AttributeSummary(definition = definition, anchors = anchors)$
+$ClientInterfaceSummary(definition = definition, anchors = anchors, links = links)$
+$ServerInterfaceSummary(definition = definition, anchors = anchors, links = links)$
+$SubComponentSummary(definition = definition, anchors = anchors, links = links)$
+$BindingSummary(definition = definition, anchors = anchors)$
+$ImplementationSummary(definition = definition, anchors = anchors, links = links)$
+
+$AttributeDetail(definition = definition, anchors = anchors)$
+$ClientInterfaceDetail(definition = definition, anchors = anchors, links = links)$
+$ServerInterfaceDetail(definition = definition, anchors = anchors, links = links)$
+$SubComponentDetail(definition = definition, anchors = anchors, links = links)$
+$BindingDetail(definition = definition, anchors = anchors)$
+$ImplementationDetail(definition = definition, anchors = anchors, links = links)$
+
+</body>
+</html>
+>>
+
+summarySectionLinks(sectionAnchors) ::= <<
+$linkOrLabel(name="attributes", label="ATTRIBUTES", anchorSuffix="SUM")$ |
+$linkOrLabel(name="clientInterfaces", label="CLIENT INTERFACES", anchorSuffix="SUM")$ |  
+$linkOrLabel(name="serverInterfaces", label="SERVER INTERFACES", anchorSuffix="SUM")$ |
+$linkOrLabel(name="components", label="COMPONENTS", anchorSuffix="SUM")$ |
+$linkOrLabel(name="bindings", label="BINDINGS", anchorSuffix="SUM")$ |
+$linkOrLabel(name="implementations", label="IMPLEMENTATIONS", anchorSuffix="SUM")$
+>>
+
+detailSectionLinks(sectionAnchors) ::= <<
+$linkOrLabel(name="data", label="DATA", anchorSuffix="DET")$ |
+$linkOrLabel(name="attributes", label="ATTRIBUTES", anchorSuffix="DET")$ |
+$linkOrLabel(name="clientInterfaces", label="CLIENT INTERFACES", anchorSuffix="DET")$ |  
+$linkOrLabel(name="serverInterfaces", label="SERVER INTERFACES", anchorSuffix="DET")$ |
+$linkOrLabel(name="components", label="COMPONENTS", anchorSuffix="DET")$ |
+$linkOrLabel(name="bindings", label="BINDINGS", anchorSuffix="DET")$ |
+$linkOrLabel(name="implementations", label="IMPLEMENTATIONS", anchorSuffix="DET")$
+>>
+
+fullDefinitionName(definition) ::= <<
+$definition.name; format="shortName"$ 
+$if(definition.astNodeTypes.("formalTypeParameter"))$
+  $if(definition.formalTypeParameters)$
+&nbsp;&lt;&nbsp;$definition.formalTypeParameters:{$it.name$ conformsto $definitionLink(definition=it.definitionReference)$}; separator=", "$&nbsp;&gt; 
+  $endif$
+$endif$
+$if (definition.astNodeTypes.("formalParameter"))$
+  	$if(definition.formalParameters)$
+($definition.formalParameters:{$it.name$}; separator=", "$)
+    $endif$ 
+  $endif$
+>>
+
+DefinitionSection(definition) ::= <<
+<p class="package-name">$definition.name; format="packageName"$</p>
+<h1 class="component-name">$definition.astDecorations.kind$ $fullDefinitionName(definition)$</h1>
+<div>
+<p>$inheritanceInfo(definition)$</p>
+</div>
+>>
+
+inheritanceInfo(definition) ::= <<
+$if(definition.astDecorations.extends)$
+<h3>All extended definitions:</h3>
+<p class="indent">$definition.astDecorations.extends.extends:{$definitionLink(definition=it)$};separator=", "$</p>
+  $endif$
+$endif$
+
+>>
+
+ComponentCommentSection(definition, anchors) ::= <<
+$if(definition.astDecorations.comment)$
+<div class="component-comment">
+<p>$definition.astDecorations.comment$</p>
+$annotationList(definition)$
+</div>
+<hr/>
+$endif$
+>>
+
+dataSection(definition) ::= <<
+$if (definition.astNodeTypes.("data"))$
+  $if(definition.data.cCode)$
+<h2><a name="$sectionAnchors.data$_DET">Data</a></h2>
+<p>$definition.data.astDecorations.comment$</p>
+<pre>
+$definition.data.cCode$
+</pre>
+  $annotationList(definition.data)$
+  $elseif(definition.data.path)$
+<h2><a name="$sectionAnchors.data$_DET">Data</a></h2>
+<p> $definition.data.astDecorations.comment$<br/>
+    $if(definition.data.astDecorations.link)$
+    <a href="$definition.data.astDecorations.link$">$definition.data.path$</a>
+    $else$
+    $definition.data.path$
+    $endif$
+   </p>
+   $annotationList(definition.data)$
+  $endif$
+$endif$
+>>
+
+ClientInterfaceSummary(definition, anchors, links) ::= <<
+$if (definition.astDecorations.clientInterfaces)$
+<table class="summary">
+<tr><th colspan="2"><a name="$sectionAnchors.clientInterfaces$_SUM">Client Interface Summary</a></th></tr>
+$definition.astDecorations.clientInterfaces:{
+<tr><td class="type-column"><a href="$links.itf.(it.signature)$" title="interface $it.signature$">$it.signature; format="shortName"$</a></td><td><a href="#$anchors.itf.(it.name)$">$interfaceName(it)$</a><p class="summary-comment">$it.astDecorations.short_comment$</p></td></tr>
+}; separator="\n"$
+</table>
+$endif$
+>>
+
+ServerInterfaceSummary(definition, anchors, links) ::= <<
+$if (definition.astDecorations.serverInterfaces)$
+<table class="summary">
+<tr><th colspan="2"><a name="$sectionAnchors.serverInterfaces$_SUM">Server Interface Summary</a></th></tr>
+$definition.astDecorations.serverInterfaces:{
+<tr><td class="type-column"><a href="$links.itf.(it.signature)$" title="interface $it.signature$">$it.signature; format="shortName"$</a></td><td><a href="#$anchors.itf.(it.name)$">$interfaceName(it)$</a><p class="summary-comment">$it.astDecorations.short_comment$</p></td></tr>
+}; separator="\n"$
+</table>
+$endif$
+>>
+
+definitionLink(definition, name) ::= <<
+<a href="$links.cmp.(definition.name)$" title='$definition.astDecorations.("kind"); format="toLower"$ $definition.name$'>$if(name)$$name$$else$$definition.name; format="shortName"$$endif$</a>$typeArguments(definitionReference=definition)$$arguments(definitionReference=definition)$
+>>
+
+typeArguments(definitionReference) ::= <<
+$if (definition.astNodeTypes.("typeArgument"))$$if(definitionReference.typeArguments)$&lt;$definitionReference.typeArguments:{$definitionLink(definition=it.definitionReference)$}; separator=", "$&gt;$endif$$endif$
+>>
+
+arguments(definitionReference) ::= <<
+$if (definitionReference.astDecorations.("arguments"))$
+  ($definitionReference.astDecorations.("arguments"):{$it$}; separator=", "$)
+$endif$
+>>
+
+componentDefinitionLink(component) ::= <<
+$if(component.definitionReference)$
+$definitionLink(definition=component.definitionReference)$
+$else$
+$definitionLink(definition=component.astDecorations.("resolved-component-definition").definition, name=component.typeParameterReference)$
+$endif$
+>>
+
+SubComponentSummary(definition, anchors, links) ::= <<
+$if (definition.astNodeTypes.("component"))$
+   $if (definition.components)$
+<table class="summary">
+<tr><th colspan="2"><a name="$sectionAnchors.components$_SUM">Sub-component Summary</a></th></tr>
+$definition.components:{
+<tr><td class="type-column">$componentDefinitionLink(it)$</td><td><a href="#$anchors.cmp.(it.name)$">$it.name$</a><p class="summary-comment">$it.astDecorations.short_comment$</p></td></tr>
+}; separator="\n"$
+</table>
+   $endif$
+$endif$
+>>
+
+isThis ::= [
+	"this" : "true"
+]
+
+interfaceLink(component, interface, interfaceNumber) ::= <<
+$if(isThis.(component))$
+  <a href="#$anchors.itf.(interface)$" title="interface">this.$interface$</a>$if(interfaceNumber)$[$interfaceNumber$]$endif$
+$else$
+  <a href="#$anchors.cmp.(component)$" title="interface">$component$.$interface$</a>$if(interfaceNumber)$[$interfaceNumber$]$endif$
+$endif$
+
+>>
+
+BindingSummary(definition, anchors) ::= <<
+$if (definition.astNodeTypes.("binding"))$
+   $if (definition.bindings)$
+<table class="summary">
+<tr><th colspan="3"><a name="$sectionAnchors.bindings$_SUM">Binding Summary</a></th></tr>
+$definition.bindings:{
+<tr>
+  <td class="binding-column"><p class="no-margin">from $interfaceLink(component = it.fromComponent, interface = it.fromInterface, interfaceNumber = it.fromInterfaceNumber)$<br />
+to $interfaceLink(component = it.toComponent, interface = it.toInterface, interfaceNumber = it.toInterfaceNumber)$</p></td>
+  <td><p class="binding-comment">$it.astDecorations.short_comment$ <a href="#$anchors.bind.(it)$">Details.</a></p></td>
+</tr>
+}; separator="\n"$
+</table>    
+   $endif$
+$endif$
+>>
+
+AttributeSummary(definition, anchors) ::= <<
+$if (definition.astNodeTypes.("attribute"))$
+   $if (definition.attributes)$
+<table class="summary">
+<tr><th colspan="2"><a name="$sectionAnchors.attributes$_SUM">Attribute Summary</a></th></tr>
+$definition.attributes:{
+<tr><td class="type-column">$it.type$</td><td><a href="#$anchors.attr.(it.name)$">$it.name$</a><p class="summary-comment">$it.astDecorations.short_comment$</p></td></tr>
+}; separator="\n"$    
+</table>
+   $endif$
+$endif$
+>>
+
+ImplementationSummary(definition, anchors, links) ::= <<
+$if (definition.astNodeTypes.("source"))$
+   $if (definition.sources)$
+<table class="summary">
+<tr><th><a name="$sectionAnchors.implementations$_SUM">Implementation Summary</a></th></tr>
+$definition.sources:{
+<tr><td><a href="$links.impl.(it)$">$it.path$</a><p class=summary-comment>$it.astDecorations.short_comment$ <a href='#$anchors.impl.(it)$'>Details.</a></td></tr>
+}; separator="\n"$    
+</table>
+   $endif$
+$endif$
+>>
+
+annotationList(element) ::= <<
+$if(element.astDecorations.annotation_list)$
+<h3>Annotations:</h3>
+<p class="indent">
+$element.astDecorations.annotation_list:{$it$
+}; separator="<br/>"$
+</p>
+$endif$
+>>
+
+ClientInterfaceDetail(definition, anchors, links) ::= <<
+$if (definition.astDecorations.clientInterfaces)$
+<h2><a name="$sectionAnchors.clientInterfaces$_DET">Client Interface Detail</a></h2>
+$definition.astDecorations.clientInterfaces:{
+<p class="item-name"><a href="$links.itf.(it.signature)$" title="interface $it.signature$">$it.signature; format="shortName"$</a> <a name="$anchors.itf.(it.name)$">$interfaceName(it)$</a></p>
+<div class="item-details">
+  <p class="full-comment">$it.astDecorations.comment$</p>
+  $annotationList(it)$
+</div>
+}; separator="\n<hr />"$
+
+$endif$
+>>
+
+ServerInterfaceDetail(definition, anchors, links) ::= <<
+$if (definition.astDecorations.serverInterfaces)$
+<h2><a name="$sectionAnchors.serverInterfaces$_DET">Server Interface Detail<a></h2>
+$definition.astDecorations.serverInterfaces:{
+<p class="item-name"><a href="$links.itf.(it.signature)$" title="interface $it.signature$">$it.signature; format="shortName"$</a> <a name="$anchors.itf.(it.name)$">$interfaceName(it)$</a></p>
+<div class="item-details">
+  <p class="full-comment">$it.astDecorations.comment$</p>
+  $annotationList(it)$
+</div>
+}; separator="\n<hr />"$
+
+$endif$
+>>
+
+SubComponentDetail(definition, anchors, links) ::= <<
+$if (definition.astNodeTypes.("component"))$
+   $if (definition.components)$
+<h2><a name="$sectionAnchors.components$_DET">Sub-component Detail</a></h2>
+$definition.components:{
+<p class="item-name">$componentDefinitionLink(it)$ <a name="$anchors.cmp.(it.name)$">$it.name$</a></p>
+<div class="item-details">
+  <p class="full-comment">$it.astDecorations.comment$</p>
+  $annotationList(it)$
+</div>
+}; separator="\n<hr />"$
+   $endif$
+$endif$
+>>
+
+BindingDetail(definition, anchors) ::= <<
+$if (definition.astNodeTypes.("binding"))$
+   $if (definition.bindings)$
+<h2><a name="$sectionAnchors.bindings$_DET">Binding Detail</a></h2>
+$definition.bindings:{
+<p class="item-name"><a name="$anchors.bind.(it)$">from</a> $interfaceLink(component = it.fromComponent, interface = it.fromInterface, interfaceNumber = it.fromInterfaceNumber)$ to $interfaceLink(component = it.toComponent, interface = it.toInterface, interfaceNumber = it.toInterfaceNumber)$</p>
+<div class="item-details">
+  <p class="full-comment">$it.astDecorations.comment$</p>
+  $annotationList(it)$
+</div>
+}; separator="\n<hr />"$
+   $endif$
+$endif$
+>>
+
+AttributeDetail(definition, anchors) ::= <<
+$if (definition.astNodeTypes.("attribute"))$
+   $if (definition.attributes)$
+<h2><a name="$sectionAnchors.attributes$_DET">Attribute Detail</a></h2>
+$definition.attributes:{
+<p class="item-name">$it.type$ <a name="$anchors.attr.(it.name)$">$it.name$</a>
+$attributeValue(it)$
+</p>
+<div class="item-details">
+  <p class="full-comment">$it.astDecorations.comment$</p>
+  $annotationList(it)$
+</div>
+}; separator="\n<hr />"$
+   $endif$
+$endif$
+>>
+
+attributeValue(attr) ::= <<
+$if(attr.astDecorations.value)$
+= $attr.astDecorations.value$
+$endif$
+>>
+
+ImplementationDetail(definition, anchors, links) ::= <<
+$if (definition.astNodeTypes.("source"))$
+   $if (definition.sources)$
+<h2><a name="$sectionAnchors.implementations$_DET">Implementation Detail</a></h2>
+$definition.sources:{
+<p class="item-name"><a name='$anchors.impl.(it)$' href="$links.impl.(it)$">$it.path$</a></p>
+<div class="item-details">
+  <p class="full-comment">$it.astDecorations.comment$</p>
+  $annotationList(it)$
+</div>
+}; separator="\n<hr />"$
+   $endif$
+$endif$
+>>
+
+interfaceName(itf) ::= <<
+$it.name$
+$if(isCollection.(itf.cardinality))$
+[$if(it.numberOfElement)$$it.numberOfElement$$else$&nbsp;$endif$]$endif$
+>>
+
+}$$
+}

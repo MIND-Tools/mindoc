@@ -1,0 +1,8 @@
+/**
+ * Simple implementation of a @component template_test.PrintClient.
+ * Calls the printer with "hello world" as parameter.
+ */
+primitive template_test.PrintClientImpl extends PrintClient {
+   nodata;
+   source print_client.c
+}

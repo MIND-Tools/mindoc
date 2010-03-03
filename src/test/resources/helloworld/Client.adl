@@ -1,0 +1,42 @@
+/** Hello 
+ */
+@org.ow2.mind.doc.annotations.FooAnnotation
+primitive helloworld.Client {
+
+  /** Comment for data definition */
+  @org.ow2.mind.doc.annotations.FooAnnotation
+  data {{
+struct {
+  int a, b;
+} PRIVATE;
+}}
+  
+  /** This is an attribute.
+   * Here are details with fancy HTML:
+   * <ol>
+   * <li>A list item</li>
+   * <li>A second list item</li>
+   * </ol>
+   * And more comments.
+   */
+  @org.ow2.mind.doc.annotations.FooAnnotation
+  attribute string myAttribute = "A string";
+  
+  /** Comment. More comment.*/
+  attribute int    myIntAttribute = 1;
+  
+  
+  /** Main interface */
+  @org.ow2.mind.doc.annotations.FooAnnotation
+  provides Main as main;
+  
+  /** A service */
+  @org.ow2.mind.doc.annotations.FooAnnotation
+  requires Service as sa ;
+  
+  /** This is the source code.
+   * A C file.
+   */ 
+  @org.ow2.mind.doc.annotations.FooAnnotation
+  source client.c;
+}

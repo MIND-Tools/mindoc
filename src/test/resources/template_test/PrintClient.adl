@@ -1,0 +1,3 @@
+type template_test.PrintClient {
+	requires common.PrintService as printerCl;
+}

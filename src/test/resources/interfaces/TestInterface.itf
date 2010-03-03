@@ -1,0 +1,146 @@
+#include "data_types.idt"
+
+/**
+ * An unsigned int. More details.
+ */
+typedef unsigned int u_int;
+
+
+/**
+ * A struct with two fields. More details.
+ */
+struct my_struct {
+	int field1;
+	int field2;
+};
+
+/**
+ * A union with two fields. More details.
+ */
+union my_union {
+	char char_field;
+	int  int_field;
+};
+
+/**
+ * An enum with three values. More details.
+ */
+enum my_enum {
+	RED,
+	GREEN,
+	BLUE
+};
+
+enum my_enum;
+
+/**
+ * A typedef with inline struct
+ */
+typedef struct {
+   int foo[3];
+   int bar;
+} foobar;
+
+
+/**
+ * A typedef of an enum pointer.
+ */
+typedef enum my_enum* my_enum_ptr;
+
+/**
+ * A typedef struct with a struct field.
+ */
+typedef struct {
+   int foo;
+   int bar;
+   struct {char far; char boo;} bu;
+   enum my_enum enum_field;
+   my_enum_ptr ptr;
+} foobar2;
+
+/**
+ * An interface name TestInterface.
+ * Bla bla bla.
+ * A link to my @interface this#methods.
+ * A link to my @interface this#types.
+ */
+interface interfaces.TestInterface {
+
+	/**
+	 * Test with a type qualifier. A link to @component common.PrimitiveClient#interfaces#clientItf2.
+	 */
+	@org.ow2.mind.doc.annotations.FooAnnotation
+	const int testConstMethod(int i);
+
+	/**
+	 * A test with a type specifiers.
+	 */
+	void testTypeSpecMethod(void);
+
+	/**
+	 * A test with a type specifiers.
+	 */
+	void testTypeSpecMethod(void);
+	
+	/**
+	 * A test method with a typedef name.
+	 */
+	u_int testTypedefMethod(uint ui);
+	
+	/**
+	 * A test method with a typedef name define in an idt.
+	 */
+	external_struct testExternalTypedefMethod(uint ui);
+	
+	
+	/**
+	 * A test method with a struct
+	 */
+	struct my_struct testStructMethod(struct my_struct my_struct_param);
+
+	/**
+	 * A test method with an anonymous struct
+	 */
+	struct {char foo;} testAnonStructMethod(void);
+
+	/**
+	 * A test method with an union
+	 */
+	union my_union testUnionMethod(union my_union my_union_param);
+
+	/**
+	 * A test method with an anonymous union
+	 */
+	union {int foo; char bar;} testAnonUnionMethod();
+
+
+	/**
+	 * A test method with an enum
+	 */
+	enum my_enum testEnumMethod(enum my_enum my_enum_param);
+
+	/**
+	 * A test method with an anonymous enum
+	 */
+	enum {YELLOW, PURPLE} testAnonEnumMethod(void);
+	
+	/**
+	 * A test method with a long list of parameters
+	 */
+	volatile unsigned int testParameters(const unsigned char p1, out volatile uint32_t p2, in short int p3, in out struct my_struct p4, union my_union p5);
+
+    /**
+     * A test method with a pointer parameter and return type
+     */
+    void * testPointer(const char* argv);
+
+    /**
+     * A test method with an array of pointers parameter
+     */
+    void testArrayPointer(const char* p1[3], int * const * * p2);
+    
+    /**
+     * A test method with a struct parameter
+     */
+    void testStructParameter(struct {int a; int b;} toto);
+}

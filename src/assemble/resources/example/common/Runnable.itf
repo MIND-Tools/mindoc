@@ -1,0 +1,11 @@
+
+/**
+ * This interfaces is used to "run" a component.
+ */
+interface common.Runnable {
+ 
+  /**
+   * Called by the client to run the server component.
+   */
+  void run();
+}

@@ -1,0 +1,27 @@
+
+/**
+ * The main class of the application. 
+ * Can run up to 8 @interface common.Runnable.
+ * The exact number of runners to be executed is
+ * defined by @component this#attributes#nbRunners
+ */
+primitive template_test.Main(numberOfRunners) {
+  nodata;
+
+  /**
+   * The list of runners to be exectuted.
+   * They will be called sequentially.
+   */
+  requires common.Runnable as runners[8];
+
+  /**
+   * The number of runners to be executed.
+   * Must be lesser than 8.
+   */
+  attribute int nbRunners = numberOfRunners;
+
+  /**
+   * Implements the main function
+   */
+  source main.c
+}

@@ -1,0 +1,279 @@
+template st.definitions.documentation.Interface : st.definitions.documentation.Helper {
+ 
+$${
+/**
+ \file st/definitions/documentation/Interface.stc
+ \brief The template for the HTML documentation of an interface 
+
+
+ <B>
+ \n
+ This file is part of the Platform 2012 program,
+ a cooperation between STMicroelectronics and CEA.\n
+ Redistribution of this file to outside parties is
+ strictly prohibited without the written consent
+ of the module owner indicated below.\n
+ </B>
+
+ \par  Module owner: michel.metzger@st.com
+
+
+ \par  Copyright (C) 2009 STMicroelectronics
+
+ \par  Authors: michel.metzger@st.com
+
+ \par  Id: $Id$
+ \par  Date: $Date$
+ \par  Revision: $Rev$
+
+ */
+
+InterfaceDocumentation(idl, anchors, links, pathToRoot, sectionAnchors) ::= <<
+$HtmlHeader(def = idl, pathToRoot = pathToRoot)$
+<body>
+<hr/>
+$navBar(sectionAnchors = sectionAnchors, pathToRoot = pathToRoot)$
+<hr/>
+$DefinitionSection(idl = idl)$
+$InterfaceCommentSection(idl = idl)$
+
+$TypeSummary(idl = idl, anchors = anchors, links = links)$
+$MethodSummary(idl = idl, anchors = anchors, links = links)$
+
+$TypeDetail(idl = idl, anchors = anchors, links = links)$
+$MethodDetail(idl = idl, anchors = anchors, links = links)$
+</body>
+</html>
+>>
+
+summarySectionLinks(sectionAnchors) ::= <<
+$linkOrLabel(name="types", label="TYPES", anchorSuffix="SUM")$ |
+$linkOrLabel(name="methods", label="METHODS", anchorSuffix="SUM")$ |  
+>>
+
+detailSectionLinks(sectionAnchors) ::= <<
+$linkOrLabel(name="types", label="TYPES", anchorSuffix="DET")$ |
+$linkOrLabel(name="methods", label="METHODS", anchorSuffix="DET")$ |
+>>
+
+DefinitionSection(idl) ::= <<
+<p class="package-name">$idl.name; format="packageName"$</p>
+<h1 class="component-name">Interface $idl.name; format="shortName"$</h1>
+<div>
+<p><!--TODO: inheritance tree--></p>
+</div>
+>>
+
+InterfaceCommentSection(idl) ::= <<
+$if(idl.astDecorations.comment)$
+<div class="component-comment">
+<p>$idl.astDecorations.comment$</p>
+</div>
+<hr/>
+$endif$
+>>
+
+TypeSummary(idl, anchors, links) ::= <<
+$if (idl.astDecorations.types)$
+<table class="summary">
+<tr><th colspan="2"><a name="$sectionAnchors.types$_SUM">Type Summary</a></th>
+</tr>
+$idl.astDecorations.types:{ <tr><td class="type-column">$it.astDecorations.kind$</td>
+                                <td><a href="#$anchors.types.(it.astDecorations.kind).(it.name)$" title="$it.astDecorations.kind$ $it.name$">$it.name$</a><p class="summary-comment">$it.astDecorations.short_comment$</p></td>
+                            </tr>
+}; separator="\n"$
+$endif$
+>>
+
+MethodSummary(idl, anchors, links) ::= <<
+$if (idl.astNodeTypes.("method"))$
+   $if (idl.methods)$
+<table class="summary">
+<tr><th colspan="2"><a name="$sectionAnchors.methods$_SUM">Method Summary</th></tr>
+$idl.methods:{
+<tr><td class="type-column">$typeQualifier(it)$
+                            $GetType(type=it.type, anchors=anchors)$</td>
+    <td><a href="#$anchors.methods.(it.name)$">$it.name$</a>($GetParameters(method=it, anchors=anchors)$)<p class="summary-comment">$it.astDecorations.short_comment$</p></td>
+</tr>
+}; separator="\n"$
+</table>
+   $endif$
+$endif$
+>>
+
+annotationList(element) ::= <<
+$if(element.astDecorations.annotation_list)$
+<h3>Annotations:</h3>
+<p class="indent">
+$element.astDecorations.annotation_list:{$it$
+}; separator="<br/>"$
+</p>
+$endif$
+>>
+
+TypeDetail(idl, anchors, links) ::= <<
+$if (idl.astDecorations.types)$
+<h2><a name="$sectionAnchors.types$_DET">Type Detail</a></h2>
+$idl.astDecorations.types:{ 
+<p class="item-name"><a name="$anchors.types.(it.astDecorations.kind).(it.name)$">$it.astDecorations.kind$ $it.name$</a></p>
+<p class="typedefinition-detail">$it.astDecorations.source$</p>
+<p class="method-name"></p>
+<div class="item-details">
+  <p class="full-comment">$it.astDecorations.comment$</p>
+  $annotationList(it)$
+</div>
+}; separator="\n<hr />"$
+$endif$
+>>
+
+MethodDetail(idl, anchors, links) ::= <<
+$if (idl.astNodeTypes.("method"))$
+   $if (idl.methods)$
+<h2><a name="$sectionAnchors.methods$_DET">Method Detail</a></h2>
+$idl.methods:{
+<p class="item-name"><a name="$anchors.methods.(it.name)$">$it.name$</a></p>
+<p class="method-name">$typeQualifier(it)$$GetType(type=it.type, anchors=anchors)$ $it.name$($GetParameters(method=it, anchors=anchors)$)</p>
+<div class="item-details">
+  <p class="full-comment">$it.astDecorations.comment$</p>
+  $annotationList(it)$
+</div>
+}; separator="\n<hr />"$
+   $endif$
+$endif$
+>>
+
+GetType(type, anchors) ::= <<
+$(typeMap.(type.astDecorations.kind))(type=type, anchors=anchors)$
+>>
+
+GetParameters(method, anchors) ::= <<
+$if (method.astNodeTypes.("parameter"))$
+   $if (method.parameters)$
+$method.parameters: {$parameterDef(parameter=it, anchors=anchors)$}; separator=", "$
+   $endif$
+$endif$
+>>
+
+members(type) ::= "{$type.members:memberDef()$}"
+
+memberDef(member) ::= "$typeQualifier(qualifiers=member)$$varDef(type=member.type, name=member.name)$; "
+
+enumMembers(type) ::= <<
+  {$type.enumMembers:enumMemberDef(); separator=", "$}
+>>
+
+enumMemberDef(member) ::= "$member.name$$if (member.constantExpression)$ = $member.constantExpression.expr$$endif$"
+
+structDef(type, anchors) ::= <<
+struct $members(type=type)$
+>>
+
+structRefDef(type, anchors) ::= <<
+struct <a href="#$anchors.types.struct.(type.name)$" title="struct $type.name$">$type.name$</a>
+>>
+
+enumDef(type, anchors) ::= <<
+enum $enumMembers(type=type)$
+>>
+
+enumRefDef(type, anchors) ::= <<
+enum <a href="#$anchors.types.enum.(type.name)$" title="enum $type.name$">$type.name$</a>
+>>
+
+unionDef(type, anchors) ::= <<
+union $members(type=type)$
+>>
+
+unionRefDef(type, anchors) ::= <<
+union <a href="#$anchors.types.union.(type.name)$" title="union $type.name$">$type.name$</a>
+>>
+
+pointerOfType(type, anchors) ::= <<
+$GetType(type=type.type)$*
+>>
+
+typedefType(type, anchors) ::= <<
+<a href="#$anchors.types.typedef.(type.name)$" title="typedef $type.name$">$type.name$</a>
+>>
+
+simpleType(type, anchors) ::= <<
+$type.name$
+>>
+
+typeMap ::= [
+  "enum" :          "enumDef",
+  "enumRef" :       "enumRefDef",
+  "struct" :        "structDef",
+  "structRef" :     "structRefDef",
+  "union" :         "unionDef",
+  "unionRef" :      "unionRefDef",
+  "pointerOf" :     "pointerOfType",
+  "typedefRef" :    "typedefType",
+  "primitiveType" : "simpleType"
+]
+
+parameterDef(parameter, anchors) ::= <<
+$typeQualifier(qualifiers=parameter)$$parameterDirection(parameter=parameter)$$varDef(type=parameter.type, name=parameter.name, anchors=anchors)$
+>>
+
+
+parameterDirection(parameter) ::= <<
+$if (parameter.isIn)$in $endif$
+$if (parameter.isOut)$out $endif$
+>>
+
+varDef(type, name, anchors) ::= <<
+$(varDefTemplateMap.(type.astDecorations.kind))(type=type, name=name, anchors=anchors)$
+>>
+
+enumVarDef(type, name, anchors) ::= "$enumDef(type=type, anchors=anchors)$ $name$"
+
+enumVarRefDef(type, name, anchors) ::= "$enumRefDef(type=type, anchors=anchors)$ $name$"
+
+structVarDef(type, name, anchors) ::= "$structDef(type=type, anchors=anchors)$ $name$"
+
+structRefVarDef(type, name, anchors) ::= "$structRefDef(type=type, anchors=anchors)$ $name$"
+
+unionVarDef(type, name, anchors) ::= "$unionDef(type=type, anchors=anchors)$ $name$"
+
+unionRefVarDef(type, name, anchors) ::= "$unionRefDef(type=type, anchors=anchors)$ $name$"
+
+pointerOfVarDef(type, name, anchors) ::= "$varDef(type=type.type, name=pointerOfVarName(type=type, name=name), anchors=anchors)$"
+
+pointerOfVarName(type, name, anchors) ::= "* $typeQualifier(qualifiers=type, anchors=anchors)$$name$"
+
+arrayOfVarDef(type, name, anchors) ::= "$varDef(type=type.type, name=arrayOfVarName(type=type, name=name), anchors=anchors)$"
+
+arrayOfVarName(type, name, anchors) ::= "$name$[$if (type.constantExpression)$$type.constantExpression.expr$$endif$]"
+
+simpleVarDef(type, name, anchors) ::= "$type.name$ $name$"
+
+varDefTemplateMap ::= [
+  "enum" :          "enumVarDef",
+  "enumRef" :       "enumVarRefDef",
+  "struct" :        "structVarDef",
+  "structRef" :     "structRefVarDef",
+  "union" :         "unionVarDef",
+  "unionRef" :      "unionRefVarDef",
+  "pointerOf" :     "pointerOfVarDef",
+  "arrayOf" :       "arrayOfVarDef",
+  "primitiveType" : "simpleVarDef",
+  "typedefRef" :    "simpleVarDef"
+]
+
+typeQualifier(qualifiers) ::= <<
+$constQualiferMap.(qualifiers.isConst)$$volatileQualifierMap.(qualifiers.isVolatile)$
+>>
+
+constQualiferMap ::= [
+  "true" : "const ",
+  "false": ""
+]
+
+volatileQualifierMap ::= [
+  "true" : "volatile ",
+  "false": ""
+]
+
+}$$
+}

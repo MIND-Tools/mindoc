@@ -1,0 +1,9 @@
+primitive common.PrimitiveMultiServer {
+	nodata;
+	
+	provides PrintService as serverItf[4];	  
+    
+    provides optional PrintService as printServiceCollection[];
+	
+	source server.c;
+}

@@ -1,0 +1,9 @@
+/**
+ * This component is a @component template_test.PrintClient and a @component template_test.PrintServer.
+ * It prints the string received by the interface @component this#interfaces#printerCl, adds a prefix and prints it
+ * using the @component this#interfaces#printerSrv interface
+ */
+primitive template_test.ProxyComponent extends PrintServer, PrintClient{
+   nodata;
+   source proxy_component.c;	
+}

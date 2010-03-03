@@ -1,0 +1,7 @@
+/**
+ * Defines the entry point.
+ * This is a comment.
+ */
+interface Main {
+  int main(int argc, char **argv);
+}

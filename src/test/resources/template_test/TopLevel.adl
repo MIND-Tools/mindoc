@@ -1,0 +1,5 @@
+composite template_test.TopLevel {
+	contains MyTemplateComposite<PrintServerImpl, PrintClientImpl> as templateInstance;
+	
+	contains MyTemplateComposite<ProxyPrintServer<PrintServerImpl>, PrintClientImpl> as templateInstance2;
+}

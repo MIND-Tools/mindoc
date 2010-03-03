@@ -1,0 +1,3 @@
+composite parameters.Top {
+	contains ParameterComponent(42, "The answer") as internalComponent;
+}

@@ -1,0 +1,13 @@
+/**
+ * This is the definition of Composite.<br/>
+ * An image:
+ * @figure star.gif
+ * The same, scaled down:
+ * @figure star.gif width=128px
+ * The same, scaled up:
+ * @figure star.gif height=512px
+ * Bla bla bla. Bli blu. 
+ */
+composite figure_test.Composite{
+ 
+}

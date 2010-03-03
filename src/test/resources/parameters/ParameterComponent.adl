@@ -1,0 +1,5 @@
+primitive parameters.ParameterComponent(a, b) {
+	nodata;
+	attribute int anInt = a;
+	attribute string aString = b;
+}

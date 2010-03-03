@@ -1,0 +1,49 @@
+import common.PrimitiveClient;
+import common.PrimitiveServer;
+import common.PrintService;
+
+/**
+ * This is the definition of Composite.<br/>
+ * Subcomponents:
+ * <ul>
+ *   <li>@component common.PrimitiveClient</li>
+ *   <li>@component common.PrimitiveServer</li>
+ * </ul>
+ * Bla bla bla. Bli blu.
+ * Link to my @component this#components.
+ * Link to my @component this#interfaces. 
+ */
+composite link_test.Composite{
+  /**
+   * This is a client subcomponent.
+   * The interface is @component common.PrimitiveClient#interfaces#clientItf and will
+   * be bound to @component common.PrimitiveServer#interfaces#serverItf
+   */
+  contains PrimitiveClient as client;
+  
+  /**
+   * This is a client subcomponent.
+   * it will be bound to @component this#components#client through
+   * the interface @component common.Service.
+   */
+  contains PrimitiveServer as server;
+  
+  /** Binds the client and the server. Binds @component this#components#client to 
+   * @component this#components#server
+   */
+  binds client.clientItf to server.serverItf;
+  binds client.clientItf2 to server.serverItf;
+  binds client.clientItf3 to server.serverItf;
+  
+  /** Interface to print stuff (server).
+   * Not related to @component common.PrimitiveServer#interfaces#serverItf. 
+   */
+  provides optional PrintService as printService2;
+
+  /** Interface @interface common.Service to print stuff.
+   * More links @interface common.Service#methods#print. 
+   */
+  requires optional PrintService as printService;
+  
+  
+}

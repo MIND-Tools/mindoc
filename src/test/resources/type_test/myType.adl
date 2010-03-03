@@ -1,0 +1,23 @@
+
+ /** 
+  * A well commented type definition.
+  * This type does not do anything;
+  * but requires a multi-line documentation
+  * anyway.
+  */
+type type_test.myType {
+
+	/**
+	 * This type provides the Main service.
+	 * The main method is called to launch
+	 * the application.
+	 */
+	provides Main as main;
+	
+	/**
+	 * This type requires the service Service.
+	 * bla bla bla.
+	 */
+	requires common.PrintService as aService;	
+
+}

@@ -1,0 +1,13 @@
+
+/**
+ * An interface that defines a print service.
+ * The print service can print strings.
+ */ 
+interface common.PrintService {
+
+  /**
+   * Prints a string.
+   */
+  void print(const char *msg);
+};
+

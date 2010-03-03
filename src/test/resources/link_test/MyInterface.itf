@@ -1,0 +1,67 @@
+/**
+ * An unsigned int. More details.
+ */
+typedef unsigned int u_int;
+
+
+/**
+ * A struct with two fields. More details.
+ */
+struct my_struct {
+	int field1;
+	int field2;
+};
+
+/**
+ * A union with two fields. More details.
+ */
+union my_union {
+	char char_field;
+	int  int_field;
+};
+
+/**
+ * An enum with three values. More details.
+ */
+enum my_enum {
+	RED,
+	GREEN,
+	BLUE
+};
+
+/**
+ * A typedef with inline struct
+ */
+typedef struct {
+   int foo[3];
+   int bar;
+} foobar;
+
+typedef my_enum* my_enum_ptr;
+
+/**
+ * A typedef struct with a struct field. the field enum_field is an enum: @interface this#enums#my_enum.
+ */
+typedef struct {
+   int foo;
+   int bar;
+   struct {char far; char boo;} bu;
+   enum my_enum enum_field;
+   my_enum_ptr ptr;
+} foobar2;
+
+/**
+ * An interface named MyInterface.
+ * Bla bla bla. A link to another interface @interface interfaces.TestInterface <br/>
+ * A link to an external method: @interface Main#methods#main
+ * A link to a method: @interface this#methods#getId
+ * A link to a union: @interface this#unions#my_union
+ * A link to a union: @interface this#structs#my_struct
+ */
+interface link_test.MyInterface {
+
+	/**
+	 * A method with a parameter @interface this#typedefs#foobar2.
+	 */
+	int getId(foobar2 * param);
+}

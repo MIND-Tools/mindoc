@@ -1,0 +1,147 @@
+/**
+ * Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+ * <b>Donec massa</b> dui, pretium vel blandit in, elementum 
+ * tincidunt nibh. In <i>commodo</i> sollicitudin ante, ac tempus
+ * diam porttitor ut. Proin dignissim est sit amet nisl 
+ * dignissim in eleifend eros commodo.
+ * <ul>
+ *   <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
+ *   <li>Aenean vitae diam nec purus fringilla scelerisque.</li>
+ *   <li>Praesent facilisis turpis vitae diam tincidunt vitae laoreet mauris pharetra.</li>
+ *   <li>Nullam malesuada volutpat ipsum, sit amet vestibulum elit hendrerit quis.</li>
+ * </ul>
+ * Cum sociis natoque 
+ * penatibus et magnis dis  parturient montes, nascetur 
+ * ridiculus mus. Sed ipsum lacus, condimentum vitae 
+ * hendrerit eu, imperdiet eget ante. Cras sit amet nulla 
+ * neque. Aliquam erat volutpat. Pellentesque aliquam, 
+ * libero at viverra varius, tortor erat pretium ipsum, 
+ * sed posuere ante ipsum vestibulum enim. Sed euismod 
+ * condimentum suscipit. Curabitur ac quam ipsum, a 
+ * sagittis arcu.
+ * <ol>
+ *   <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+ *     <ul>
+ *       <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
+ *       <li>Aenean vitae diam nec purus fringilla scelerisque.</li>
+ *       <li>Praesent facilisis turpis vitae diam tincidunt vitae laoreet mauris pharetra.</li>
+ *       <li>Nullam malesuada volutpat ipsum, sit amet vestibulum elit hendrerit quis.</li>
+ *     </ul>
+ *   </li>
+ *   <li>Aenean vitae diam nec purus fringilla scelerisque.</li>
+ *   <li>Praesent facilisis turpis vitae diam tincidunt vitae laoreet mauris pharetra.</li>
+ *   <li>Nullam malesuada volutpat ipsum, sit amet vestibulum elit hendrerit quis.</li>
+ * </ol>
+ * Cum sociis natoque 
+ * penatibus et magnis dis  parturient montes, nascetur 
+ * ridiculus mus. Sed ipsum lacus, condimentum vitae 
+ * hendrerit eu, imperdiet eget ante. Cras sit amet nulla 
+ * neque. Aliquam erat volutpat. Pellentesque aliquam, 
+ * libero at viverra varius, tortor erat pretium ipsum, 
+ * sed posuere ante ipsum vestibulum enim. Sed euismod 
+ * condimentum suscipit. Curabitur ac quam ipsum, a 
+ * sagittis arcu.
+ */
+primitive common.PrimitiveServer {
+	
+   /**
+    * Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+    * Donec massa dui, pretium vel blandit in, elementum 
+    * tincidunt nibh. In commodo sollicitudin ante, ac tempus
+    * diam porttitor ut. Proin dignissim est sit amet nisl 
+    * dignissim in eleifend eros commodo.  Cum sociis natoque 
+    * penatibus et magnis dis  parturient montes, nascetur 
+    * ridiculus mus.
+    * <ul>
+    *   <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
+    *   <li>Aenean vitae diam nec purus fringilla scelerisque.</li>
+    *   <li>Praesent facilisis turpis vitae diam tincidunt vitae laoreet mauris pharetra.</li>
+    *   <li>Nullam malesuada volutpat ipsum, sit amet vestibulum elit hendrerit quis.</li>
+    * </ul>
+    * Sed ipsum lacus, condimentum vitae hendrerit eu, 
+    * imperdiet eget ante. Cras sit amet nulla 
+    * neque. Aliquam erat volutpat. Pellentesque aliquam, 
+    * libero at viverra varius, tortor erat pretium ipsum, 
+    * sed posuere ante ipsum vestibulum enim. Sed euismod 
+    * condimentum suscipit. Curabitur ac quam ipsum, a 
+    * sagittis arcu.
+    * <ol>
+    *   <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
+    *   <li>Aenean vitae diam nec purus fringilla scelerisque.</li>
+    *   <li>Praesent facilisis turpis vitae diam tincidunt vitae laoreet mauris pharetra.</li>
+    *   <li>Nullam malesuada volutpat ipsum, sit amet vestibulum elit hendrerit quis.</li>
+    * </ol>
+    * Sed ipsum lacus, condimentum vitae hendrerit eu, 
+    * imperdiet eget ante. Cras sit amet nulla 
+    * neque. Aliquam erat volutpat. 
+    */
+	data {{
+	  int j;
+	}}
+	
+   /**
+    * Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+    * Donec massa dui, pretium vel blandit in, elementum 
+    * tincidunt nibh. In commodo sollicitudin ante, ac tempus
+    * diam porttitor ut. Proin dignissim est sit amet nisl 
+    * dignissim in eleifend eros commodo.  Cum sociis natoque 
+    * penatibus et magnis dis  parturient montes, nascetur 
+    * ridiculus mus.
+    * <ul>
+    *   <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
+    *   <li>Aenean vitae diam nec purus fringilla scelerisque.</li>
+    *   <li>Praesent facilisis turpis vitae diam tincidunt vitae laoreet mauris pharetra.</li>
+    *   <li>Nullam malesuada volutpat ipsum, sit amet vestibulum elit hendrerit quis.</li>
+    * </ul>
+    * Sed ipsum lacus, condimentum vitae hendrerit eu, 
+    * imperdiet eget ante. Cras sit amet nulla 
+    * neque. Aliquam erat volutpat. Pellentesque aliquam, 
+    * libero at viverra varius, tortor erat pretium ipsum, 
+    * sed posuere ante ipsum vestibulum enim. Sed euismod 
+    * condimentum suscipit. Curabitur ac quam ipsum, a 
+    * sagittis arcu.
+    * <ol>
+    *   <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
+    *   <li>Aenean vitae diam nec purus fringilla scelerisque.</li>
+    *   <li>Praesent facilisis turpis vitae diam tincidunt vitae laoreet mauris pharetra.</li>
+    *   <li>Nullam malesuada volutpat ipsum, sit amet vestibulum elit hendrerit quis.</li>
+    * </ol>
+    * Sed ipsum lacus, condimentum vitae hendrerit eu, 
+    * imperdiet eget ante. Cras sit amet nulla 
+    * neque. Aliquam erat volutpat. 
+    */
+	provides PrintService as serverItf;
+	
+   /**
+    * Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+    * Donec massa dui, pretium vel blandit in, elementum 
+    * tincidunt nibh. In commodo sollicitudin ante, ac tempus
+    * diam porttitor ut. Proin dignissim est sit amet nisl 
+    * dignissim in eleifend eros commodo.  Cum sociis natoque 
+    * penatibus et magnis dis  parturient montes, nascetur 
+    * ridiculus mus.
+    * <ul>
+    *   <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
+    *   <li>Aenean vitae diam nec purus fringilla scelerisque.</li>
+    *   <li>Praesent facilisis turpis vitae diam tincidunt vitae laoreet mauris pharetra.</li>
+    *   <li>Nullam malesuada volutpat ipsum, sit amet vestibulum elit hendrerit quis.</li>
+    * </ul>
+    * Sed ipsum lacus, condimentum vitae hendrerit eu, 
+    * imperdiet eget ante. Cras sit amet nulla 
+    * neque. Aliquam erat volutpat. Pellentesque aliquam, 
+    * libero at viverra varius, tortor erat pretium ipsum, 
+    * sed posuere ante ipsum vestibulum enim. Sed euismod 
+    * condimentum suscipit. Curabitur ac quam ipsum, a 
+    * sagittis arcu.
+    * <ol>
+    *   <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
+    *   <li>Aenean vitae diam nec purus fringilla scelerisque.</li>
+    *   <li>Praesent facilisis turpis vitae diam tincidunt vitae laoreet mauris pharetra.</li>
+    *   <li>Nullam malesuada volutpat ipsum, sit amet vestibulum elit hendrerit quis.</li>
+    * </ol>
+    * Sed ipsum lacus, condimentum vitae hendrerit eu, 
+    * imperdiet eget ante. Cras sit amet nulla 
+    * neque. Aliquam erat volutpat. 
+    */
+	source server.c;
+}

@@ -1,0 +1,3 @@
+primitive template_test.PrintServerImpl extends PrintServer {
+	source ../common/server.c;
+}

@@ -1,0 +1,8 @@
+
+
+composite template_test.MyTemplateComposite <Printer conformsto PrintServer, Client conformsto PrintClient>{
+	contains Printer as server;
+	contains Client as client;
+	
+	binds client.printerCl to server.printerSrv;
+}

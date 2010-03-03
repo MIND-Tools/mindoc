@@ -1,0 +1,8 @@
+composite template_test.ProxyPrintServer <ActualPrinter conformsto PrintServer> extends PrintServer{
+	
+	contains ActualPrinter as actualPrinter;
+	contains ProxyComponent as proxy;
+	
+	binds this.printerSrv to proxy.printerSrv;
+	binds proxy.printerCl to actualPrinter.printerSrv;
+}

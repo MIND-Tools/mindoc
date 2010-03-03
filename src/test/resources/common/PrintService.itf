@@ -1,0 +1,5 @@
+
+interface common.PrintService {
+  void print(const char *msg);
+};
+

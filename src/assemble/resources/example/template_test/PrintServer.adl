@@ -1,0 +1,7 @@
+
+/**
+ * Defines a printer server.
+ */
+type template_test.PrintServer {
+  provides common.PrintService as printerSrv;
+}

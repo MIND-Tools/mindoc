@@ -1,0 +1,19 @@
+
+/**
+ * The top level component. Instantiates the @component template_test.Main and the different
+ * components @component template_test.MyTemplateComposite. The client interfaces @component template_test.MyTemplateComposite#interfaces#runner will be called
+ * sequentially.
+ */
+composite template_test.TopLevel {
+  contains MyTemplateComposite<PrintServerImpl, PrintClientImpl> as templateInstance;
+  contains MyTemplateComposite<PrintServerImpl, PrintClientImpl> as templateInstance1;
+  contains MyTemplateComposite<ProxyPrintServer<PrintServerImpl>, PrintClientImpl> as templateInstance2;  
+  
+  contains Main(3) as main;
+
+  binds main.runners[0] to templateInstance.runner;
+  binds main.runners[1] to templateInstance1.runner;
+  binds main.runners[2] to templateInstance2.runner;
+
+
+}

@@ -1,0 +1,4 @@
+primitive template_test.ProxyComponent extends PrintServer, PrintClient{
+	source ../common/client.c;
+	source ../common/server.c;
+}

@@ -1,0 +1,17 @@
+
+/**
+ * Defines a printer client.
+ * The client can be run through its @component this#interfaces#runner interface.
+ */
+type template_test.PrintClient {
+
+        /**
+         * Access point to the printer.
+         */
+	requires common.PrintService as printerCl;
+
+        /**
+         * Interface used to run the client.
+         */
+        provides common.Runnable as runner;
+}

@@ -1,0 +1,46 @@
+import common.PrimitiveClient;
+import common.PrimitiveServer;
+import common.PrimitiveMultiClient;
+import common.PrimitiveMultiServer;
+import common.PrintService;
+
+/**
+ * This is the definition of Composite1
+ */
+@org.ow2.mind.doc.annotations.FooAnnotation
+composite composite_test.Composite1{
+
+  /** This is a client subcomponent. More details about the component. */
+  @org.ow2.mind.doc.annotations.FooAnnotation
+  contains PrimitiveClient as client;
+  
+  /** This is a server subcomponent. More details about the component. */
+  contains PrimitiveServer as server;
+  
+  /** Binds the client and the server. More details about the binding. */
+  @org.ow2.mind.doc.annotations.FooAnnotation
+  binds client.clientItf to server.serverItf;
+  binds client.clientItf2 to server.serverItf;
+  binds client.clientItf3 to server.serverItf;
+  
+  /** A client component with interface collections */
+  contains PrimitiveMultiClient as multiClient;
+  
+  /** A server component with interface collections */
+  contains PrimitiveMultiServer as multiServer;
+
+  binds multiClient.clientItf[0] to multiServer.serverItf[3];
+  binds multiClient.clientItf[1] to multiServer.serverItf[2];
+  binds multiClient.clientItf[2] to multiServer.serverItf[1];
+  binds multiClient.clientItf[3] to multiServer.serverItf[0];
+
+  /** An exported interface */
+  provides PrintService as externalPrintSrv;
+
+  /** The internal server. Its interface will be exported.*/
+  contains PrimitiveServer as internalServer;
+  
+  /** Interface export. The component interface is exported. */
+  binds this.externalPrintSrv to internalServer.serverItf;
+
+}

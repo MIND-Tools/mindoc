@@ -1,0 +1,8 @@
+composite extends_test.ExtendedComponent1 {
+    requires common.PrintService as clientItf;
+	contains common.PrimitiveClient as client;
+	
+    binds client.clientItf to this.clientItf;
+    binds client.clientItf2 to this.clientItf;
+    binds client.clientItf3 to this.clientItf;
+}

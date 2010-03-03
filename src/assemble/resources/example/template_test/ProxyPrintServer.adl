@@ -1,0 +1,24 @@
+
+/**
+ * Implements a proxy printer.
+ * It provides a @interface common.PrintService and uses the parameter
+ * @component template_test.PrintServer <tt>ActualPrinter</tt> passed as 
+ * a parameter and uses it to print. The string to be printed is modified by
+ * the @component template_test.ProxyComponent.
+ */
+composite template_test.ProxyPrintServer <ActualPrinter conformsto PrintServer> extends PrintServer{
+	
+        /**
+         * The printer that will be used to print the result string.
+         */
+	contains ActualPrinter as actualPrinter;
+
+        /**
+         * The actual proxy.
+         */
+	contains ProxyComponent as proxy;
+	
+	
+	binds this.printerSrv to proxy.printerSrv;
+	binds proxy.printerCl to actualPrinter.printerSrv;
+}

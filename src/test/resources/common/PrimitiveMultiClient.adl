@@ -1,0 +1,7 @@
+primitive common.PrimitiveMultiClient {
+	nodata;
+	
+	requires PrintService as clientItf[4];
+	
+	source client.c;
+}
