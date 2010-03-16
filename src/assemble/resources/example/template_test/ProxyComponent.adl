@@ -4,6 +4,5 @@
  * using the @component this#interfaces#printerSrv interface
  */
 primitive template_test.ProxyComponent extends PrintServer, PrintClient{
-   nodata;
    source proxy_component.c;	
 }

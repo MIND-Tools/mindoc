@@ -6,7 +6,6 @@
  * defined by @component this#attributes#nbRunners
  */
 primitive template_test.Main(numberOfRunners) {
-  nodata;
 
   /**
    * The list of runners to be exectuted.

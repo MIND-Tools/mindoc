@@ -3,6 +3,5 @@
  * It prints the string on standard output.
  */
 primitive template_test.PrintServerImpl extends PrintServer {
-   nodata;
    source print_server.c	
 }
