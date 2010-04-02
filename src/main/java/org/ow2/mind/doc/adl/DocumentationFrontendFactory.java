@@ -29,8 +29,7 @@ import static org.ow2.mind.idl.IDLLocator.ITF_RESOURCE_KIND;
 import org.objectweb.fractal.adl.Loader;
 import org.objectweb.fractal.adl.NodeFactory;
 import org.objectweb.fractal.adl.merger.NodeMerger;
-import org.objectweb.fractal.adl.merger.NodeMergerImpl;
-import org.objectweb.fractal.adl.xml.XMLNodeFactoryImpl;
+import org.objectweb.fractal.adl.xml.XMLNodeFactory;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.cecilia.adl.plugin.JavaPluginManager;
 import org.objectweb.fractal.cecilia.adl.plugin.PluginManager;
@@ -95,10 +94,10 @@ import org.ow2.mind.idl.IDLLoader;
 import org.ow2.mind.idl.IDLLoaderChainFactory;
 import org.ow2.mind.idl.IDLLocator;
 import org.ow2.mind.plugin.SimpleClassPluginFactory;
-import org.ow2.mind.st.BasicASTTransformer;
 import org.ow2.mind.st.STLoaderFactory;
 import org.ow2.mind.st.STNodeFactoryImpl;
-import org.ow2.mind.st.StringTemplateASTTransformer;
+import org.ow2.mind.st.STNodeMergerImpl;
+import org.ow2.mind.st.XMLSTNodeFactoryImpl;
 
 public final class DocumentationFrontendFactory {
   private DocumentationFrontendFactory() {
@@ -155,9 +154,9 @@ public final class DocumentationFrontendFactory {
 
     // node management components
     final STCFNodeMerger stcfNodeMerger = new STCFNodeMerger();
-    final XMLNodeFactoryImpl xmlNodeFactory = new XMLNodeFactoryImpl();
+    final XMLNodeFactory xmlNodeFactory = new XMLSTNodeFactoryImpl();
     final STNodeFactoryImpl nodeFactory = new STNodeFactoryImpl();
-    final NodeMergerImpl nodeMerger = new NodeMergerImpl();
+    final STNodeMergerImpl nodeMerger = new STNodeMergerImpl();
 
     inputResourceLocator.genericResourceLocators.put(ADL_RESOURCE_KIND,
         adlLocator);
@@ -365,8 +364,6 @@ public final class DocumentationFrontendFactory {
     padr.nodeFactoryItf = nodeFactory;
     padr.nodeMergerItf = nodeMerger;
 
-    final BasicASTTransformer bas = new BasicASTTransformer();
-    bas.nodeFactoryItf = nodeFactory;
     // configuration of plugin-manager
     try {
       ((BindingController) pluginManager).bindFc(NodeFactory.ITF_NAME,
@@ -378,8 +375,6 @@ public final class DocumentationFrontendFactory {
       ((BindingController) pluginManager).bindFc(IDLLoader.ITF_NAME, idlLoader);
       ((BindingController) pluginManager).bindFc("template-loader",
           STLoaderFactory.newSTLoader());
-      ((BindingController) pluginManager).bindFc(
-          StringTemplateASTTransformer.ITF_NAME, bas);
     } catch (final Exception e) {
     }
 

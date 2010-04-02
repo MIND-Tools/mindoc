@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2009 STMicroelectronics
  *
- * This file is part of "Mind Compiler" is free software: you can redistribute 
- * it and/or modify it under the terms of the GNU Lesser General Public License 
- * as published by the Free Software Foundation, either version 3 of the 
+ * This file is part of "Mind Compiler" is free software: you can redistribute
+ * it and/or modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
  * details.
@@ -17,7 +17,7 @@
  * Contact: mind@ow2.org
  *
  * Authors: ali-erdem.ozcan@st.com
- * Contributors: 
+ * Contributors:
  */
 package org.ow2.mind.doc;
 
@@ -31,7 +31,6 @@ import java.util.Map;
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.adl.Definition;
 import org.objectweb.fractal.adl.Loader;
-import org.objectweb.fractal.adl.NodeFactoryImpl;
 import org.objectweb.fractal.adl.xml.XMLNodeFactory;
 import org.objectweb.fractal.adl.xml.XMLNodeFactoryImpl;
 import org.ow2.mind.BasicInputResourceLocator;
@@ -48,8 +47,6 @@ import org.ow2.mind.idl.IDLVisitor;
 import org.ow2.mind.idl.ast.IDL;
 import org.ow2.mind.io.BasicOutputFileLocator;
 import org.ow2.mind.plugin.SimpleClassPluginFactory;
-import org.ow2.mind.st.BasicASTTransformer;
-import org.ow2.mind.st.StringTemplateASTTransformer;
 import org.ow2.mind.st.StringTemplateComponentLoader;
 import org.ow2.mind.st.templates.parser.StringTemplateLoader;
 
@@ -62,8 +59,6 @@ public class DefinitionDocumentGenerator {
 
   public DefinitionCompiler    adlCompiler;
   public IDLVisitor            idlCompiler;
-
-  public StringTemplateASTTransformer astTransformer;
 
   public Map<Object, Object>          context;
 
@@ -97,11 +92,6 @@ public class DefinitionDocumentGenerator {
 
     idlCompiler = IDLBackendFactory.newIDLCompiler();
 
-    // AST Transformer;
-    final BasicASTTransformer basicASTTransformer = new BasicASTTransformer();
-    basicASTTransformer.nodeFactoryItf = new NodeFactoryImpl();
-    astTransformer = basicASTTransformer;
-
     // init context
     context = new HashMap<Object, Object>();
     context.put(BasicOutputFileLocator.OUTPUT_DIR_CONTEXT_KEY, targetDirectory);
@@ -125,8 +115,7 @@ public class DefinitionDocumentGenerator {
 
   public void generateADLDocumentation(final String adlName)
       throws ADLException, InterruptedException {
-    Definition d = loadADL(adlName);
-    d = astTransformer.toStringTemplateAST(d);
+    final Definition d = loadADL(adlName);
     adlCompiler.visit(d, context);
   }
 
@@ -136,8 +125,7 @@ public class DefinitionDocumentGenerator {
 
   public void generateIDLDocumentation(final String idlName)
       throws ADLException, InterruptedException {
-    IDL idl = loadIDL(idlName);
-    idl = astTransformer.toStringTemplateAST(idl);
+    final IDL idl = loadIDL(idlName);
     idlCompiler.visit(idl, context);
   }
 }
