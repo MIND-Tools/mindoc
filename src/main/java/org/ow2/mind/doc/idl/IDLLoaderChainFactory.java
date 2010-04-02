@@ -22,8 +22,6 @@
 
 package org.ow2.mind.doc.idl;
 
-import org.objectweb.fractal.adl.NodeFactoryImpl;
-import org.objectweb.fractal.adl.xml.XMLNodeFactoryImpl;
 import org.ow2.mind.annotation.AnnotationChainFactory;
 import org.ow2.mind.doc.idl.parser.IDLFileLoader;
 import org.ow2.mind.idl.BasicIDLLocator;
@@ -48,6 +46,8 @@ import org.ow2.mind.idl.ReferencedInterfaceResolver;
 import org.ow2.mind.idl.annotation.AnnotationLoader;
 import org.ow2.mind.idl.annotation.AnnotationProcessorLoader;
 import org.ow2.mind.idl.annotation.IDLLoaderPhase;
+import org.ow2.mind.st.STNodeFactoryImpl;
+import org.ow2.mind.st.XMLSTNodeFactoryImpl;
 
 
 public final class IDLLoaderChainFactory {
@@ -137,8 +137,8 @@ public final class IDLLoaderChainFactory {
     ifl.idlLocatorItf = idlLocator;
 
     // node factories
-    final XMLNodeFactoryImpl xnf = new XMLNodeFactoryImpl();
-    final NodeFactoryImpl nf = new NodeFactoryImpl();
+    final XMLSTNodeFactoryImpl xnf = new XMLSTNodeFactoryImpl();
+    final STNodeFactoryImpl nf = new STNodeFactoryImpl();
     ifl.nodeFactoryItf = xnf;
     ihr.nodeFactoryItf = nf;
 
