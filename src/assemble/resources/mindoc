@@ -150,17 +150,17 @@ fi
 
 JAR_SET=`ls "$MINDOC_LIB"`
 for i in $JAR_SET; do
-  if [ -z "$MINDOC_CLASSPATH" ] ; then
+  if [ -z "$MIND_CLASSPATH" ] ; then
     if $cygwin; then
-      MINDOC_CLASSPATH="${MINDOC_LIB}\\${i}"
+      MIND_CLASSPATH="${MINDOC_LIB}\\${i}"
     else
-      MINDOC_CLASSPATH="${MINDOC_LIB}/${i}"
+      MIND_CLASSPATH="${MINDOC_LIB}/${i}"
     fi
   else
     if $cygwin; then
-      MINDOC_CLASSPATH="${MINDOC_CLASSPATH};${MINDOC_LIB}\\${i}"
+      MIND_CLASSPATH="${MIND_CLASSPATH};${MINDOC_LIB}\\${i}"
     else
-      MINDOC_CLASSPATH="${MINDOC_CLASSPATH}:${MINDOC_LIB}/${i}"
+      MIND_CLASSPATH="${MIND_CLASSPATH}:${MINDOC_LIB}/${i}"
     fi
   fi
 done
@@ -170,11 +170,11 @@ export MINDOC_HOME
 ##########################################
 #echo MINDOC_HOME=$MINDOC_HOME
 #echo MINDOC_LIB=$MINDOC_LIB
-#echo MINDOC_CLASSPATH=$MINDOC_CLASSPATH
+#echo MIND_CLASSPATH=$MIND_CLASSPATH
 ###########################################
 
 exec "$JAVACMD" \
-  -classpath "${MINDOC_CLASSPATH}" \
+  -classpath "${MIND_CLASSPATH}" \
   ${MINDOC_OPTS} \
   ${LAUNCHER} \
   "$@"

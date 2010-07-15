@@ -38,7 +38,7 @@ public final class IDLBackendFactory {
   }
 
   public static IDLVisitor newIDLCompiler() {
-    final IDLLoader idlLoader = IDLLoaderChainFactory.newLoader();
+    final IDLLoader idlLoader = IDLLoaderChainFactory.newLoader().loader;
     final BasicInputResourceLocator inputResourceLocator = new BasicInputResourceLocator();
     final BasicOutputFileLocator outputFileLocator = new BasicOutputFileLocator();
 

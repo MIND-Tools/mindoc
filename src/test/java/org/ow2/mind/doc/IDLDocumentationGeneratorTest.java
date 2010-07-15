@@ -1,8 +1,6 @@
 package org.ow2.mind.doc;
 
 import java.io.File;
-import java.io.IOException;
-
 import org.ow2.mind.doc.DefinitionDocumentGenerator;
 import org.testng.annotations.Test;
 
@@ -11,7 +9,7 @@ public class IDLDocumentationGeneratorTest {
   private final File source[] = new File[] { new File("src/test/resources")};
   DefinitionDocumentGenerator generator;
 
-  public IDLDocumentationGeneratorTest() throws IOException {
+  public IDLDocumentationGeneratorTest() throws Exception {
     generator = new DefinitionDocumentGenerator(source, source[0], target);
   }
 

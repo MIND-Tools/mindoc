@@ -36,7 +36,10 @@ import org.objectweb.fractal.adl.xml.XMLNodeFactoryImpl;
 import org.ow2.mind.BasicInputResourceLocator;
 import org.ow2.mind.adl.ADLLocator;
 import org.ow2.mind.adl.DefinitionCompiler;
+import org.ow2.mind.adl.implementation.BasicImplementationLocator;
+import org.ow2.mind.adl.implementation.ImplementationLocator;
 import org.ow2.mind.annotation.AnnotationLocatorHelper;
+import org.ow2.mind.annotation.PredefinedAnnotationsHelper;
 import org.ow2.mind.doc.adl.DocumentationBackendFactory;
 import org.ow2.mind.doc.adl.DocumentationFrontendFactory;
 import org.ow2.mind.doc.idl.IDLBackendFactory;
@@ -44,9 +47,12 @@ import org.ow2.mind.doc.idl.IDLLoaderChainFactory;
 import org.ow2.mind.idl.IDLLoader;
 import org.ow2.mind.idl.IDLLocator;
 import org.ow2.mind.idl.IDLVisitor;
+import org.ow2.mind.idl.IDLLoaderChainFactory.IDLFrontend;
 import org.ow2.mind.idl.ast.IDL;
 import org.ow2.mind.io.BasicOutputFileLocator;
+import org.ow2.mind.plugin.BasicPluginManager;
 import org.ow2.mind.plugin.SimpleClassPluginFactory;
+import org.ow2.mind.st.STNodeFactoryImpl;
 import org.ow2.mind.st.StringTemplateComponentLoader;
 import org.ow2.mind.st.templates.parser.StringTemplateLoader;
 
@@ -62,35 +68,7 @@ public class DefinitionDocumentGenerator {
 
   public Map<Object, Object>          context;
 
-  public DefinitionDocumentGenerator(final File sourceDirectories[], final File rootDirectory, final File targetDirectory) throws IOException {
-
-    // input locators
-    final BasicInputResourceLocator inputResourceLocator = new BasicInputResourceLocator();
-    final IDLLocator idlLocator = IDLLoaderChainFactory.newLocator();
-    final ADLLocator adlLocator = DocumentationFrontendFactory.newLocator();
-
-    // String Template Component Loaders
-    final StringTemplateComponentLoader stcLoader = new StringTemplateComponentLoader();
-    final StringTemplateLoader templateLoader = new StringTemplateLoader();
-    final XMLNodeFactory nodeFactory = new XMLNodeFactoryImpl();
-
-    templateLoader.nodeFactoryItf = nodeFactory;
-    stcLoader.loaderItf = templateLoader;
-
-    // Plugin Manager Components
-    final org.objectweb.fractal.adl.Factory pluginFactory = new SimpleClassPluginFactory();
-
-    // loader chains
-    idlLoader = IDLLoaderChainFactory.newLoader(idlLocator);
-    adlLoader = DocumentationFrontendFactory.newLoader(inputResourceLocator,
-        adlLocator, idlLocator, idlLoader, pluginFactory);
-
-    // instantiator chain
-    // graphInstantiator = Factory.newInstantiator(adlLoader);
-
-    adlCompiler = DocumentationBackendFactory.newDefinitionCompiler();
-
-    idlCompiler = IDLBackendFactory.newIDLCompiler();
+  public DefinitionDocumentGenerator(final File sourceDirectories[], final File rootDirectory, final File targetDirectory) throws IOException, CompilerInstantiationException, ADLException {
 
     // init context
     context = new HashMap<Object, Object>();
@@ -101,8 +79,67 @@ public class DefinitionDocumentGenerator {
       urls[i] = directory.toURI().toURL();
     }
 
+    // input locators
+    final BasicInputResourceLocator inputResourceLocator = new BasicInputResourceLocator();
+    final IDLLocator idlLocator = IDLLoaderChainFactory.newIDLLocator(inputResourceLocator);
+    final ADLLocator adlLocator = DocumentationFrontendFactory.newADLLocator(inputResourceLocator);
+    final ImplementationLocator implementationLocator = new BasicImplementationLocator();
+
+    // String Template Component Loaders
+    final StringTemplateComponentLoader stcLoader = new StringTemplateComponentLoader();
+    final StringTemplateLoader templateLoader = new StringTemplateLoader();
+    final XMLNodeFactory nodeFactory = new XMLNodeFactoryImpl();
+
+    templateLoader.nodeFactoryItf = nodeFactory;
+    stcLoader.loaderItf = templateLoader;
+
+    /****** Initialization of the PluginManager Component *******/
+    // NodeFactory Component
+    final STNodeFactoryImpl stNodeFactory = new STNodeFactoryImpl();
+
+    final BasicPluginManager pluginManager = new BasicPluginManager();
+    final ClassLoader pluginClassLoader = BasicPluginManager
+        .getPluginClassLoader(context);
+    if (pluginClassLoader != null) {
+      pluginManager.setClassLoader(pluginClassLoader);
+    }
+    pluginManager.nodeFactoryItf = stNodeFactory;
+    //force the manager to load plugins
+    pluginManager.getExtensionPointNames(context);
+
+    final org.objectweb.fractal.adl.Factory pluginFactory = new SimpleClassPluginFactory();
+
+    // loader chains
+    final IDLFrontend idlFrontend = IDLLoaderChainFactory.newLoader(idlLocator, inputResourceLocator, pluginFactory);
+
+    idlLoader = idlFrontend.loader;
+
+    adlLoader = DocumentationFrontendFactory.newLoader(inputResourceLocator,
+        adlLocator, idlLocator, implementationLocator, idlFrontend.cache, idlLoader, pluginFactory);
+
+    // instantiator chain
+    // graphInstantiator = Factory.newInstantiator(adlLoader);
+
+    adlCompiler = DocumentationBackendFactory.newDefinitionCompiler();
+
+    idlCompiler = IDLBackendFactory.newIDLCompiler();
+
     AnnotationLocatorHelper.addDefaultAnnotationPackage("org.ow2.mind.adl.annotation.predefined",
         context);
+
+    String[] annotationPackages;
+    try {
+      annotationPackages = PredefinedAnnotationsHelper
+          .getPredefinedAnnotations(pluginManager, context);
+    } catch (final ADLException e) {
+      throw new CompilerInstantiationException(
+          "Cannot load predefined annotations.", e, 101);
+    }
+    for (final String annotationPackage : annotationPackages) {
+      System.out.println("Annotation package:" + annotationPackage);
+      AnnotationLocatorHelper.addDefaultAnnotationPackage(annotationPackage,
+          context);
+    }
 
     final ClassLoader srcClassLoader = new URLClassLoader(urls, getClass().getClassLoader());
     context.put("classloader", srcClassLoader);
@@ -127,5 +164,25 @@ public class DefinitionDocumentGenerator {
       throws ADLException, InterruptedException {
     final IDL idl = loadIDL(idlName);
     idlCompiler.visit(idl, context);
+  }
+
+  /**
+   * Exception thrown when the compiler can't be instantiated.
+   */
+  public static class CompilerInstantiationException extends Exception {
+
+    final int exitValue;
+
+    /**
+     * @param message detail message.
+     * @param cause cause.
+     * @param exitValue exit value.
+     */
+    public CompilerInstantiationException(final String message,
+        final Throwable cause, final int exitValue) {
+      super(message, cause);
+      this.exitValue = exitValue;
+    }
+
   }
 }
