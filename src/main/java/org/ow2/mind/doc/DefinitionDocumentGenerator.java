@@ -136,7 +136,6 @@ public class DefinitionDocumentGenerator {
           "Cannot load predefined annotations.", e, 101);
     }
     for (final String annotationPackage : annotationPackages) {
-      System.out.println("Annotation package:" + annotationPackage);
       AnnotationLocatorHelper.addDefaultAnnotationPackage(annotationPackage,
           context);
     }
