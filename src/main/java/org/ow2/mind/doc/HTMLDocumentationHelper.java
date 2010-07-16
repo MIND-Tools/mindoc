@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2009 STMicroelectronics
  *
- * This file is part of "Mind Compiler" is free software: you can redistribute 
- * it and/or modify it under the terms of the GNU Lesser General Public License 
- * as published by the Free Software Foundation, either version 3 of the 
+ * This file is part of "Mind Compiler" is free software: you can redistribute
+ * it and/or modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
  * details.
@@ -17,7 +17,7 @@
  * Contact: mind@ow2.org
  *
  * Authors: michel.metzger@st.com
- * Contributors: 
+ * Contributors:
  */
 
 package org.ow2.mind.doc;
@@ -28,6 +28,7 @@ import static org.ow2.mind.PathHelper.fullyQualifiedNameToPath;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +36,7 @@ import org.objectweb.fractal.adl.Node;
 import org.ow2.mind.NameHelper;
 import org.ow2.mind.PathHelper;
 import org.ow2.mind.annotation.Annotation;
+import org.ow2.mind.annotation.AnnotationElement;
 import org.ow2.mind.annotation.AnnotationHelper;
 import org.ow2.mind.value.ast.BooleanLiteral;
 import org.ow2.mind.value.ast.NumberLiteral;
@@ -294,15 +296,41 @@ public final class HTMLDocumentationHelper {
     return sb.toString();
   }
 
+  public static class AnnotationDecoration {
+    public String name;
+    public String parameterString = null;
+
+    public AnnotationDecoration(final Annotation annotation) {
+      name = annotation.getClass().getName();
+      final StringBuilder sb = new StringBuilder();
+      for(final Field f: annotation.getClass().getFields()) {
+        if(f.getAnnotation(AnnotationElement.class) != null) {
+          try {
+            sb.append(f.getName());
+            sb.append("=");
+            sb.append(f.get(annotation).toString());
+            sb.append(",");
+          } catch (final Exception e) {
+            //ignore
+          }
+        }
+      }
+      if(sb.length() > 1) {
+        sb.deleteCharAt(sb.length()-1);
+        parameterString = sb.toString();
+      }
+    }
+  }
+
   public static void addAnnotationDecoration(
       final Node container) {
     final Annotation annotations[] = AnnotationHelper.getAnnotations(container);
     if(annotations != null) {
-      final List<String> annotationsList = new ArrayList<String>(annotations.length);
+      final List<AnnotationDecoration> annotationsList = new ArrayList<AnnotationDecoration>(annotations.length);
       for (final Annotation annotation : annotations) {
-        annotationsList.add(annotation.getClass().getName());
+        annotationsList.add(new AnnotationDecoration(annotation));
+        container.astSetDecoration("annotation_list", annotationsList);
       }
-      container.astSetDecoration("annotation_list", annotationsList);
     }
   }
 

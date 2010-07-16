@@ -261,7 +261,7 @@ annotationList(element) ::= <<
 $if(element.astDecorations.annotation_list)$
 <h3>Annotations:</h3>
 <p class="indent">
-$element.astDecorations.annotation_list:{$it$
+$element.astDecorations.annotation_list:{$it.name$$if(it.parameterString)$($it.parameterString$)$endif$
 }; separator="<br/>"$
 </p>
 $endif$

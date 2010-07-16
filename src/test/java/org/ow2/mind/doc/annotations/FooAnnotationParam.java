@@ -24,10 +24,11 @@ package org.ow2.mind.doc.annotations;
 
 import org.ow2.mind.adl.annotation.ADLAnnotationTarget;
 import org.ow2.mind.annotation.Annotation;
+import org.ow2.mind.annotation.AnnotationElement;
 import org.ow2.mind.annotation.AnnotationTarget;
 import org.ow2.mind.idl.annotation.IDLAnnotationTarget;
 
-public class FooAnnotation implements Annotation {
+public class FooAnnotationParam implements Annotation {
 
   private static final AnnotationTarget[] TARGETS = {
       IDLAnnotationTarget.INTERFACE, IDLAnnotationTarget.METHOD,
@@ -35,6 +36,9 @@ public class FooAnnotation implements Annotation {
       ADLAnnotationTarget.BINDING, ADLAnnotationTarget.INTERFACE,
       ADLAnnotationTarget.SOURCE, ADLAnnotationTarget.DATA,
       ADLAnnotationTarget.ATTRIBUTE};
+
+  @AnnotationElement
+  public String value = null;
 
   public AnnotationTarget[] getAnnotationTargets() {
     return TARGETS;
