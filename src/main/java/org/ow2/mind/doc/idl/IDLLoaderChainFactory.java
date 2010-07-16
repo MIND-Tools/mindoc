@@ -22,29 +22,15 @@
 
 package org.ow2.mind.doc.idl;
 
-import static org.ow2.mind.idl.IDLLocator.IDT_RESOURCE_KIND;
-import static org.ow2.mind.idl.IDLLocator.ITF_RESOURCE_KIND;
-
-import org.objectweb.fractal.adl.CompilerError;
-import org.objectweb.fractal.adl.NodeFactory;
-import org.objectweb.fractal.adl.error.GenericErrors;
-import org.objectweb.fractal.adl.merger.NodeMerger;
-import org.objectweb.fractal.api.control.BindingController;
-import org.objectweb.fractal.cecilia.adl.plugin.JavaPluginManager;
-import org.objectweb.fractal.cecilia.adl.plugin.PluginManager;
-import org.ow2.mind.BasicInputResourceLocator;
-import org.ow2.mind.InputResourceLocator;
 import org.ow2.mind.annotation.AnnotationChainFactory;
 import org.ow2.mind.doc.idl.parser.IDLFileLoader;
 import org.ow2.mind.idl.BasicIDLLocator;
 import org.ow2.mind.idl.BasicIncludeResolver;
 import org.ow2.mind.idl.BasicInterfaceReferenceResolver;
-import org.ow2.mind.idl.BinaryIDLLoader;
 import org.ow2.mind.idl.CacheIDLLoader;
 import org.ow2.mind.idl.CachingIncludeResolver;
 import org.ow2.mind.idl.ExtendsInterfaceLoader;
 import org.ow2.mind.idl.HeaderLoader;
-import org.ow2.mind.idl.IDLCache;
 import org.ow2.mind.idl.IDLLoader;
 import org.ow2.mind.idl.IDLLocator;
 import org.ow2.mind.idl.IDLTypeCheckerLoader;
@@ -58,57 +44,34 @@ import org.ow2.mind.idl.KindDecorationLoader;
 import org.ow2.mind.idl.RecursiveIDLLoader;
 import org.ow2.mind.idl.RecursiveIDLLoaderImpl;
 import org.ow2.mind.idl.ReferencedInterfaceResolver;
-import org.ow2.mind.idl.IDLLoaderChainFactory.IDLFrontend;
 import org.ow2.mind.idl.annotation.AnnotationLoader;
 import org.ow2.mind.idl.annotation.AnnotationProcessorLoader;
 import org.ow2.mind.idl.annotation.IDLLoaderPhase;
-import org.ow2.mind.plugin.SimpleClassPluginFactory;
-import org.ow2.mind.st.STLoaderFactory;
 import org.ow2.mind.st.STNodeFactoryImpl;
-import org.ow2.mind.st.STNodeMergerImpl;
 import org.ow2.mind.st.XMLSTNodeFactoryImpl;
+
 
 public final class IDLLoaderChainFactory {
 
   private IDLLoaderChainFactory() {
   }
 
-  public static IDLLocator newIDLLocator(
-      final BasicInputResourceLocator inputResourceLocator) {
-    final IDLLocator idlLocator = new BasicIDLLocator();
-    inputResourceLocator.genericResourceLocators.put(IDT_RESOURCE_KIND,
-        idlLocator);
-    inputResourceLocator.genericResourceLocators.put(ITF_RESOURCE_KIND,
-        idlLocator);
+  public static IDLLocator newLocator() {
+    IDLLocator idlLocator;
+    final BasicIDLLocator bil = new BasicIDLLocator();
+    idlLocator = bil;
+
     return idlLocator;
   }
 
-  public static IDLFrontend newLoader() {
-    final BasicInputResourceLocator inputResourceLocator = new BasicInputResourceLocator();
-
-    final org.objectweb.fractal.adl.Factory pluginFactory;
-    final SimpleClassPluginFactory scpf = new SimpleClassPluginFactory();
-
-    // Configuration of plugin factory components
-    pluginFactory = scpf;
-
-    return newLoader(newIDLLocator(inputResourceLocator), inputResourceLocator,
-        pluginFactory);
+  public static IDLLoader newLoader() {
+    return newLoader(newLocator());
   }
 
-  public static IDLFrontend newLoader(final IDLLocator idlLocator,
-      final InputResourceLocator inputResourceLocator,
-      final org.objectweb.fractal.adl.Factory pluginFactory) {
-
-    // plugin manager components
-    PluginManager pluginManager;
-    final JavaPluginManager jpm = new JavaPluginManager();
-    jpm.pluginFactoryItf = pluginFactory;
-    pluginManager = jpm;
+  public static IDLLoader newLoader(final IDLLocator idlLocator) {
 
     // Loader chain components
     IDLLoader idlLoader;
-    IDLCache idlCache;
     final IDLFileLoader ifl = new IDLFileLoader();
     final AnnotationLoader al = new AnnotationLoader();
     final AnnotationProcessorLoader apl1 = new AnnotationProcessorLoader();
@@ -117,15 +80,10 @@ public final class IDLLoaderChainFactory {
     final IDLTypeCheckerLoader tcl = new IDLTypeCheckerLoader();
     final KindDecorationLoader kdl = new KindDecorationLoader();
     final AnnotationProcessorLoader apl2 = new AnnotationProcessorLoader();
-    final BinaryIDLLoader bil = new BinaryIDLLoader();
-    final HeaderLoader hl = new HeaderLoader();
     final CacheIDLLoader cil = new CacheIDLLoader();
 
     idlLoader = cil;
-    idlCache = cil;
-    cil.clientIDLLoaderItf = hl;
-    hl.clientIDLLoaderItf = bil;
-    bil.clientIDLLoaderItf = apl2;
+    cil.clientIDLLoaderItf = apl2;
     apl2.clientIDLLoaderItf = kdl;
     kdl.clientIDLLoaderItf = tcl;
     tcl.clientIDLLoaderItf = uil;
@@ -136,8 +94,6 @@ public final class IDLLoaderChainFactory {
 
     apl1.setPhase(IDLLoaderPhase.AFTER_PARSING.name());
     apl2.setPhase(IDLLoaderPhase.AFTER_CHECKING.name());
-    apl1.pluginManagerItf = pluginManager;
-    apl2.pluginManagerItf = pluginManager;
 
     al.annotationCheckerItf = AnnotationChainFactory.newAnnotationChecker();
 
@@ -161,7 +117,6 @@ public final class IDLLoaderChainFactory {
 
     bir.recursiveIdlLoaderItf = recursiveIDLLoader;
     bir.idlLocatorItf = idlLocator;
-    ihr.idlLocatorItf = idlLocator;
     cir.idlLoaderItf = idlLoader;
 
     uil.idlResolverItf = includeResolver;
@@ -181,35 +136,13 @@ public final class IDLLoaderChainFactory {
     tcl.interfaceReferenceResolverItf = interfaceReferenceResolver;
 
     ifl.idlLocatorItf = idlLocator;
-    bil.idlLocatorItf = idlLocator;
 
     // node factories
     final XMLSTNodeFactoryImpl xnf = new XMLSTNodeFactoryImpl();
-    // set my class loader as classloader used by XMLNodeFactory
-    xnf.setClassLoader(IDLLoaderChainFactory.class.getClassLoader());
     final STNodeFactoryImpl nf = new STNodeFactoryImpl();
-    final STNodeMergerImpl nodeMerger = new STNodeMergerImpl();
-    nodeMerger.setClassLoader(IDLLoaderChainFactory.class.getClassLoader());
     ifl.nodeFactoryItf = xnf;
-    hl.nodeFactoryItf = nf;
     ihr.nodeFactoryItf = nf;
 
-    bil.inputResourceLocatorItf = inputResourceLocator;
-
-    // configuration of plugin-manager
-    try {
-      ((BindingController) pluginManager).bindFc(NodeFactory.ITF_NAME, nf);
-      ((BindingController) pluginManager).bindFc(NodeMerger.ITF_NAME,
-          nodeMerger);
-      ((BindingController) pluginManager).bindFc(IDLCache.ITF_NAME, idlCache);
-      ((BindingController) pluginManager).bindFc(IDLLoader.ITF_NAME, idlLoader);
-      ((BindingController) pluginManager).bindFc("template-loader",
-          STLoaderFactory.newSTLoader());
-    } catch (final Exception e) {
-      throw new CompilerError(GenericErrors.INTERNAL_ERROR, e,
-          "adl-frontend instantiation error");
-    }
-
-    return new IDLFrontend(idlLocator, idlCache, idlLoader);
+    return idlLoader;
   }
 }

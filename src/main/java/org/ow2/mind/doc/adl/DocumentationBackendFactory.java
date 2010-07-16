@@ -89,7 +89,7 @@ public final class DocumentationBackendFactory {
   }
 
   public static DefinitionCompiler newDefinitionCompiler() {
-    final IDLLoader idlLoader = IDLLoaderChainFactory.newLoader().loader;
+    final IDLLoader idlLoader = IDLLoaderChainFactory.newLoader();
     final BasicInputResourceLocator inputResourceLocator = new BasicInputResourceLocator();
     final BasicOutputFileLocator outputFileLocator = new BasicOutputFileLocator();
     final ImplementationLocator implementationLocator = new BasicImplementationLocator();

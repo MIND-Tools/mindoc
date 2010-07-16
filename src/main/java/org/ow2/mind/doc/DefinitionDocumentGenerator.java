@@ -36,8 +36,6 @@ import org.objectweb.fractal.adl.xml.XMLNodeFactoryImpl;
 import org.ow2.mind.BasicInputResourceLocator;
 import org.ow2.mind.adl.ADLLocator;
 import org.ow2.mind.adl.DefinitionCompiler;
-import org.ow2.mind.adl.implementation.BasicImplementationLocator;
-import org.ow2.mind.adl.implementation.ImplementationLocator;
 import org.ow2.mind.annotation.AnnotationLocatorHelper;
 import org.ow2.mind.annotation.PredefinedAnnotationsHelper;
 import org.ow2.mind.doc.adl.DocumentationBackendFactory;
@@ -47,7 +45,6 @@ import org.ow2.mind.doc.idl.IDLLoaderChainFactory;
 import org.ow2.mind.idl.IDLLoader;
 import org.ow2.mind.idl.IDLLocator;
 import org.ow2.mind.idl.IDLVisitor;
-import org.ow2.mind.idl.IDLLoaderChainFactory.IDLFrontend;
 import org.ow2.mind.idl.ast.IDL;
 import org.ow2.mind.io.BasicOutputFileLocator;
 import org.ow2.mind.plugin.BasicPluginManager;
@@ -81,9 +78,8 @@ public class DefinitionDocumentGenerator {
 
     // input locators
     final BasicInputResourceLocator inputResourceLocator = new BasicInputResourceLocator();
-    final IDLLocator idlLocator = IDLLoaderChainFactory.newIDLLocator(inputResourceLocator);
-    final ADLLocator adlLocator = DocumentationFrontendFactory.newADLLocator(inputResourceLocator);
-    final ImplementationLocator implementationLocator = new BasicImplementationLocator();
+    final IDLLocator idlLocator = IDLLoaderChainFactory.newLocator();
+    final ADLLocator adlLocator = DocumentationFrontendFactory.newLocator();
 
     // String Template Component Loaders
     final StringTemplateComponentLoader stcLoader = new StringTemplateComponentLoader();
@@ -110,12 +106,11 @@ public class DefinitionDocumentGenerator {
     final org.objectweb.fractal.adl.Factory pluginFactory = new SimpleClassPluginFactory();
 
     // loader chains
-    final IDLFrontend idlFrontend = IDLLoaderChainFactory.newLoader(idlLocator, inputResourceLocator, pluginFactory);
+    idlLoader = IDLLoaderChainFactory.newLoader(idlLocator);
 
-    idlLoader = idlFrontend.loader;
 
     adlLoader = DocumentationFrontendFactory.newLoader(inputResourceLocator,
-        adlLocator, idlLocator, implementationLocator, idlFrontend.cache, idlLoader, pluginFactory);
+        adlLocator, idlLocator, idlLoader, pluginFactory);
 
     // instantiator chain
     // graphInstantiator = Factory.newInstantiator(adlLoader);

@@ -61,7 +61,7 @@ public class DefinitionTreeDocumentationGenerator extends DirectoryWalker {
 
   @SuppressWarnings("unchecked")
   @Override
-  protected void handleFile(final File file, final int depth, final Collection results)
+  protected void handleFile(final File file, final int depth, @SuppressWarnings("rawtypes") final Collection results)
   throws IOException {
     results.add(file);
   }
