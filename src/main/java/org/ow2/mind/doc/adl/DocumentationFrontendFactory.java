@@ -23,8 +23,6 @@
 package org.ow2.mind.doc.adl;
 
 import static org.ow2.mind.adl.ADLLocator.ADL_RESOURCE_KIND;
-import static org.ow2.mind.idl.IDLLocator.IDT_RESOURCE_KIND;
-import static org.ow2.mind.idl.IDLLocator.ITF_RESOURCE_KIND;
 import org.objectweb.fractal.adl.Loader;
 import org.objectweb.fractal.adl.NodeFactory;
 import org.objectweb.fractal.adl.merger.NodeMerger;
@@ -120,20 +118,16 @@ public final class DocumentationFrontendFactory {
     final ADLLocator adlLocator = newLocator();
     final IDLLocator idlLocator = IDLLoaderChainFactory
         .newIDLLocator(inputResourceLocator);
-    // IDL Loader Chain
-    final IDLLoader idlLoader = IDLLoaderChainFactory.newLoader(idlLocator,
-        inputResourceLocator);
     final org.objectweb.fractal.adl.Factory pluginFactory;
     final SimpleClassPluginFactory scpf = new SimpleClassPluginFactory();
 
     // Configuration of plugin factory components
     pluginFactory = scpf;
 
-    // TODO should be moved into IDLFactory
-    inputResourceLocator.genericResourceLocators.put(IDT_RESOURCE_KIND,
-        idlLocator);
-    inputResourceLocator.genericResourceLocators.put(ITF_RESOURCE_KIND,
-        idlLocator);
+    // IDL Loader Chain
+    final IDLLoader idlLoader = IDLLoaderChainFactory.newLoader(idlLocator,
+        inputResourceLocator, pluginFactory).loader;
+
     return newLoader(inputResourceLocator, adlLocator, idlLocator, idlLoader,
         pluginFactory);
   }
