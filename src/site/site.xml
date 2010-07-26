@@ -12,7 +12,7 @@
     Place, Suite 330, Boston, MA 02111-1307 USA
   -->
 
-<project name="Mind Compiler">
+<project name="Mind Documentation Generator">
   <body>
     <menu ref="reports" />
     <menu ref="modules" />
