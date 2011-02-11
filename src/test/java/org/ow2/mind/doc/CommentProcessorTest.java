@@ -3,7 +3,6 @@ package org.ow2.mind.doc;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 
-import org.ow2.mind.doc.adl.parser.CommentProcessor;
 import org.testng.annotations.Test;
 
 

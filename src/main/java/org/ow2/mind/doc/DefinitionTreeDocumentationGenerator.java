@@ -19,41 +19,68 @@
  * Authors: michel.metzger@st.com
  * Contributors:
  */
+
 package org.ow2.mind.doc;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.DirectoryWalker;
 import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.ow2.mind.io.BasicOutputFileLocator;
 
+import com.google.inject.Inject;
 
 public class DefinitionTreeDocumentationGenerator extends DirectoryWalker {
-  private final File sourceDirectories[];
 
-  public DefinitionTreeDocumentationGenerator(final File sourceDirectories[]) {
-    super(FileFilterUtils.trueFileFilter(),
-        FileFilterUtils.orFileFilter(FileFilterUtils.suffixFileFilter(".adl"),
-            FileFilterUtils.suffixFileFilter(".itf")),
-        -1);
-    this.sourceDirectories = sourceDirectories;
+  @Inject
+  DefinitionDocumentGenerator generator;
+
+  public DefinitionTreeDocumentationGenerator() {
+    super(FileFilterUtils.trueFileFilter(), FileFilterUtils.orFileFilter(
+        FileFilterUtils.suffixFileFilter(".adl"),
+        FileFilterUtils.suffixFileFilter(".itf")), -1);
   }
 
-  public void generateDocumentation(final File targetDirectory) throws Exception{
+  public void generateDocumentation(final File sourceDirectories[],
+      final File targetDirectory, final Map<Object, Object> context) throws Exception {
+
+    final Map<Object, Object> ctx = new HashMap<Object, Object>(context);
+    ctx.put(BasicOutputFileLocator.OUTPUT_DIR_CONTEXT_KEY, targetDirectory);
+    final URL urls[] = new URL[sourceDirectories.length];
+    for (int i = 0; i < sourceDirectories.length; i++) {
+      final File directory = sourceDirectories[i];
+      urls[i] = directory.toURI().toURL();
+    }
+
+    final ClassLoader srcClassLoader = new URLClassLoader(urls,
+        Launcher.class.getClassLoader());
+    ctx.put("classloader", srcClassLoader);
+
     for (final File rootDirectory : sourceDirectories) {
       final List<File> definitions = new LinkedList<File>();
+
       walk(rootDirectory, definitions);
-      final DefinitionDocumentGenerator generator = new DefinitionDocumentGenerator(sourceDirectories, rootDirectory, targetDirectory);
+
+      ctx.put("sourceDirectory", rootDirectory);
+
       for (final File definition : definitions) {
-        final String definitionName = HTMLDocumentationHelper.getDefinitionName(rootDirectory.getCanonicalPath(), definition.getCanonicalPath());
+        final String definitionName = HTMLDocumentationHelper
+            .getDefinitionName(rootDirectory.getCanonicalPath(),
+                definition.getCanonicalPath());
+
         Launcher.logger.finer("Generating documentation for " + definitionName);
-        if(definition.getName().endsWith(".adl")) {
-          generator.generateADLDocumentation(definitionName);
-        } else if(definition.getName().endsWith(".itf")) {
-          generator.generateIDLDocumentation(definitionName);
+        if (definition.getName().endsWith(".adl")) {
+          generator.generateADLDocumentation(definitionName, ctx);
+        } else if (definition.getName().endsWith(".itf")) {
+          generator.generateIDLDocumentation(definitionName, ctx);
         }
       }
     }
@@ -61,8 +88,10 @@ public class DefinitionTreeDocumentationGenerator extends DirectoryWalker {
 
   @SuppressWarnings("unchecked")
   @Override
-  protected void handleFile(final File file, final int depth, @SuppressWarnings("rawtypes") final Collection results)
-  throws IOException {
+  protected void handleFile(final File file, final int depth,
+      @SuppressWarnings("rawtypes") final Collection results)
+      throws IOException {
     results.add(file);
   }
+
 }
