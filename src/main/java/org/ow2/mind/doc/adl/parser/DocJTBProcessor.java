@@ -25,7 +25,6 @@ package org.ow2.mind.doc.adl.parser;
 import static org.ow2.mind.doc.ast.CommentDecoration.setComment;
 
 import org.objectweb.fractal.adl.Node;
-import org.objectweb.fractal.adl.xml.XMLNodeFactory;
 import org.ow2.mind.adl.jtb.syntaxtree.Annotation;
 import org.ow2.mind.adl.jtb.syntaxtree.Annotations;
 import org.ow2.mind.adl.jtb.syntaxtree.AttributeDefinition;
@@ -39,19 +38,8 @@ import org.ow2.mind.adl.jtb.syntaxtree.PrimitiveDefinition;
 import org.ow2.mind.adl.jtb.syntaxtree.SubComponentDefinition;
 import org.ow2.mind.adl.jtb.syntaxtree.TypeDefinition;
 import org.ow2.mind.doc.CommentProcessor;
-import org.ow2.mind.error.ErrorManager;
-
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 public class DocJTBProcessor extends org.ow2.mind.adl.parser.JTBProcessor {
-
-  @Inject
-  protected DocJTBProcessor(final ErrorManager errorManager,
-      final XMLNodeFactory nodeFactory, @Named(ADL_DTD) final String adlDtd,
-      final String filename) {
-    super(errorManager, nodeFactory, adlDtd, filename);
-  }
 
   private NodeToken getCommentFromAnnotation(final Annotations annotation) {
     NodeToken commentToken = null;
