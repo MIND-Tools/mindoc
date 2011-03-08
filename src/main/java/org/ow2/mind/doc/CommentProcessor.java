@@ -20,7 +20,7 @@
  * Contributors: 
  */
 
-package org.ow2.mind.doc.adl.parser;
+package org.ow2.mind.doc;
 
 public final class CommentProcessor {
 

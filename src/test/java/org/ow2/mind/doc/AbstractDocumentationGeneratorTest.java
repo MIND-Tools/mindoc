@@ -24,36 +24,58 @@ package org.ow2.mind.doc;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.objectweb.fractal.adl.ADLException;
 import org.ow2.mind.doc.DefinitionDocumentGenerator;
+import org.ow2.mind.inject.GuiceModuleExtensionHelper;
+import org.ow2.mind.plugin.PluginLoaderModule;
+import org.ow2.mind.plugin.PluginManager;
+import org.testng.annotations.BeforeTest;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 public class AbstractDocumentationGeneratorTest {
-  private final File target = new File("target/doc");
-  private final File sources[] = new File[] { new File("src/test/resources")};
+  protected final File                    target    = new File("target/doc");
+  protected final File                    sources[] = new File[]{new File(
+                                                      "src/test/resources")};
 
-  DefinitionDocumentGenerator generator;
+  protected DefinitionDocumentGenerator generator;
+  protected Map<Object, Object>         context;
+  protected Injector injector;
 
-  public AbstractDocumentationGeneratorTest() throws Exception  {
-    generator = new DefinitionDocumentGenerator(sources, sources[0], target);
+  @BeforeTest(alwaysRun = true)
+  public void setUp() throws Exception {
+    context = new HashMap<Object, Object>();
+
+    // create plugin manager
+    final Injector pluginManagerInjector = Guice
+        .createInjector(new PluginLoaderModule());
+    final PluginManager pluginManager = pluginManagerInjector
+        .getInstance(PluginManager.class);
+
+    // init context
+
+    // Put this in context to enable mindoc Guice modules.
+    context.put("org.ow2.mind.doc.GenrateDoc", Boolean.TRUE);
+
+    injector = Guice.createInjector(GuiceModuleExtensionHelper
+        .getModules(pluginManager, context));
+    context.put("sourceDirectory", sources[0]);
+
+    generator = injector.getInstance(DefinitionDocumentGenerator.class);
   }
 
-  /*public Definition loadADL(final String adlName) throws ADLException {
-    return generator.load(adlName);
-  }*/
-
-  public Collection<File> compileADL(final String adlName)
-      throws ADLException, InterruptedException {
-    generator.generateADLDocumentation(adlName);
+  public Collection<File> compileADL(final String adlName) throws ADLException,
+      InterruptedException {
+    generator.generateADLDocumentation(adlName, context);
     return null;
   }
 
-  /*public IDL loadIDL(final String idlName) throws ADLException {
-    return generator.loadIDL(idlName);
-  }*/
-
-  public void compileIDL(final String idlName)
-      throws ADLException, InterruptedException {
-    generator.generateIDLDocumentation(idlName);
+  public void compileIDL(final String idlName) throws ADLException,
+      InterruptedException {
+    generator.generateIDLDocumentation(idlName, context);
   }
 }

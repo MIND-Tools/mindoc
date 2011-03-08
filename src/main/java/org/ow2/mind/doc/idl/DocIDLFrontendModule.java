@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 STMicroelectronics
+ * Copyright (C) 2010 STMicroelectronics
  *
  * This file is part of "Mind Compiler" is free software: you can redistribute
  * it and/or modify it under the terms of the GNU Lesser General Public License
@@ -16,25 +16,20 @@
  *
  * Contact: mind@ow2.org
  *
- * Authors: michel.metzger@st.com
+ * Authors: Matthieu Leclercq
  * Contributors:
  */
 
-package org.ow2.mind.doc;
+package org.ow2.mind.doc.idl;
 
-import org.ow2.mind.doc.DefinitionTreeDocumentationGenerator;
-import org.testng.annotations.Test;
+import org.ow2.mind.doc.idl.parser.DocJTBProcessor;
+import org.ow2.mind.idl.parser.JTBProcessor;
+import org.ow2.mind.inject.AbstractMindModule;
 
-public class ADLDocumentationGeneratorTest
-    extends
-      AbstractDocumentationGeneratorTest {
+public class DocIDLFrontendModule extends AbstractMindModule {
 
-  @Test
-  public void testDefinitionDocumentationGenerator() throws Exception {
-
-    final DefinitionTreeDocumentationGenerator generator = injector
-        .getInstance(DefinitionTreeDocumentationGenerator.class);
-
-    generator.generateDocumentation(sources, target, context);
+  protected void configureJTBProcessor() {
+    bind(JTBProcessor.class).to(DocJTBProcessor.class);
   }
+
 }

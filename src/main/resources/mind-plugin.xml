@@ -1,0 +1,76 @@
+<!--
+  Copyright (C) 2011 STMicroelectronics
+
+ This file is part of "Mind Compiler" is free software: you can redistribute 
+ it and/or modify it under the terms of the GNU Lesser General Public License 
+ as published by the Free Software Foundation, either version 3 of the 
+ License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT 
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+ details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+ Contact: mind@ow2.org
+
+ Authors: Matthieu Leclercq
+ Contributors: 
+
+ -->
+<plugin
+    id="org.ow2.mind.doc"
+    name="Documentation Generator for Mind">
+
+    <extension
+        point="org.ow2.mind.plugin.guice-module">
+        <module
+            class="org.ow2.mind.doc.adl.DocADLFrontendModule">
+            <override
+                class="org.ow2.mind.adl.ADLFrontendModule" />
+            <enableWhen>
+                <contextContains
+                    key="org.ow2.mind.doc.GenrateDoc" />
+            </enableWhen>
+        </module>
+        <module
+            class="org.ow2.mind.doc.adl.DocADLBackendModule">
+            <override
+                class="org.ow2.mind.adl.ADLBackendModule" />
+            <enableWhen>
+                <contextContains
+                    key="org.ow2.mind.doc.GenrateDoc" />
+            </enableWhen>
+        </module>
+        <module
+            class="org.ow2.mind.doc.idl.DocIDLFrontendModule">
+            <override
+                class="org.ow2.mind.idl.IDLFrontendModule" />
+            <enableWhen>
+                <contextContains
+                    key="org.ow2.mind.doc.GenrateDoc" />
+            </enableWhen>
+        </module>
+        <module
+            class="org.ow2.mind.doc.idl.DocIDLBackendModule">
+            <override
+                class="org.ow2.mind.idl.IDLBackendModule" />
+            <enableWhen>
+                <contextContains
+                    key="org.ow2.mind.doc.GenrateDoc" />
+            </enableWhen>
+        </module>
+    </extension>
+
+    <extension
+        point="org.ow2.mind.mindc.command-line-options">
+
+        <cmdFlag
+            id="org.ow2.mind.exportbind.GenerateStub"
+            longName="generate-stub"
+            description="Generate Comete stub and skeleton. When this flag is used on the command line, the definitions are interpreted as the name of the Interface signature of the stub/skeleton to be generated." />
+
+    </extension>
+</plugin>

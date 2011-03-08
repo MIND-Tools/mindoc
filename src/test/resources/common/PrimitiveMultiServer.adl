@@ -2,7 +2,7 @@ primitive common.PrimitiveMultiServer {
 	
 	provides PrintService as serverItf[4];	  
     
-    provides optional PrintService as printServiceCollection[];
+    provides optional PrintService as printServiceCollection[2];
 	
 	source server.c;
 }

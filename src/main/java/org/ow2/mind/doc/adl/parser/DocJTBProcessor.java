@@ -25,7 +25,6 @@ package org.ow2.mind.doc.adl.parser;
 import static org.ow2.mind.doc.ast.CommentDecoration.setComment;
 
 import org.objectweb.fractal.adl.Node;
-import org.objectweb.fractal.adl.xml.XMLNodeFactory;
 import org.ow2.mind.adl.jtb.syntaxtree.Annotation;
 import org.ow2.mind.adl.jtb.syntaxtree.Annotations;
 import org.ow2.mind.adl.jtb.syntaxtree.AttributeDefinition;
@@ -38,20 +37,14 @@ import org.ow2.mind.adl.jtb.syntaxtree.NodeToken;
 import org.ow2.mind.adl.jtb.syntaxtree.PrimitiveDefinition;
 import org.ow2.mind.adl.jtb.syntaxtree.SubComponentDefinition;
 import org.ow2.mind.adl.jtb.syntaxtree.TypeDefinition;
+import org.ow2.mind.doc.CommentProcessor;
 
-public class JTBProcessor
-    extends
-      org.ow2.mind.adl.parser.JTBProcessor {
-
-  public JTBProcessor(final XMLNodeFactory nodeFactory, final String adlDtd,
-      final String filename) {
-    super(nodeFactory, adlDtd, filename);
-  }
+public class DocJTBProcessor extends org.ow2.mind.adl.parser.JTBProcessor {
 
   private NodeToken getCommentFromAnnotation(final Annotations annotation) {
     NodeToken commentToken = null;
-    if(annotation.f0.present()) {
-      commentToken = ((Annotation)annotation.f0.elementAt(0)).f0;
+    if (annotation.f0.present()) {
+      commentToken = ((Annotation) annotation.f0.elementAt(0)).f0;
     }
     return commentToken;
   }
@@ -74,8 +67,7 @@ public class JTBProcessor
     final Node result = super.visit(n, argu);
 
     NodeToken commentToken = getCommentFromAnnotation(n.f0);
-    if(commentToken == null)
-      commentToken = n.f1;
+    if (commentToken == null) commentToken = n.f1;
     setComment(result, getComment(commentToken));
 
     return result;
@@ -85,7 +77,7 @@ public class JTBProcessor
   public Node visit(final PrimitiveDefinition n, final Node argu) {
     final Node result = super.visit(n, argu);
     NodeToken commentToken = getCommentFromAnnotation(n.f0);
-    if(commentToken == null) {
+    if (commentToken == null) {
       if (n.f1.present()) {
         commentToken = (NodeToken) n.f1.node;
       } else {
@@ -102,8 +94,7 @@ public class JTBProcessor
     final Node result = super.visit(n, argu);
 
     NodeToken commentToken = getCommentFromAnnotation(n.f0);
-    if(commentToken == null)
-      commentToken = n.f1;
+    if (commentToken == null) commentToken = n.f1;
     setComment(result, getComment(commentToken));
     return result;
   }
@@ -112,8 +103,7 @@ public class JTBProcessor
   public Node visit(final SubComponentDefinition n, final Node argu) {
     final Node result = super.visit(n, argu);
     NodeToken commentToken = getCommentFromAnnotation(n.f0);
-    if(commentToken == null)
-      commentToken = n.f1;
+    if (commentToken == null) commentToken = n.f1;
     setComment(result, getComment(commentToken));
     return result;
   }
@@ -122,8 +112,7 @@ public class JTBProcessor
   public Node visit(final BindingDefinition n, final Node argu) {
     final Node result = super.visit(n, argu);
     NodeToken commentToken = getCommentFromAnnotation(n.f0);
-    if(commentToken == null)
-      commentToken = n.f1;
+    if (commentToken == null) commentToken = n.f1;
     setComment(result, getComment(commentToken));
     return result;
   }
@@ -132,8 +121,7 @@ public class JTBProcessor
   public Node visit(final InterfaceDefinition n, final Node argu) {
     final Node result = super.visit(n, argu);
     NodeToken commentToken = getCommentFromAnnotation(n.f0);
-    if(commentToken == null)
-      commentToken = (NodeToken) n.f1.choice;
+    if (commentToken == null) commentToken = (NodeToken) n.f1.choice;
     setComment(result, getComment(commentToken));
     return result;
   }
@@ -142,8 +130,7 @@ public class JTBProcessor
   public Node visit(final AttributeDefinition n, final Node argu) {
     final Node result = super.visit(n, argu);
     NodeToken commentToken = getCommentFromAnnotation(n.f0);
-    if(commentToken == null)
-      commentToken = n.f1;
+    if (commentToken == null) commentToken = n.f1;
     setComment(result, getComment(commentToken));
     return result;
   }
@@ -152,8 +139,7 @@ public class JTBProcessor
   public Node visit(final DataDefinition n, final Node argu) {
     final Node result = super.visit(n, argu);
     NodeToken commentToken = getCommentFromAnnotation(n.f0);
-    if(commentToken == null)
-      commentToken = n.f1;
+    if (commentToken == null) commentToken = n.f1;
     setComment(result, getComment(commentToken));
     return result;
   }
@@ -162,8 +148,7 @@ public class JTBProcessor
   public Node visit(final ImplementationDefinition n, final Node argu) {
     final Node result = super.visit(n, argu);
     NodeToken commentToken = getCommentFromAnnotation(n.f0);
-    if(commentToken == null)
-      commentToken = n.f1;
+    if (commentToken == null) commentToken = n.f1;
     setComment(result, getComment(commentToken));
     return result;
   }
