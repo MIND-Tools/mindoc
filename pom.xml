@@ -72,7 +72,7 @@
         <dependency>
             <groupId>org.ow2.mind</groupId>
             <artifactId>mindc</artifactId>
-            <version>0.3-alpha-1-SNAPSHOT</version>
+            <version>0.3-beta-1</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
