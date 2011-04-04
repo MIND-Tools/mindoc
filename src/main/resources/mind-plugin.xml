@@ -64,13 +64,4 @@
         </module>
     </extension>
 
-    <extension
-        point="org.ow2.mind.mindc.command-line-options">
-
-        <cmdFlag
-            id="org.ow2.mind.exportbind.GenerateStub"
-            longName="generate-stub"
-            description="Generate Comete stub and skeleton. When this flag is used on the command line, the definitions are interpreted as the name of the Interface signature of the stub/skeleton to be generated." />
-
-    </extension>
 </plugin>
