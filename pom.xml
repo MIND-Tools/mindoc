@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>mindoc</artifactId>
-    <version>0.3</version>
+    <version>1.0-SNAPSHOT</version>
 
     <name>Mind Documentation Generator</name>
     <description>Document generator for MIND</description>
@@ -83,9 +83,9 @@
     </dependencies>
 
     <scm>
-        <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/mind/mindoc/tags/mindoc-0.3</connection>
-        <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/mind/mindoc/tags/mindoc-0.3</developerConnection>
-        <url>http://fisheye.ow2.org/browse/MIND/mindoc/tags/mindoc-0.3</url>
+        <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/mind/mindoc/trunk</connection>
+        <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/mind/mindoc/trunk</developerConnection>
+        <url>http://fisheye.ow2.org/browse/MIND/mindoc/trunk</url>
     </scm>
 
     <distributionManagement>
