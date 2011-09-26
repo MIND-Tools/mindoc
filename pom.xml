@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>mindoc</artifactId>
-    <version>0.3-alpha-1-SNAPSHOT</version>
+    <version>0.3</version>
 
     <name>Mind Documentation Generator</name>
     <description>Document generator for MIND</description>
@@ -72,21 +72,20 @@
         <dependency>
             <groupId>org.ow2.mind</groupId>
             <artifactId>mindc</artifactId>
-            <version>0.3-alpha-1-SNAPSHOT</version>
+            <version>0.3</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <classifier>jdk15</classifier>
-            <version>5.8</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <scm>
-        <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/mind/mindoc/trunk</connection>
-        <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/mind/mindoc/trunk</developerConnection>
-        <url>http://fisheye.ow2.org/browse/MIND/mindoc/trunk</url>
+        <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/mind/mindoc/tags/mindoc-0.3</connection>
+        <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/mind/mindoc/tags/mindoc-0.3</developerConnection>
+        <url>http://fisheye.ow2.org/browse/MIND/mindoc/tags/mindoc-0.3</url>
     </scm>
 
     <distributionManagement>
