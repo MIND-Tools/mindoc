@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>mindoc</artifactId>
-    <version>0.3-beta-2-SNAPSHOT</version>
+    <version>0.3-SNAPSHOT</version>
 
     <name>Mind Documentation Generator</name>
     <description>Document generator for MIND</description>
@@ -72,13 +72,12 @@
         <dependency>
             <groupId>org.ow2.mind</groupId>
             <artifactId>mindc</artifactId>
-            <version>0.3-beta-1</version>
+            <version>0.3</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <classifier>jdk15</classifier>
-            <version>5.8</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
