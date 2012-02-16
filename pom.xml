@@ -5,11 +5,11 @@
     <parent>
         <groupId>org.ow2.mind</groupId>
         <artifactId>mind-parent</artifactId>
-        <version>3</version>
+        <version>6</version>
     </parent>
 
     <artifactId>mindoc</artifactId>
-    <version>0.3-alpha-1-SNAPSHOT</version>
+    <version>1.0</version>
 
     <name>Mind Documentation Generator</name>
     <description>Document generator for MIND</description>
@@ -20,7 +20,7 @@
 
     <developers>
         <developer>
-            <id>ozcan</id>
+            <id>metzger</id>
             <name>Michel Metzger</name>
             <email>michel.metzger@st.com</email>
             <organization>STMicroelectronics</organization>
@@ -72,21 +72,20 @@
         <dependency>
             <groupId>org.ow2.mind</groupId>
             <artifactId>mindc</artifactId>
-            <version>0.3-alpha-1-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <classifier>jdk15</classifier>
-            <version>5.8</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <scm>
-        <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/mind/mindoc/trunk</connection>
-        <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/mind/mindoc/trunk</developerConnection>
-        <url>http://fisheye.ow2.org/browse/MIND/mindoc/trunk</url>
+        <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/mind/mindoc/tags/mindoc-1.0</connection>
+        <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/mind/mindoc/tags/mindoc-1.0</developerConnection>
+        <url>http://fisheye.ow2.org/browse/MIND/mindoc/tags/mindoc-1.0</url>
     </scm>
 
     <distributionManagement>
@@ -190,7 +189,7 @@
             <id>src-packages</id>
             <activation>
                 <property>
-                    <name>performRelease</name>
+                    <name>mindRelease</name>
                     <value>true</value>
                 </property>
             </activation>
@@ -223,7 +222,7 @@
             <id>release</id>
             <activation>
                 <property>
-                    <name>performRelease</name>
+                    <name>mindRelease</name>
                     <value>true</value>
                 </property>
             </activation>
@@ -290,16 +289,7 @@
             </build>
 
             <reporting>
-                <plugins>
-                    <!-- PMD reports -->
-                    <plugin>
-                        <artifactId>maven-pmd-plugin</artifactId>
-                        <version>2.4</version>
-                        <configuration>
-                            <targetJdk>1.5</targetJdk>
-                        </configuration>
-                    </plugin>
-                    
+                <plugins>                    
                     <!-- javadoc -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -316,13 +306,6 @@
                             <quiet>true</quiet>
                         </configuration>
                         <reportSets>
-                            <reportSet>
-                                <id>aggregrate</id>
-                                <reports>
-                                    <report>aggregate</report>
-                                </reports>
-                                <inherited>false</inherited>
-                            </reportSet>
                             <reportSet>
                                 <id>single</id>
                                 <reports>
