@@ -99,7 +99,7 @@ if $cygwin ; then
     MINDOC_EXT=`cygpath --path --unix "$MINDOC_EXT"`
 fi
 
-# For Migwn, ensure paths are in UNIX format before anything is touched
+# For MinGW, ensure paths are in UNIX format before anything is touched
 if $mingw ; then
   [ -n "$MINDOC_HOME" ] &&
     MINDOC_HOME="`(cd "$MINDOC_HOME"; pwd)`"
@@ -118,11 +118,14 @@ if [ -z "$JAVACMD" ] ; then
     if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
       # IBM's JDK on AIX uses strange locations for the executables
       JAVACMD="$JAVA_HOME/jre/sh/java"
-    else
+    elif [ -f "$JAVA_HOME"  -a -x "$JAVA_HOME" ] ; then
+      # In some cases (such as on TRAVIS CI system) $JAVA_HOME directly point the java executable.
+      JAVACMD="$JAVA_HOME"
+    else 
       JAVACMD="$JAVA_HOME/bin/java"
     fi
   else
-    JAVACMD=java
+    JAVACMD="`which java`"
   fi
 fi
 
