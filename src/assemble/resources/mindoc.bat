@@ -13,8 +13,10 @@
 @REM 
 @REM  Contact: mind@ow2.org
 @REM 
-@REM  Authors: Edine Coly (edine.coly@mail.sogeti.com)
+@REM  Authors: Stephane Seyvoz (sseyvoz@assystem.com)
 @REM  Contributors: 
+@REM
+@REM  Note: Inspired by the mindc.bat script from Edine Coly
 @REM -----------------------------------------------------------------------------
 @REM Mind Doc batch script ${project.version}
 @REM

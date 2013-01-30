@@ -17,7 +17,7 @@
  * Contact: mind@ow2.org
  *
  * Authors: michel.metzger@st.com
- * Contributors:
+ * Contributors: sseyvoz@assystem.com
  */
 package org.ow2.mind.doc;
 
