@@ -167,6 +167,8 @@ for i in "${MINDOC_LIB}"/*.jar "${MINDOC_EXT}"/*.jar; do
     if $cygwin; then
       lib=`cygpath --path --windows "${i}"`
       MIND_CLASSPATH="${MIND_CLASSPATH};${lib}"
+    elif $mingw; then
+      MIND_CLASSPATH="${MIND_CLASSPATH};${i}"
     else
       MIND_CLASSPATH="${MIND_CLASSPATH}:${i}"
     fi
@@ -180,6 +182,15 @@ export MINDOC_HOME
 #echo MINDOC_LIB=$MINDOC_LIB
 #echo MIND_CLASSPATH=$MIND_CLASSPATH
 ###########################################
+
+echo $MINDOC_HOME
+
+echo "$JAVACMD" \
+  -classpath "${MIND_CLASSPATH}" \
+  ${MINDOC_OPTS} \
+  ${LAUNCHER} \
+  "$@"
+
 
 exec "$JAVACMD" \
   -classpath "${MIND_CLASSPATH}" \
