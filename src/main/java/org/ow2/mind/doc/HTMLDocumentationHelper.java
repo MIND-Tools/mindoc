@@ -274,10 +274,6 @@ public final class HTMLDocumentationHelper {
 
   protected static String getDefinitionName(final String sourceDirectory, final String definitionFileName) throws IOException {
 
-
-
-    // SSZ BEGIN
-
     final String fileName;
     final String rootPath[];
     final String filePath[];
@@ -293,13 +289,12 @@ public final class HTMLDocumentationHelper {
       rootPath = sourceDirectory.split("\\" + File.separator);
       filePath = fileName.split("\\" + File.separator);
     } else {
-      // SSZ TODO: CHECK IF THE REMOVE EXTENSION METHOD HAS BEEN FIXED IN LATER VERSIONS OF THE LIB (1.0/1.1 !!)
+      // SSZ TODO: CHECK IF THE REMOVE EXTENSION METHOD HAS BEEN FIXED IN LATER VERSIONS OF THE LIB (1.0/1.1)
       // HERE IT ONLY WORKS FOR UNIX PATHS
       fileName = PathHelper.removeExtension(definitionFileName);
       rootPath = sourceDirectory.split(File.separator);
       filePath = fileName.split(File.separator);
     }
-    // SSZ END
 
     int i;
     for(i = 0; i < rootPath.length; i++) {
