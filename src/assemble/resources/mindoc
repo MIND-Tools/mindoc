@@ -167,8 +167,6 @@ for i in "${MINDOC_LIB}"/*.jar "${MINDOC_EXT}"/*.jar; do
     if $cygwin; then
       lib=`cygpath --path --windows "${i}"`
       MIND_CLASSPATH="${MIND_CLASSPATH};${lib}"
-    elif $mingw; then
-      MIND_CLASSPATH="${MIND_CLASSPATH};${i}"
     else
       MIND_CLASSPATH="${MIND_CLASSPATH}:${i}"
     fi
