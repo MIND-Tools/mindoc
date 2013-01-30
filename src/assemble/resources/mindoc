@@ -183,15 +183,6 @@ export MINDOC_HOME
 #echo MIND_CLASSPATH=$MIND_CLASSPATH
 ###########################################
 
-echo $MINDOC_HOME
-
-echo "$JAVACMD" \
-  -classpath "${MIND_CLASSPATH}" \
-  ${MINDOC_OPTS} \
-  ${LAUNCHER} \
-  "$@"
-
-
 exec "$JAVACMD" \
   -classpath "${MIND_CLASSPATH}" \
   ${MINDOC_OPTS} \
