@@ -73,6 +73,13 @@
             <groupId>org.ow2.mind</groupId>
             <artifactId>mindc</artifactId>
             <version>1.0</version>
+            <!-- Needed to allow doc generation for user-specific runtime -->
+            <exclusions>
+            	<exclusion>
+            		<artifactId>fractal-runtime</artifactId>
+            		<groupId>org.ow2.mind</groupId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
