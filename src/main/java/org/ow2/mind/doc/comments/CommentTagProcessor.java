@@ -46,9 +46,6 @@ public class CommentTagProcessor {
   private static final Pattern figurePattern =
     Pattern.compile("@figure\\s+(((\\./)?(\\.\\./)*|/)[^\\s]+(/[^\\s]+)*(\\.[^\\s]+)?)(\\s(width|height)=(\\d+)px)?");
 
-  private static final Pattern genFigurePattern =
-      Pattern.compile("@genFigure\\s+(\\s(width|height)=(\\d+)px)?");
-
   private final String definitionName;
   private int lastIndex = 0;
   private final String comment;
@@ -180,5 +177,4 @@ public class CommentTagProcessor {
       tags.add(tag);
     }
   }
-
 }

@@ -67,8 +67,13 @@ public class FigureTag extends CommentTag {
     } else if(height != -1) {
       sizeString = String.format("height=\"%dpx\"", height);
     }
-    return String.format("<img src=\"%s\" class=\"figure\" %s/>",
-        DOC_FILES_DIRECTORY + "/" + path, sizeString);
+
+    if (path.endsWith(".svg")) {
+      return String.format("<embed src=\"%s\" class=\"figure\" %s type=\"image/svg+xml\"/>",
+          DOC_FILES_DIRECTORY + "/" + path, sizeString);
+    } else
+      return String.format("<img src=\"%s\" class=\"figure\" %s/>",
+          DOC_FILES_DIRECTORY + "/" + path, sizeString);
   }
 
 }
