@@ -69,7 +69,7 @@ public class FigureTag extends CommentTag {
     }
 
     if (path.endsWith(".svg")) {
-      return String.format("<embed src=\"%s\" class=\"figure\" %s type=\"image/svg+xml\"/>",
+      return String.format("<embed src=\"%s\" class=\"svgFigure\" %s type=\"image/svg+xml\"/>",
           DOC_FILES_DIRECTORY + "/" + path, sizeString);
     } else
       return String.format("<img src=\"%s\" class=\"figure\" %s/>",

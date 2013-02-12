@@ -62,7 +62,7 @@ img.figure {
     margin-right: auto;
 }
 
-embed.figure {
+embed.svgFigure {
     margin-top: 10px;
     margin-bottom: 10px;
     display: block;
