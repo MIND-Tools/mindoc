@@ -57,8 +57,6 @@ public class CommentProcessor {
     final String comment = (String)n.astGetDecoration(CommentDecoration.COMMENT_DECORATION);
     if(comment != null) {
       if ((sourceKind == SourceKind.COMPONENT) && CommentTagProcessor.hasGenFigures(comment)) {
-        System.out.println("[SSZ Dirty debug] CommentProcessor: Current definition " + ((Definition)n).getName() + " has @genFigures");
-        // TODO: generate figures
         final Dot2SVGProcessor imagesGenerator = new Dot2SVGProcessor();
         imagesGenerator.process((Definition)n, context);
       }
