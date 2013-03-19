@@ -44,7 +44,10 @@ public class CommentTagProcessor {
   private static final Pattern interfaceLinkPattern = Pattern.compile(INTERFACE_LINK + LINK_PATTERN);
 
   private static final Pattern figurePattern =
-    Pattern.compile("@figure\\s+(((\\./)?(\\.\\./)*|/)[^\\s]+(/[^\\s]+)*(\\.[^\\s]+)?)(\\s(width|height)=(\\d+)px)?");
+      Pattern.compile("@figure\\s+(((\\./)?(\\.\\./)*|/)[^\\s]+(/[^\\s]+)*(\\.[^\\s]+)?)(\\s(width|height)=(\\d+)px)?");
+
+  private static final Pattern genFigurePattern =
+      Pattern.compile("@genFigure\\s+((width|height)=(\\d+)px)?");
 
   private final String definitionName;
   private int lastIndex = 0;
@@ -121,6 +124,7 @@ public class CommentTagProcessor {
     extractComponentLinks(comment, tags);
     extractInterfaceLinks(comment, tags);
     extractFigures(comment, tags);
+    extractGenFigures(comment, tags);
     Collections.sort(tags, new CommentTag.Comparator());
     return tags;
   }
@@ -176,5 +180,23 @@ public class CommentTagProcessor {
         tag.setHeight(Integer.parseInt(m.group(9)));
       tags.add(tag);
     }
+  }
+
+  private static void extractGenFigures(final String comment, final List<CommentTag> tags) {
+    final Matcher m = genFigurePattern.matcher(comment);
+    while (m.find()) {
+      final GenFigureTag tag;
+      tag = new GenFigureTag(m.start(), m.end());
+      if("width".equals(m.group(2)))
+        tag.setWidth(Integer.parseInt(m.group(3)));
+      else if("height".equals(m.group(2)))
+        tag.setHeight(Integer.parseInt(m.group(3)));
+      tags.add(tag);
+    }
+  }
+
+  public static boolean hasGenFigures(final String comment) {
+    final Matcher m = genFigurePattern.matcher(comment);
+    return m.find();
   }
 }

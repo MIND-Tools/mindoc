@@ -83,7 +83,7 @@ public class IDLTemplateProcessor extends AbstractSourceGenerator
     final File headerFile = outputFileLocatorItf.getCSourceOutputFile(
         getOutputFileName(idl), context);
 
-    CommentProcessor.process(idl);
+    CommentProcessor.process(idl, context);
 
     st.setAttribute("idl", idl);
     st.setAttribute("pathToRoot", getPathToRoot(idl.getName()));

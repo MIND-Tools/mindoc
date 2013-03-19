@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2009 STMicroelectronics
  *
- * This file is part of "Mind Compiler" is free software: you can redistribute 
- * it and/or modify it under the terms of the GNU Lesser General Public License 
- * as published by the Free Software Foundation, either version 3 of the 
+ * This file is part of "Mind Compiler" is free software: you can redistribute
+ * it and/or modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
  * details.
@@ -17,7 +17,7 @@
  * Contact: mind@ow2.org
  *
  * Authors: ali-erdem.ozcan@st.com
- * Contributors: 
+ * Contributors:
  */
 
 package org.ow2.mind.doc.adl;
@@ -108,7 +108,7 @@ public class HTMLDocumentGenerator extends AbstractSourceGenerator
     st.setAttribute("links", getLinkMap(definition, (File)context.get("sourceDirectory")));
     st.setAttribute("pathToRoot", pathToRoot);
 
-    CommentProcessor.process(definition);
+    CommentProcessor.process(definition, context);
 
     try {
       SourceFileWriter.writeToFile(outputFile, st.toString());
