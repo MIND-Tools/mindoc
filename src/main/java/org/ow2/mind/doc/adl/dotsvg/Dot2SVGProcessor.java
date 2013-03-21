@@ -43,6 +43,7 @@ import org.ow2.mind.adl.ast.ComponentContainer;
 import org.ow2.mind.adl.ast.ImplementationContainer;
 import org.ow2.mind.adl.ast.MindInterface;
 import org.ow2.mind.adl.ast.Source;
+import org.ow2.mind.adl.generic.ast.FormalTypeParameterContainer;
 import org.ow2.mind.io.BasicOutputFileLocator;
 
 /**
@@ -101,6 +102,20 @@ public class Dot2SVGProcessor {
     }
   }
 
+  private void showType(final Definition definition, final DotWriter currentDefinitionDot) {
+
+    final TreeSet<MindInterface> interfaces = new TreeSet<MindInterface>(new MindInterfaceComparator());
+    for (final Interface itf : ((InterfaceContainer) definition).getInterfaces())
+      interfaces.add((MindInterface) itf);
+
+    for (final MindInterface itf : interfaces) {
+      if (itf.getRole()==TypeInterface.SERVER_ROLE)
+        currentDefinitionDot.addServer(itf.getName());
+      if (itf.getRole()==TypeInterface.CLIENT_ROLE)
+        currentDefinitionDot.addClient(itf.getName());
+    }
+  }
+
   /**
    * Entry point
    * @param definition
@@ -109,6 +124,7 @@ public class Dot2SVGProcessor {
    */
   public void process(final Definition definition, final Map<Object, Object> cont) {
 
+    DotWriter dotWriter;
     gic = new GraphvizImageConverter("svg");
 
     // FIXME
@@ -116,13 +132,22 @@ public class Dot2SVGProcessor {
 
     // Create files
     dotLogger.log(Level.FINE, "Building Dot file for " + definition.getName() + " definition");
-    final DotWriter dotWriter = new DotWriter(buildDir, definition.getName());
 
-    // Start recursion
+
+    // Select surrounding digraph style according to type
+    if (ASTHelper.isType(definition))
+      dotWriter = new DotWriter(buildDir, definition.getName(), true);
+    else
+      // standard mode
+      dotWriter = new DotWriter(buildDir, definition.getName());
+
+    // Start file write
     if (ASTHelper.isComposite(definition)) {
-      showComposite(definition, dotWriter);
+        showComposite(definition, dotWriter);
     } else if (ASTHelper.isPrimitive(definition)) {
       showPrimitive(definition, dotWriter);
+    } else if (ASTHelper.isType(definition)) {
+      showType(definition, dotWriter);
     }
 
     dotWriter.close();
@@ -144,6 +169,15 @@ public class Dot2SVGProcessor {
     dotLogger.log(Level.FINE, "Converting " + buildDir.toString() + definition.getName() + ".dot to " + targetDocFilesDirName + shortDefName + ".svg");
     gic.convertDotToImage(buildDir, definition.getName(), targetDocFilesDirName, shortDefName);
 
+  }
+
+  /**
+   * Deprecated utility
+   * @param definition
+   * @return
+   */
+  private boolean isTemplate(final Definition definition) {
+    return ((definition instanceof FormalTypeParameterContainer) && (((FormalTypeParameterContainer)definition).getFormalTypeParameters().length > 0));
   }
 
 }

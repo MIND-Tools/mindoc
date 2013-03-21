@@ -18,6 +18,7 @@ import org.ow2.mind.adl.ast.Source;
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.adl.Definition;
 import org.ow2.mind.adl.ast.Binding;
+import org.ow2.mind.adl.generic.ast.FormalTypeParameterReference;
 import org.ow2.mind.adl.implementation.BasicImplementationLocator;
 import org.objectweb.fractal.adl.types.TypeInterface;
 
@@ -31,12 +32,13 @@ public class DotWriter {
   private String fileName;
   private String srcs="subgraph cluster_sources {\ncolor=none;\n";
   private int srcNb=0;
-  private String srvItfs="{rank=source; Servers [shape=Mrecord,style=filled,fillcolor=blue,label=\" Servers | {{ ";
+  private String srvItfs="{rank=source; Servers [shape=Mrecord,style=filled,fillcolor=lightskyblue,label=\" Servers | {{ ";
   private int srvItfsNb=0;
-  private String cltItfs="{rank=sink Clients [shape=Mrecord,style=filled,fillcolor=blue,label=\" Clients | {{ ";;
+  private String cltItfs="{rank=sink Clients [shape=Mrecord,style=filled,fillcolor=lightskyblue,label=\" Clients | {{ ";;
   private int cltItfsNb=0;
   private int maxItf=0; // Used to adapt the size of composite interface boxes
   private int color=1;
+  private boolean isType = false;
 
   public BasicImplementationLocator implementationLocatorItf = new BasicImplementationLocator();
 
@@ -59,14 +61,54 @@ public class DotWriter {
     }
   }
 
+  /**
+   * Here we want to change the skin for the type mode
+   * @param dir
+   * @param name
+   * @param isType
+   */
+  public DotWriter(final String dir, final String name, final boolean isType) {
+    try {
+      this.isType = isType;
+      compName = name;
+      final int i = name.lastIndexOf('.');
+      if (i == -1 ) {
+        localName = name;
+      } else {
+        localName = name.substring(i + 1);
+      }
+      buildDir = dir;
+      fileName = buildDir + File.separator + compName + ".dot";
+      currentPrinter = new PrintWriter( new FileWriter( fileName ) );
+      if (isType)
+         writeTypeHeader();
+      else
+        writeHeader();
+    } catch ( final IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
   private void writeHeader() {
     currentPrinter.println("digraph " + localName  + " {");
     currentPrinter.println("rankdir=LR;");
     currentPrinter.println("ranksep=3;");
     currentPrinter.println("subgraph cluster_membrane {");
-    currentPrinter.println("penwidth=15;");
-    currentPrinter.println("color=blue;");
+    currentPrinter.println("penwidth=5;");
+    currentPrinter.println("color=dodgerblue;");
     currentPrinter.println("style=rounded;");
+    //currentPrinter.println("height=20;"); // max number of itf /50*18
+  }
+
+  private void writeTypeHeader() {
+    currentPrinter.println("digraph " + localName  + " {");
+    currentPrinter.println("rankdir=LR;");
+    currentPrinter.println("ranksep=3;");
+    currentPrinter.println("subgraph cluster_membrane {");
+    currentPrinter.println("penwidth=5;");
+    currentPrinter.println("color=dodgerblue;");
+    currentPrinter.println("style=\"rounded, dashed\";");
     //currentPrinter.println("height=20;"); // max number of itf /50*18
   }
 
@@ -78,8 +120,22 @@ public class DotWriter {
       int clientItf = 0;
       int serverItf = 0;
 
-      final DefinitionReference defRef = component.getDefinitionReference();
-      final Definition definition = ASTHelper.getResolvedDefinition(defRef, null, null);
+      boolean isFormalTypeParameterReference = false;
+      Definition definition = null;
+      DefinitionReference defRef = null;
+
+      // Templates support, inspired from TemplateInstantiatorImpl logic
+      if ((component instanceof FormalTypeParameterReference) && (((FormalTypeParameterReference) component).getTypeParameterReference() !=null))
+        isFormalTypeParameterReference = true;
+
+      if (!isFormalTypeParameterReference) {
+        // Standard sub-component
+        defRef = component.getDefinitionReference();
+        definition = ASTHelper.getResolvedDefinition(defRef, null, null);
+      } else {
+        // sub-component is "templated"
+        definition = ASTHelper.getResolvedComponentDefinition(component, null, null);
+      }
 
       // the mindoc @figure tag uses the package name for folders and subfolder "doc-files"
       // calculate strings
@@ -110,7 +166,10 @@ public class DotWriter {
 
       // mindoc naming convention includes ".ADL"
       // please note we use target="main-frame" for SVG to replace the current frame (otherwise only the embed containing SVG is replaced)
-      currentPrinter.print(component.getName() + "[URL=\"" + backToOutputDir.toString() + targetHtmlFileDirName + shortDefName + ".ADL" + ".html\",target=\"main-frame\",shape=Mrecord,style=filled,fillcolor=lightgrey,label=\"" + component.getName() + " | {{ " );
+      if (!isFormalTypeParameterReference)
+        currentPrinter.print(component.getName() + "[URL=\"" + backToOutputDir.toString() + targetHtmlFileDirName + shortDefName + ".ADL" + ".html\",target=\"main-frame\",shape=Mrecord,style=filled,fillcolor=gainsboro,tooltip=\"Type: " + shortDefName + "\"" + ",label=\"" +  component.getName() + " | {{ " );
+      else
+        currentPrinter.print(component.getName() + "[URL=\"" + backToOutputDir.toString() + targetHtmlFileDirName + shortDefName + ".ADL" + ".html\",target=\"main-frame\",shape=Mrecord,style=\"filled, dashed\",fillcolor=snow,tooltip=\"Type: " + shortDefName + "\"" + " "  + ",label=\"" + component.getName() + " | {{ " );
 
       if (definition instanceof InterfaceContainer) {
 
@@ -159,13 +218,13 @@ public class DotWriter {
     final String ti = binding.getToInterface();
     if (fc == "this") fc="Servers";
     if (tc == "this") tc="Clients";
-    currentPrinter.println( fc + ":" + fi + "->" + tc + ":" + ti + "[tailport=e headport=w colorscheme=\"paired12\" color=" + color + "];");
+    currentPrinter.println( fc + ":" + fi + ":e" + "->" + tc + ":" + ti + ":w" + "[colorscheme=\"paired12\" color=" + color + "];");
   }
 
   public void addSource(final Source source) {
     if (source.getPath() != null) {
       final String s = "";
-      srcs=srcs + srcNb + "[label=\"" + source.getPath() + s + "\""+ "];\n";
+      srcs=srcs + srcNb + "[label=\"" + source.getPath() + s + "\", shape=\"note\""+ "];\n";
       srcNb++;
     }
   }
@@ -180,6 +239,16 @@ public class DotWriter {
     if (cltItfsNb != 0) cltItfs=cltItfs + " | ";
     cltItfs=cltItfs + "<" + itf + "> " + itf;
     cltItfsNb++;
+  }
+
+  /**
+   * Dirty hack (?) to reserve some space in the middle of type files.
+   * Otherwise if a type provides a single interface it fills the whole drawing.
+   * And in the case of provided and required and provided interfaces they would
+   * be stuck together.
+   */
+  public void addTypeEmptySpace() {
+    currentPrinter.println("{ 0 [label=\"" + "        " + "\", style=invisible" + "]; }\n");
   }
 
   public void close() {
@@ -197,6 +266,11 @@ public class DotWriter {
     if (srvItfsNb > 0) currentPrinter.println(srvItfs);
     if (cltItfsNb > 0) currentPrinter.println(cltItfs);
     if (srcNb > 0) currentPrinter.println(srcs);
+
+    // can't happen at the same time as sources
+    if (this.isType)
+      addTypeEmptySpace();
+
     for (int i=0; i<srcNb; i++) {
       if ((srvItfsNb*srcNb) > 0) currentPrinter.println("Servers->"+i+"[color=none]");
       if ((srcNb*cltItfsNb) > 0)currentPrinter.println(i+"->Clients[color=none]");

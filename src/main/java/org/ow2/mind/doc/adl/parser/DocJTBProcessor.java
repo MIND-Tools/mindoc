@@ -57,7 +57,7 @@ public class DocJTBProcessor extends org.ow2.mind.adl.parser.JTBProcessor {
    */
   private String getComment(final NodeToken token) {
     if (token.specialTokens != null) {
-      return CommentProcessor.processComment(token.getSpecialAt(0).tokenImage);
+      return CommentProcessor.processComment(token.getSpecialAt(token.specialTokens.size()-1).tokenImage);
     }
     return null;
   }
