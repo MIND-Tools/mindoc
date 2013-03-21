@@ -143,6 +143,13 @@ public class DocumentationIndexGenerator {
         return new IndexEntry(EntryKind.PACKAGE, packageName, frameHtmlFileName, summaryHtmlFileName, directory, adl, itf);
     }
 
+    public static IndexEntry mergePackageEntries(final IndexEntry existingEntry, final IndexEntry newEntry) {
+      // TODO: verify if we should check for duplicates ?
+      existingEntry.adl.addAll(newEntry.adl);
+      existingEntry.itf.addAll(newEntry.itf);
+      return existingEntry;
+    }
+
     @Override
     public String toString() {
       return String.format("[%s,%s]", name, frameHtmlFileName);
@@ -247,7 +254,21 @@ public class DocumentationIndexGenerator {
     }
 
     if(!packageADLDefinition.isEmpty() || !packageITFDefinition.isEmpty()) {
-      packages.add(IndexEntry.createPackageEntry(rootDirectory, directory, packageADLDefinition, packageITFDefinition));
+      final IndexEntry packageEntry = IndexEntry.createPackageEntry(rootDirectory, directory, packageADLDefinition, packageITFDefinition);
+
+      // Avoid erroneous package duplicates: merge when needed
+      IndexEntry existingPackageEntry = null;
+      for (final IndexEntry currentPackage : packages) {
+        if (currentPackage.name.equals(packageEntry.name)) {
+          existingPackageEntry = currentPackage;
+          break;
+        }
+      }
+      if (existingPackageEntry == null)
+        packages.add(packageEntry);
+      else
+        IndexEntry.mergePackageEntries(existingPackageEntry, packageEntry);
+
       Collections.sort(packageADLDefinition, new IndexEntryComparatorNoPackage());
       Collections.sort(packageITFDefinition, new IndexEntryComparatorNoPackage());
     }
