@@ -57,7 +57,7 @@ public class CommentProcessor {
     final String comment = (String)n.astGetDecoration(CommentDecoration.COMMENT_DECORATION);
     if(comment != null) {
       // the recursive processing (see last "internalProcess" call from this method) includes all types of subNode-s
-      if ((n instanceof Definition) && (sourceKind == SourceKind.COMPONENT)) {
+      if ((n instanceof Definition) && (sourceKind == SourceKind.COMPONENT) && CommentTagProcessor.hasGenFigures(comment)) {
         final Dot2SVGProcessor imagesGenerator = new Dot2SVGProcessor();
         imagesGenerator.process((Definition)n, context);
       }

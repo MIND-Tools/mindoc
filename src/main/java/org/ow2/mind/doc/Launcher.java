@@ -64,6 +64,7 @@ public class Launcher {
   private static final String  VERBOSE_OPTION          = "v";
   private static final String  HELP_OPTION             = "help";
   private static final String  HELP_OPTION_SHORT       = "h";
+  private static final String  KEEPDOT_OPTION          = "keepdot";
   private static final String  OVERVIEW_OPTION         = "overview";
   private static final String  DOCTITLE_OPTION         = "doctitle";
 
@@ -92,16 +93,21 @@ public class Launcher {
     final Option docTitleOption = new Option(DOCTITLE_OPTION, true,
         "Specifies the title that will be used in the the overview page.");
 
+    final Option keepDotOption = new Option(KEEPDOT_OPTION, false,
+        "Specifies to keep the intermediary GraphViz Dot files used for SVG generation.");
+
     options.addOption(destinationPathOption);
     options.addOption(verboseOption);
     options.addOption(helpDirectoryOption);
     options.addOption(overviewOption);
     options.addOption(docTitleOption);
+    options.addOption(keepDotOption);
 
     File sourceDirectories[] = null;
     File targetDirectory = new File(DEFAULT_DESTINATION);
     File overviewFile = null;
     String docTitle = null;
+    boolean keepDot = false;
 
     final CommandLineParser parser = new PosixParser();
 
@@ -148,6 +154,9 @@ public class Launcher {
       if (cmd.hasOption(DOCTITLE_OPTION)) {
         docTitle = cmd.getOptionValue(DOCTITLE_OPTION);
       }
+
+      if (cmd.hasOption(KEEPDOT_OPTION))
+        keepDot = true;
     } catch (final ParseException e) {
       logger.severe("Command line parse error. Reason: " + e.getMessage());
       System.exit(1);
@@ -175,7 +184,7 @@ public class Launcher {
     final PluginManager pluginManager = pluginManagerInjector
         .getInstance(PluginManager.class);
     runGenarators(pluginManager, sourceDirectories, targetDirectory, new File(
-        getMindocHome(), RESOURCE_DIR_NAME), docTitle, overviewFile);
+        getMindocHome(), RESOURCE_DIR_NAME), docTitle, overviewFile, keepDot);
     ResourceCopier.copyResources(sourceDirectories, targetDirectory);
     logger.info("Documentation generated in " + targetDirectory.getPath());
   }
@@ -183,13 +192,15 @@ public class Launcher {
   private static void runGenarators(final PluginManager pluginManager,
       final File sourceDirectories[], final File targetDirectory,
       final File resourceDirectory, final String docTitle,
-      final File overviewFile) {
+      final File overviewFile, final boolean keepDot) {
     try {
       // init context
       final Map<Object, Object> context = new HashMap<Object, Object>();
 
       // Put this in context to enable mindoc Guice modules.
       context.put("org.ow2.mind.doc.GenrateDoc", Boolean.TRUE);
+      // also put info about keeping Dot files or not
+      context.put("org.ow2.mind.doc.KeepDot", new Boolean(keepDot));
 
       // create injector from guice-module extensions
       final Injector injector = Guice.createInjector(GuiceModuleExtensionHelper

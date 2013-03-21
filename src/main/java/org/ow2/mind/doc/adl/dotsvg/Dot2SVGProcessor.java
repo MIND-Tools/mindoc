@@ -169,6 +169,9 @@ public class Dot2SVGProcessor {
     dotLogger.log(Level.FINE, "Converting " + buildDir.toString() + definition.getName() + ".dot to " + targetDocFilesDirName + shortDefName + ".svg");
     gic.convertDotToImage(buildDir, definition.getName(), targetDocFilesDirName, shortDefName);
 
+    // cleanup
+    if (!(Boolean) cont.get("org.ow2.mind.doc.KeepDot"))
+      dotWriter.deleteFile();
   }
 
   /**

@@ -154,7 +154,6 @@ public class DotWriter {
       // here the return dirName will start with "/" : careful !
       final String targetHtmlFileDirName = packageDirName.substring(1) + "/";
       final File targetHtmlFileDir = new File(targetHtmlFileDirName);
-      targetHtmlFileDir.mkdirs();
 
       // compute definition short name (removing package)
       String shortDefName = null;
@@ -254,6 +253,11 @@ public class DotWriter {
   public void close() {
     writeFooter();
 
+  }
+
+  public void deleteFile() {
+    final File file = new File(fileName);
+    file.delete();
   }
 
   private void writeFooter() {
