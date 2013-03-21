@@ -23,7 +23,6 @@ package org.ow2.mind.doc;
 
 import static org.ow2.mind.PathHelper.packageNameToDirName;
 import static org.ow2.mind.doc.HTMLDocumentationHelper.getDefinitionName;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
@@ -32,10 +31,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.antlr.stringtemplate.PathGroupLoader;
 import org.antlr.stringtemplate.StringTemplate;
@@ -83,9 +81,9 @@ public class DocumentationIndexGenerator {
      */
     public File file;
 
-    public List<IndexEntry> adl;
+    public Set<IndexEntry> adl;
 
-    public List<IndexEntry> itf;
+    public Set<IndexEntry> itf;
 
     private IndexEntry(final EntryKind kind, final String name, final String frameHtmlFileName, final String summaryHtmlFileName, final File file) {
       this(kind, name, frameHtmlFileName, summaryHtmlFileName, file, null, null);
@@ -93,7 +91,7 @@ public class DocumentationIndexGenerator {
 
     private IndexEntry(final EntryKind kind, final String name,
         final String frameHtmlFileName, final String summaryHtmlFileName,
-        final File file, final List<IndexEntry> adl, final List<IndexEntry> itf) {
+        final File file, final Set<IndexEntry> adl, final Set<IndexEntry> itf) {
       this.name = name;
       this.frameHtmlFileName = frameHtmlFileName;
       this.summaryHtmlFileName = summaryHtmlFileName;
@@ -126,8 +124,8 @@ public class DocumentationIndexGenerator {
     public static IndexEntry createPackageEntry(
         final File rootDirectory,
         final File directory,
-        final List<IndexEntry> adl,
-        final List<IndexEntry> itf) throws IOException {
+        final Set<IndexEntry> adl,
+        final Set<IndexEntry> itf) throws IOException {
         final String packageName = getDefinitionName(rootDirectory.getCanonicalPath(), directory.getCanonicalPath());
 
         String frameHtmlFileName = packageNameToDirName(packageName) + '/' + PACKAGE_FRAME_HTML;
@@ -144,7 +142,11 @@ public class DocumentationIndexGenerator {
     }
 
     public static IndexEntry mergePackageEntries(final IndexEntry existingEntry, final IndexEntry newEntry) {
-      // TODO: verify if we should check for duplicates ?
+      // ignore packages duplicates by removing them before adding new entries
+      newEntry.adl.removeAll(existingEntry.adl);
+      newEntry.itf.removeAll(existingEntry.itf);
+
+      // add new content
       existingEntry.adl.addAll(newEntry.adl);
       existingEntry.itf.addAll(newEntry.itf);
       return existingEntry;
@@ -173,9 +175,9 @@ public class DocumentationIndexGenerator {
 
   private final File[] sourceDirectories;
 
-  private final List<IndexEntry> adlDefinitionEntries = new LinkedList<IndexEntry>();
-  private final List<IndexEntry> itfDefinitionEntries = new LinkedList<IndexEntry>();
-  private final List<IndexEntry> packages = new LinkedList<IndexEntry>();
+  private final Set<IndexEntry> adlDefinitionEntries = new TreeSet<IndexEntry>(new IndexEntryComparatorNoPackage());
+  private final Set<IndexEntry> itfDefinitionEntries = new TreeSet<IndexEntry>(new IndexEntryComparatorNoPackage());
+  private final Set<IndexEntry> packages = new TreeSet<IndexEntry>(new IndexEntryComparator());
   private final StringTemplateGroupLoader groupLoader;
 
   private final StringTemplate allDefinitionTemplate;
@@ -230,16 +232,13 @@ public class DocumentationIndexGenerator {
     for (final File directory : sourceDirectories) {
       exploreDirectory(directory.getCanonicalFile(), directory.getCanonicalFile());
     }
-    Collections.sort(adlDefinitionEntries, new IndexEntryComparatorNoPackage());
-    Collections.sort(itfDefinitionEntries, new IndexEntryComparatorNoPackage());
-    Collections.sort(packages, new IndexEntryComparator());
   }
 
   private void exploreDirectory(final File rootDirectory, final File directory) throws IOException {
     if(directory.isHidden()) return;
 
-    final List<IndexEntry> packageADLDefinition = new LinkedList<IndexEntry>();
-    final List<IndexEntry> packageITFDefinition = new LinkedList<IndexEntry>();
+    final Set<IndexEntry> packageADLDefinition = new TreeSet<IndexEntry>(new IndexEntryComparatorNoPackage());
+    final Set<IndexEntry> packageITFDefinition = new TreeSet<IndexEntry>(new IndexEntryComparatorNoPackage());
 
     for (final File file : directory.listFiles((FileFilter)FileFilterUtils.suffixFileFilter(".adl"))) {
       final IndexEntry entry = IndexEntry.createADLEntry(rootDirectory, file);
@@ -268,9 +267,6 @@ public class DocumentationIndexGenerator {
         packages.add(packageEntry);
       else
         IndexEntry.mergePackageEntries(existingPackageEntry, packageEntry);
-
-      Collections.sort(packageADLDefinition, new IndexEntryComparatorNoPackage());
-      Collections.sort(packageITFDefinition, new IndexEntryComparatorNoPackage());
     }
 
     for (final File subDirectory: directory.listFiles(new FileFilter() {
