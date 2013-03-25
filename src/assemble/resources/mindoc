@@ -24,7 +24,7 @@
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
-# Mindoc batch script ${project.version}
+# Mindoc batch script 1.1-SNAPSHOT
 #
 # Required ENV vars:
 # ------------------
@@ -94,9 +94,9 @@ if $cygwin ; then
   [ -n "$JAVA_HOME" ] &&
     JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
   [ -n "$MINDOC_LIB" ] &&
-    MINDOC_LIB=`cygpath --path --unix "$MINDOC_LIB"`
+    MINDOC_LIB=`cygpath --unix "$MINDOC_LIB"`
   [ -n "$MINDOC_EXT" ] &&
-    MINDOC_EXT=`cygpath --path --unix "$MINDOC_EXT"`
+    MINDOC_EXT=`cygpath --unix "$MINDOC_EXT"`
 fi
 
 # For MinGW, ensure paths are in UNIX format before anything is touched
@@ -142,15 +142,15 @@ fi
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then
   [ -n "$MINDOC_HOME" ] &&
-    MINDOC_HOME=`cygpath --path --windows "$MINDOC_HOME"`
+    MINDOC_HOME=`cygpath --windows "$MINDOC_HOME"`
   [ -n "$JAVA_HOME" ] &&
-    JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
+    JAVA_HOME=`cygpath --windows "$JAVA_HOME"`
   [ -n "$HOME" ] &&
-    HOME=`cygpath --path --windows "$HOME"`
+    HOME=`cygpath --windows "$HOME"`
   [ -n "$MINDOC_LIB" ] &&
-    MINDOC_LIB=`cygpath --path --windows "$MINDOC_LIB"`
+    MINDOC_LIB=`cygpath --windows "$MINDOC_LIB"`
   [ -n "$MINDOC_EXT" ] &&
-    MINDOC_LIB=`cygpath --path --windows "$MINDOC_EXT"`
+    MINDOC_EXT=`cygpath --windows "$MINDOC_EXT"`
 fi
 
 
@@ -158,14 +158,14 @@ fi
 for i in "${MINDOC_LIB}"/*.jar "${MINDOC_EXT}"/*.jar; do
   if [ -z "$MIND_CLASSPATH" ] ; then
     if $cygwin; then
-      lib=`cygpath --path --windows "${i}"`
+      lib=`cygpath --windows "${i}"`
       MIND_CLASSPATH="${lib}"
     else
       MIND_CLASSPATH="${i}"
     fi
   else
     if $cygwin; then
-      lib=`cygpath --path --windows "${i}"`
+      lib=`cygpath --windows "${i}"`
       MIND_CLASSPATH="${MIND_CLASSPATH};${lib}"
     else
       MIND_CLASSPATH="${MIND_CLASSPATH}:${i}"
