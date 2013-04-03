@@ -17,7 +17,7 @@
  * Contact: mind@ow2.org
  *
  * Authors: Julien TOUS
- * Contributors:
+ * Contributors: Stéphane Seyvoz
  */
 
 package org.ow2.mind.doc.adl.dotsvg;
