@@ -76,7 +76,7 @@ setlocal
 set MIND_CMD_LINE_ARGS=%*
 set MINDOC_LIB=%MINDOC_HOME%/lib
 set MINDOC_EXT=%MINDOC_HOME%/ext
-set LAUNCHER=org.ow2.mind.Launcher
+set LAUNCHER=org.ow2.mind.doc.Launcher
 set MIND_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 if not "%MINDOC_CLASSPATH%" == "" set MINDOC_CLASSPATH=%MINDOC_CLASSPATH%;
 
