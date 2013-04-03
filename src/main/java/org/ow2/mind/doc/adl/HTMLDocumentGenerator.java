@@ -82,8 +82,8 @@ import org.ow2.mind.doc.comments.CommentProcessor;
 import org.ow2.mind.io.IOErrors;
 
 public class HTMLDocumentGenerator extends AbstractSourceGenerator
-    implements
-      DefinitionSourceGenerator {
+implements
+DefinitionSourceGenerator {
 
   public String              pathToRoot;
   private File outputFile;
@@ -198,7 +198,8 @@ public class HTMLDocumentGenerator extends AbstractSourceGenerator
     if (definition instanceof ImplementationContainer) {
       final ImplementationContainer implContainer = (ImplementationContainer) definition;
       for (final Source src : implContainer.getSources()) {
-        map.put(src.toString(), getImplementationAnchor(src.getPath()));
+        if ((src.toString() != null) && (src.getPath() != null))
+          map.put(src.toString(), getImplementationAnchor(src.getPath()));
       }
     }
     return superMap;
@@ -259,13 +260,16 @@ public class HTMLDocumentGenerator extends AbstractSourceGenerator
       final ImplementationContainer implContainer = (ImplementationContainer) definition;
       for (final Source src : implContainer.getSources()) {
 
-        final String sourceFileName = src.getPath().toString();
-        final String destFileName = "impl" + src.hashCode() + ".html";
-        String dest = null;
+        if (src.getPath() != null) {
 
-        dest = copySourceToHTML(sourceDirectory, sourceFileName, destFileName);
-        if(dest != null)
-          map.put(src.toString(), dest);
+          final String sourceFileName = src.getPath().toString();
+          final String destFileName = "impl" + src.hashCode() + ".html";
+          String dest = null;
+
+          dest = copySourceToHTML(sourceDirectory, sourceFileName, destFileName);
+          if(dest != null)
+            map.put(src.toString(), dest);
+        }
       }
     }
     return superMap;
@@ -289,10 +293,10 @@ public class HTMLDocumentGenerator extends AbstractSourceGenerator
         final InputStream in = new FileInputStream(sourceFile);
 
         writer.print("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
-        		"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" +
-        		"<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
-        		"<head>\n" +
-        		"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n");
+            "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" +
+            "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
+            "<head>\n" +
+            "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n");
         writer.printf("<title>%s</title>\n", sourceFileName);
         writer.println("</head>");
         writer.println("<body>");
