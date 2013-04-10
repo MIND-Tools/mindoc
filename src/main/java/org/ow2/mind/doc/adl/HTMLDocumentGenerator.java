@@ -391,7 +391,9 @@ DefinitionSourceGenerator {
 
     if (definition instanceof FormalTypeParameterContainer) {
       for (final FormalTypeParameter typeParam: ((FormalTypeParameterContainer)definition).getFormalTypeParameters()) {
-        setDefinitionReferenceKind(typeParam.getDefinitionReference());
+        final DefinitionReference defRef = typeParam.getDefinitionReference();
+        if (defRef != null)
+        setDefinitionReferenceKind(defRef);
       }
     }
 
