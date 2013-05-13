@@ -202,6 +202,7 @@ public class DocumentationIndexGenerator {
       public void error(final String msg, final Throwable e) {
         System.out.println("String template error: " + msg);
         e.printStackTrace(new PrintStream(System.err));
+        System.out.println("Considered resource folder was: " + resourceDirectory.getAbsolutePath());
       }
     });
 

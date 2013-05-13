@@ -75,7 +75,8 @@ public class Launcher {
       logger
           .severe("MINDOC_HOME variable is not defined. MINDOC_HOME must point to the location where mindoc is installed.");
       System.exit(1);
-    }
+    } else
+      logger.info("MINDOC_HOME variable set to: " + System.getenv(MINDOC_HOME));
 
     final Option destinationPathOption = new Option(DESTINATION_PATH_OPTION,
         true, "The path where the documentation is generated.");
