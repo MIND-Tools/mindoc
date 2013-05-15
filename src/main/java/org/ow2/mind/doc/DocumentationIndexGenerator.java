@@ -35,7 +35,6 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.antlr.stringtemplate.PathGroupLoader;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateErrorListener;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -45,6 +44,7 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.ow2.mind.PathHelper;
 import org.ow2.mind.doc.HTMLDocumentationHelper.SourceKind;
 import org.ow2.mind.doc.comments.CommentTagProcessor;
+import org.ow2.mind.doc.stringtemplate.PortablePathGroupLoader;
 
 
 public class DocumentationIndexGenerator {
@@ -194,7 +194,7 @@ public class DocumentationIndexGenerator {
     this.overviewFile = overviewFile;
     this.docTitle = docTitle;
 
-    groupLoader = new PathGroupLoader(resourceDirectory.getAbsolutePath(), new StringTemplateErrorListener() {
+    groupLoader = new PortablePathGroupLoader(resourceDirectory.getAbsolutePath(), new StringTemplateErrorListener() {
       public void warning(final String msg) {
         System.out.println("String template: " + msg);
       }
@@ -202,7 +202,6 @@ public class DocumentationIndexGenerator {
       public void error(final String msg, final Throwable e) {
         System.out.println("String template error: " + msg);
         e.printStackTrace(new PrintStream(System.err));
-        System.out.println("Considered resource folder was: " + resourceDirectory.getAbsolutePath());
       }
     });
 
@@ -216,6 +215,7 @@ public class DocumentationIndexGenerator {
 
     group = groupLoader.loadGroup(ALL_DEF_FRAME_TEMPLATE, DefaultTemplateLexer.class, null);
     group.registerRenderer(String.class, new HTMLRenderer());
+
     allDefinitionTemplate = group.getInstanceOf("frame");
 
     generateIndexLists();
