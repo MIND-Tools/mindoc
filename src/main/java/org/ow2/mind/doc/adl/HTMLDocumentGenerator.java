@@ -323,6 +323,11 @@ DefinitionSourceGenerator {
   private void addTypeArgumentLinks(final Definition definition, final Map<String, String> map, final TypeArgumentContainer typeArgumentContainer) {
     for (final TypeArgument typeArg : typeArgumentContainer.getTypeArguments()) {
       final DefinitionReference argDefRef = typeArg.getDefinitionReference();
+
+      // TODO: Handle this case more finely
+      if (argDefRef == null)
+        continue;
+
       addDefinitionReferenceLink(definition, map, argDefRef);
       if(argDefRef instanceof TypeArgumentContainer) {
         addTypeArgumentLinks(definition, map, (TypeArgumentContainer)argDefRef);
