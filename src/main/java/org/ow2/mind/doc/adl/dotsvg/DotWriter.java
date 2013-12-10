@@ -103,7 +103,7 @@ public class DotWriter {
       fileName = buildDir + File.separator + compName + ".dot";
       currentPrinter = new PrintWriter( new FileWriter( fileName ) );
       if (isType)
-         writeTypeHeader();
+        writeTypeHeader();
       else
         writeHeader();
     } catch ( final IOException e) {
@@ -118,8 +118,10 @@ public class DotWriter {
     currentPrinter.println("ranksep=3;");
     currentPrinter.println("subgraph cluster_membrane {");
     currentPrinter.println("penwidth=5;");
+
     currentPrinter.println("color=dodgerblue;");
     currentPrinter.println("style=rounded;");
+
     //currentPrinter.println("height=20;"); // max number of itf /50*18
   }
 
@@ -129,8 +131,10 @@ public class DotWriter {
     currentPrinter.println("ranksep=3;");
     currentPrinter.println("subgraph cluster_membrane {");
     currentPrinter.println("penwidth=5;");
+
     currentPrinter.println("color=dodgerblue;");
     currentPrinter.println("style=\"rounded, dashed\";");
+
     //currentPrinter.println("height=20;"); // max number of itf /50*18
   }
 
@@ -187,10 +191,11 @@ public class DotWriter {
 
       // mindoc naming convention includes ".ADL"
       // please note we use target="main-frame" for SVG to replace the current frame (otherwise only the embed containing SVG is replaced)
-      if (!isFormalTypeParameterReference)
+      if (!isFormalTypeParameterReference) {
         currentPrinter.print(component.getName() + "[URL=\"" + backToOutputDir.toString() + targetHtmlFileDirName + shortDefName + ".ADL" + ".html\",target=\"main-frame\",shape=Mrecord,style=filled,fillcolor=gainsboro,tooltip=\"Type: " + shortDefName + "\"" + ",label=\"" +  component.getName() + " | {{ " );
-      else
+      } else {
         currentPrinter.print(component.getName() + "[URL=\"" + backToOutputDir.toString() + targetHtmlFileDirName + shortDefName + ".ADL" + ".html\",target=\"main-frame\",shape=Mrecord,style=\"filled, dashed\",fillcolor=snow,tooltip=\"Type: " + shortDefName + "\"" + " "  + ",label=\"" + component.getName() + " | {{ " );
+      }
 
       if (definition instanceof InterfaceContainer) {
 
