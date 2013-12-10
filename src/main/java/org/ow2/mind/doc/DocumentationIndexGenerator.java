@@ -373,12 +373,13 @@ public class DocumentationIndexGenerator {
       documentation = tagProcessor.replaceTagsInComment();
 
       String shortDocumentation = null;
-      final int index = documentation.indexOf('.');
+      final int index = documentation.indexOf(".");
       if(index != -1) {
-        shortDocumentation = documentation.substring(0, index);
+        shortDocumentation = documentation.substring(0, index + 1);
       } else {
         shortDocumentation = documentation;
       }
+      documentation = documentation.substring(index + 1);
       template.setAttribute("documentation", documentation);
       template.setAttribute("shortDocumentation", shortDocumentation);
     }
