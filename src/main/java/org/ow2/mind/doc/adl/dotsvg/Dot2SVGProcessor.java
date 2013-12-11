@@ -124,11 +124,13 @@ public class Dot2SVGProcessor {
    */
   public void process(final Definition definition, final Map<Object, Object> cont) {
 
-    DotWriter dotWriter;
+    final DotWriter dotWriter;
     gic = new GraphvizImageConverter("svg");
 
-    // FIXME
-    buildDir = ((File) cont.get(BasicOutputFileLocator.OUTPUT_DIR_CONTEXT_KEY)).getPath() + File.separator;
+    final File outputDir = (File) cont.get(BasicOutputFileLocator.OUTPUT_DIR_CONTEXT_KEY);
+    // useful for some test cases where output directory isn't configured
+    if (outputDir == null) return;
+    buildDir = outputDir.getPath() + File.separator;
 
     // Create files
     dotLogger.log(Level.FINE, "Building Dot file for " + definition.getName() + " definition");
@@ -170,7 +172,8 @@ public class Dot2SVGProcessor {
     gic.convertDotToImage(buildDir, definition.getName(), targetDocFilesDirName, shortDefName);
 
     // cleanup
-    if (!(Boolean) cont.get("org.ow2.mind.doc.KeepDot"))
+    final Boolean keepDotStatus = (Boolean) cont.get("org.ow2.mind.doc.KeepDot");
+    if (keepDotStatus != null && !keepDotStatus)
       dotWriter.deleteFile();
   }
 

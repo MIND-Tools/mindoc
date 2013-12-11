@@ -78,6 +78,7 @@ import org.ow2.mind.doc.HTMLDocumentationHelper;
 import org.ow2.mind.doc.HTMLRenderer;
 import org.ow2.mind.doc.Launcher;
 import org.ow2.mind.doc.HTMLDocumentationHelper.SourceKind;
+import org.ow2.mind.doc.adl.dotsvg.Dot2SVGProcessor;
 import org.ow2.mind.doc.comments.CommentProcessor;
 import org.ow2.mind.io.IOErrors;
 
@@ -109,6 +110,10 @@ DefinitionSourceGenerator {
     st.setAttribute("pathToRoot", pathToRoot);
 
     CommentProcessor.process(definition, context);
+
+    // Create SVG component graph
+    final Dot2SVGProcessor imagesGenerator = new Dot2SVGProcessor();
+    imagesGenerator.process(definition, context);
 
     try {
       SourceFileWriter.writeToFile(outputFile, st.toString());

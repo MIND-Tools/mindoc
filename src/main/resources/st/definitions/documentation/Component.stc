@@ -41,6 +41,8 @@ $DefinitionSection(definition = definition)$
 <hr/>
 $ComponentCommentSection(definition = definition, anchors = anchors)$
 
+$SVGFigureSection(definition = definition)$
+
 $dataSection(definition = definition)$
 
 $AttributeSummary(definition = definition, anchors = anchors)$
@@ -119,6 +121,13 @@ $annotationList(definition)$
 </div>
 <hr/>
 $endif$
+>>
+
+SVGFigureSection(definition) ::= <<
+<div class="svg-figure-section">
+<embed src="doc-files/$definition.name; format="shortName"$.svg" class="svgFigure" %s type="image/svg+xml"/>
+</div>
+<hr/>
 >>
 
 dataSection(definition) ::= <<
