@@ -39,6 +39,11 @@
             <email>matthieu.leclercq@st.com</email>
             <organization>STMicroelectronics</organization>
         </contributor>
+        <contributor>
+            <name>Stephane Seyvoz</name>
+            <email>sseyvoz@assystem.com</email>
+            <organization>Assystem</organization>
+        </contributor>
     </contributors>
 
     <ciManagement>
@@ -72,7 +77,7 @@
         <dependency>
             <groupId>org.ow2.mind</groupId>
             <artifactId>mindc</artifactId>
-            <version>1.0</version>
+            <version>2.1-SNAPSHOT</version>
             <!-- Needed to allow doc generation for user-specific runtime -->
             <exclusions>
             	<exclusion>
