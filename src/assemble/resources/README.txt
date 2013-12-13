@@ -49,6 +49,11 @@ to document each of these elements. To add a comment to an entity the comment mu
 the entity in the adl file and be enclosed by "/**" and "*/". Finally, one can document 
 packages by adding named 'package.html' in the package directory.
 
+SVG figures are automatically generated for definitions, but need GraphViz installed with the 'dot'
+executable available in your path, since it's used for .dot to .svg conversion.
+Supported navigators are: any version of Firefox, IE9+. Chrome has some issues with the rendering.
+Intermediate .dot files can be kept for edition/debug with the help of the -keepdot option.
+
 Tags can be used in comments, in package documentations and in the overview page to add links
 and images. The tags currently supported are:
 
@@ -102,17 +107,6 @@ The syntax is as follow:
   refers to doc-files/my_image.png).
   <width> or <height> are facultative options used to resize the image. The value is in pixels and
   only one option can be used. E.g. "@link image.gif width=100px" 
-
-+ @genFigure [width=<width>px | height=<height>px] to make mindoc generate and include a SVG figure in
-  the documentation. This annotation must be (anywhere) in the comment right before a
-  composite/primitive/type definition. GraphViz must be installed on your system and the "dot" executable
-  available to access in your path. @genFigure makes SVG files according to component
-  definitions, by writing intermediary .dot files then converted to SVG by the dot executable.
-  The resulting SVG image will be put in the good doc-files/ folder and referenced with an <embed>in the
-  HTML pages. Sub-components are clickable thanks to SVG attributes.
-  Supported navigators are: any version of Firefox, IE9+. Chrome has some issues with the rendering.
-  The <height> and <width> options are the same facultative for @figure.
-  Intermediate .dot files can be kept for edition/debug with the help of the -keepdot option.
 
 HTML tags are permitted in comments and package documentation.
 

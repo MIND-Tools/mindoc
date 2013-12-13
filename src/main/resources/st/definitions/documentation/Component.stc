@@ -124,10 +124,12 @@ $endif$
 >>
 
 SVGFigureSection(definition) ::= <<
+$if(definition.astDecorations.("embed-svg"))$
 <div class="svg-figure-section">
 <embed src="doc-files/$definition.name; format="shortName"$.svg" class="svgFigure" %s type="image/svg+xml"/>
 </div>
 <hr/>
+$endif$
 >>
 
 dataSection(definition) ::= <<

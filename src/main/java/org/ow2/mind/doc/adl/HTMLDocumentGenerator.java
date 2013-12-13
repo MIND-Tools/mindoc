@@ -112,8 +112,7 @@ DefinitionSourceGenerator {
     CommentProcessor.process(definition, context);
 
     // Create SVG component graph
-    final Dot2SVGProcessor imagesGenerator = new Dot2SVGProcessor();
-    imagesGenerator.process(definition, context);
+    Dot2SVGProcessor.process(definition, context);
 
     try {
       SourceFileWriter.writeToFile(outputFile, st.toString());
