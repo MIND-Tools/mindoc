@@ -43,7 +43,6 @@ import org.ow2.mind.adl.ast.ComponentContainer;
 import org.ow2.mind.adl.ast.ImplementationContainer;
 import org.ow2.mind.adl.ast.MindInterface;
 import org.ow2.mind.adl.ast.Source;
-import org.ow2.mind.adl.generic.ast.FormalTypeParameterContainer;
 import org.ow2.mind.io.BasicOutputFileLocator;
 
 /**
@@ -54,6 +53,8 @@ public class Dot2SVGProcessor {
 
   private String buildDir;
   private GraphvizImageConverter gic;
+
+  private static Dot2SVGProcessor instance = null;
 
   // The Dot2SVGProcessor logger
   protected static Logger dotLogger = FractalADLLogManager
@@ -116,21 +117,34 @@ public class Dot2SVGProcessor {
     }
   }
 
+  private Dot2SVGProcessor(final Map<Object, Object> cont) {
+    gic = new GraphvizImageConverter("svg");
+    final File outputDir = (File) cont.get(BasicOutputFileLocator.OUTPUT_DIR_CONTEXT_KEY);
+    // useful for some test cases where output directory isn't configured
+    if (outputDir == null) return;
+    buildDir = outputDir.getPath() + File.separator;
+  }
+
+
   /**
    * Entry point
    * @param definition
    * @param cont
    * @throws ADLException
    */
-  public void process(final Definition definition, final Map<Object, Object> cont) {
+  public static void process(final Definition definition, final Map<Object, Object> cont) {
 
     final DotWriter dotWriter;
-    gic = new GraphvizImageConverter("svg");
 
-    final File outputDir = (File) cont.get(BasicOutputFileLocator.OUTPUT_DIR_CONTEXT_KEY);
-    // useful for some test cases where output directory isn't configured
-    if (outputDir == null) return;
-    buildDir = outputDir.getPath() + File.separator;
+    if (instance == null)
+      instance = new Dot2SVGProcessor(cont);
+
+    if (!instance.gic.canDotExecutableBeRan()) {
+      return;
+    }
+
+    // If Dot is accessible we can create SVGs, let's enable the according HTML section
+    definition.astSetDecoration("embed-svg", true);
 
     // Create files
     dotLogger.log(Level.FINE, "Building Dot file for " + definition.getName() + " definition");
@@ -138,18 +152,18 @@ public class Dot2SVGProcessor {
 
     // Select surrounding digraph style according to type
     if (ASTHelper.isType(definition))
-      dotWriter = new DotWriter(buildDir, definition.getName(), true);
+      dotWriter = new DotWriter(instance.buildDir, definition.getName(), true);
     else
       // standard mode
-      dotWriter = new DotWriter(buildDir, definition.getName());
+      dotWriter = new DotWriter(instance.buildDir, definition.getName());
 
     // Start file write
     if (ASTHelper.isComposite(definition)) {
-        showComposite(definition, dotWriter);
+      instance.showComposite(definition, dotWriter);
     } else if (ASTHelper.isPrimitive(definition)) {
-      showPrimitive(definition, dotWriter);
+      instance.showPrimitive(definition, dotWriter);
     } else if (ASTHelper.isType(definition)) {
-      showType(definition, dotWriter);
+      instance.showType(definition, dotWriter);
     }
 
     dotWriter.close();
@@ -158,7 +172,7 @@ public class Dot2SVGProcessor {
     final String packageDirName = PathHelper.fullyQualifiedNameToDirName(definition.getName());
     // here the return dirName will start with "/" : careful !
     // and add the mindoc "doc-files" folder as a convention
-    final String targetDocFilesDirName = buildDir + packageDirName.substring(1) + File.separator + "doc-files" + File.separator;
+    final String targetDocFilesDirName = instance.buildDir + packageDirName.substring(1) + File.separator + "doc-files" + File.separator;
     final File currentDocFilesDir = new File(targetDocFilesDirName);
     currentDocFilesDir.mkdirs();
 
@@ -168,22 +182,13 @@ public class Dot2SVGProcessor {
     if (i == -1) shortDefName = definition.getName();
     else shortDefName = definition.getName().substring(i + 1);
 
-    dotLogger.log(Level.FINE, "Converting " + buildDir.toString() + definition.getName() + ".dot to " + targetDocFilesDirName + shortDefName + ".svg");
-    gic.convertDotToImage(buildDir, definition.getName(), targetDocFilesDirName, shortDefName);
+    dotLogger.log(Level.FINE, "Converting " + instance.buildDir.toString() + definition.getName() + ".dot to " + targetDocFilesDirName + shortDefName + ".svg");
+    instance.gic.convertDotToImage(instance.buildDir, definition.getName(), targetDocFilesDirName, shortDefName);
 
     // cleanup
     final Boolean keepDotStatus = (Boolean) cont.get("org.ow2.mind.doc.KeepDot");
     if (keepDotStatus != null && !keepDotStatus)
       dotWriter.deleteFile();
-  }
-
-  /**
-   * Deprecated utility
-   * @param definition
-   * @return
-   */
-  private boolean isTemplate(final Definition definition) {
-    return ((definition instanceof FormalTypeParameterContainer) && (((FormalTypeParameterContainer)definition).getFormalTypeParameters().length > 0));
   }
 
 }

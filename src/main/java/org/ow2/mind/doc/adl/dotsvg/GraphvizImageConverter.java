@@ -23,11 +23,17 @@ package org.ow2.mind.doc.adl.dotsvg;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.objectweb.fractal.adl.util.FractalADLLogManager;
 
 public class GraphvizImageConverter {
 
+  protected static Logger gicLogger = FractalADLLogManager.getLogger("GIC");
 
   private final String imageFormat;
+  private Boolean dotExeStatus = null;
 
   public GraphvizImageConverter(final String imageFormat) {
     this.imageFormat = imageFormat;
@@ -76,7 +82,6 @@ public class GraphvizImageConverter {
       // thread-blocking
       p.waitFor();
     } catch (final IOException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     } catch (final InterruptedException e) {
       // TODO Auto-generated catch block
@@ -84,6 +89,37 @@ public class GraphvizImageConverter {
     } catch (final Exception e) {
       e.printStackTrace();
     }
+  }
+
+  /**
+   * Check if the dot executable can be ran from the path.
+   * @return true if ok, false on failure
+   */
+  public boolean canDotExecutableBeRan() {
+
+    if (dotExeStatus == null) {
+
+      // let's suppose we'll get success
+      dotExeStatus = new Boolean(true);
+
+      final String dotCommand[] = {"dot", "-V"};
+      final ProcessBuilder builder = new ProcessBuilder(dotCommand);
+      try {
+        //Use the following to track the process: Process graphVizProcess = builder.start();
+        final Process p = builder.start();
+        // thread-blocking
+        p.waitFor();
+      } catch (final IOException e) {
+         dotExeStatus = new Boolean(false);
+      } catch (final InterruptedException e) {
+        dotExeStatus = new Boolean(false);
+      }
+    }
+
+    if (dotExeStatus.equals(Boolean.FALSE))
+      gicLogger.log(Level.INFO, "GraphViz 'dot' executable not found - SVG architecture graphics can't and will not be generated");
+
+    return dotExeStatus.booleanValue();
   }
 
 }
