@@ -166,6 +166,16 @@ p.full-comment {
 	
 }
 
+p.method-parameters {
+	font-size:1em;
+	font-weight: bold;
+}
+
+p.method-returns {
+	font-size:1em;
+	font-weight: bold;
+}
+
 /* Code blocks */
 ol.code {
    margin: 2.5em 2em;

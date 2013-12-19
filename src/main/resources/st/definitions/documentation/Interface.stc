@@ -170,7 +170,7 @@ $endif$
 >>
 
 ParameterDetail(parameter, anchors) ::= <<
-$if (parameter.astDecorations.("description"))$<p class="param-details"><code>$parameter.name$</code> - $parameter.astDecorations.("description")$</p>$endif$
+$if (parameter.astDecorations.("description"))$<code>$parameter.name$</code> - $parameter.astDecorations.("description")$$endif$
 >>
 
 ReturnDetail(type, anchors) ::= <<

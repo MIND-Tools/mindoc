@@ -25,6 +25,7 @@ package org.ow2.mind.doc.comments;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +36,8 @@ import org.ow2.mind.doc.comments.LinkTag.InterfaceLinkElementType;
 
 
 public class CommentTagProcessor {
+  public static final Logger  logger                  = Logger.getAnonymousLogger();
+
   private static final String COMPONENT_LINK = "@component";
   private static final String INTERFACE_LINK = "@interface";
 
@@ -129,7 +132,24 @@ public class CommentTagProcessor {
 
   private void appendReplacement(final StringBuilder sb, final String originalString,
       final CommentTag tag, final String replacement) {
+
+    /* check for nested tags, for example:
+     * @param myParam blablablabla0 @interface blabla1
+     * since @param captures the WHOLE line and started earlier than @interface,
+     * when next tag @interface is handled, its beginIndex is LOWER than
+     * the endIndex of @param, which leads to a negative length substring,
+     * then throwing a java.lang.StringIndexOutOfBoundsException...
+     * Javadoc simply skips handling the nested annotations so we do the same
+     * and skip the link.
+     * Substitution could be considered for later.
+     */
+    if (lastIndex > tag.beginIndex) {
+      logger.fine("Found a nested comment annotation in definition '" + definitionName + "': Skip ! Comment was: \n" + comment);
+      return;
+    }
+
     sb.append(originalString.substring(lastIndex, tag.beginIndex));
+
     sb.append(replacement);
     lastIndex = tag.endIndex;
   }
