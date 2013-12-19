@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.objectweb.fractal.adl.Node;
 import org.ow2.mind.doc.HTMLDocumentationHelper.SourceKind;
 import org.ow2.mind.doc.comments.LinkTag.ComponentLinkElementType;
 import org.ow2.mind.doc.comments.LinkTag.InterfaceLinkElementType;
@@ -36,6 +37,9 @@ import org.ow2.mind.doc.comments.LinkTag.InterfaceLinkElementType;
 public class CommentTagProcessor {
   private static final String COMPONENT_LINK = "@component";
   private static final String INTERFACE_LINK = "@interface";
+
+  private static final String PARAM = "@param";
+  private static final String RETURN = "@return";
 
   private static final String LINK_PATTERN = "\\s+(this|([a-zA-Z0-9]\\w*(\\.[a-zA-Z0-9]\\w*)*))(#(\\w+)(#([a-zA-Z0-9]\\w*))?)?";
 
@@ -46,9 +50,14 @@ public class CommentTagProcessor {
   private static final Pattern figurePattern =
       Pattern.compile("@figure\\s+(((\\./)?(\\.\\./)*|/)[^\\s]+(/[^\\s]+)*(\\.[^\\s]+)?)(\\s(width|height)=(\\d+)px)?");
 
+  // Note: default Pattern class behavior is single-line, not multiline, so we don't need $ at the end.
+  private static final Pattern paramPattern = Pattern.compile(PARAM + "\\s+([a-zA-Z][a-zA-Z_0-9]*)\\s+(.*)"); // @param + spaces + param_name + spaces + anything (description)
+  private static final Pattern returnPattern = Pattern.compile(RETURN + "\\s+(.+)"); // @return + spaces + anything (description, at least one character)
+
   private final String definitionName;
   private int lastIndex = 0;
   private final String comment;
+  private static Node node;
 
   private final SourceKind sourceKind;
   private final List<CommentTag> tags;
@@ -62,6 +71,20 @@ public class CommentTagProcessor {
     this.definitionName = name;
     this.comment = comment;
     this.sourceKind = sourceKind;
+    tags = extractTags(comment);
+  }
+
+  /**
+   * Create a new tag processor for a Definition or a Package.
+   * @param node is the current node targetted by the comment. Used for Method parameters.
+   * @param name the name of the definition or the name of the package.
+   * @param isForPackage true if the tag processor is build to process tags from a package documentation.
+   */
+  public CommentTagProcessor(final Node node, final String name, final String comment, final SourceKind sourceKind) {
+    this.definitionName = name;
+    this.comment = comment;
+    this.sourceKind = sourceKind;
+    CommentTagProcessor.node = node;
     tags = extractTags(comment);
   }
 
@@ -121,6 +144,12 @@ public class CommentTagProcessor {
     extractComponentLinks(comment, tags);
     extractInterfaceLinks(comment, tags);
     extractFigures(comment, tags);
+
+    if (node != null) {
+      extractParams(node, comment, tags);
+      extractReturn(node, comment, tags);
+    }
+
     Collections.sort(tags, new CommentTag.Comparator());
     return tags;
   }
@@ -174,6 +203,24 @@ public class CommentTagProcessor {
         tag.setWidth(Integer.parseInt(m.group(9)));
       else if("height".equals(m.group(8)))
         tag.setHeight(Integer.parseInt(m.group(9)));
+      tags.add(tag);
+    }
+  }
+
+  private static void extractParams(final Node n, final String comment, final List<CommentTag> tags) {
+    final Matcher m = paramPattern.matcher(comment);
+    while (m.find()) {
+      final ParamTag tag;
+      tag = new ParamTag(n, m.group(1), m.group(2), m.start(), m.end());
+      tags.add(tag);
+    }
+  }
+
+  private static void extractReturn(final Node n, final String comment, final List<CommentTag> tags) {
+    final Matcher m = returnPattern.matcher(comment);
+    while (m.find()) {
+      final ReturnTag tag;
+      tag = new ReturnTag(n, m.group(1), m.start(), m.end());
       tags.add(tag);
     }
   }

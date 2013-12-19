@@ -1,0 +1,133 @@
+#include "data_types.idt"
+
+/**
+ * An unsigned int. More details.
+ */
+typedef unsigned int u_int;
+
+
+/**
+ * A struct with two fields. More details.
+ */
+struct my_struct {
+	int field1;
+	int field2;
+};
+
+/**
+ * A union with two fields. More details.
+ */
+union my_union {
+	char char_field;
+	int  int_field;
+};
+
+/**
+ * An enum with three values. More details.
+ */
+enum my_enum {
+	RED,
+	GREEN,
+	BLUE
+};
+
+enum my_enum;
+
+/**
+ * A typedef with inline struct
+ */
+typedef struct {
+   int foo[3];
+   int bar;
+} foobar;
+
+
+/**
+ * A typedef of an enum pointer.
+ */
+typedef enum my_enum* my_enum_ptr;
+
+/**
+ * A typedef struct with a struct field.
+ */
+typedef struct {
+   int foo;
+   int bar;
+   struct {char far; char boo;} bu;
+   enum my_enum enum_field;
+   my_enum_ptr ptr;
+} foobar2;
+
+/**
+ * An interface name TestInterface filled with @return annotations.
+ */
+interface return_test.TestInterface {
+
+	/**
+	 * @return a const int
+	 */
+	@org.ow2.mind.doc.annotations.FooAnnotation
+	const int testConstMethod(int i);
+
+	/**
+	 * @return should be omitted since return is void
+	 */
+	void testTypeSpecMethod(void);
+	
+	/**
+	 * @return an unsigned integer
+	 */
+	u_int testTypedefMethod(uint ui);
+	
+	/**
+	 * No return info
+	 */
+	u_int testTypedefMethodNoReturn(uint ui);
+	
+	/**
+	 * @return an internal structure described in data_types.idt
+	 */
+	external_struct testExternalTypedefMethod(uint ui);
+	
+	
+	/**
+	 * @return a structure of "my_struct" type
+	 */
+	struct my_struct testStructMethod(struct my_struct my_struct_param);
+
+	/**
+	 * @return an anonymous structure containing a char called foo
+	 */
+	struct {char foo;} testAnonStructMethod(void);
+
+	/**
+	 * @return an union
+	 */
+	union my_union testUnionMethod(union my_union my_union_param);
+
+	/**
+	 * @return an anonymous union
+	 */
+	union {int foo; char bar;} testAnonUnionMethod();
+
+
+	/**
+	 * @return an enum
+	 */
+	enum my_enum testEnumMethod(enum my_enum my_enum_param);
+
+	/**
+	 * @return an anonymous enum
+	 */
+	enum {YELLOW, PURPLE} testAnonEnumMethod(void);
+	
+	/**
+	 * @return a volatile unsigned int
+	 */
+	volatile unsigned int testParameters(const unsigned char p1, out volatile uint32_t p2, in short int p3, in out struct my_struct p4, union my_union p5);
+
+    /**
+     * @return a void* pointer
+     */
+    void * testPointer(const char* argv);
+}
