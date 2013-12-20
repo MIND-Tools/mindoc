@@ -162,7 +162,7 @@ $if (method.astNodeTypes.("parameter"))$
    $if (method.parameters)$
 <p class="method-parameters">Parameters:</p>
 <div class="item-details">
-$method.parameters: {$ParameterDetail(parameter=it, anchors=anchors)$}; separator="\n"$
+$method.parameters: {$ParameterDetail(parameter=it, anchors=anchors)$}; separator="<br/>\n"$
 </div>
    $endif$
 $endif$
