@@ -54,7 +54,7 @@ public class CommentTagProcessor {
       Pattern.compile("@figure\\s+(((\\./)?(\\.\\./)*|/)[^\\s]+(/[^\\s]+)*(\\.[^\\s]+)?)(\\s(width|height)=(\\d+)px)?");
 
   // Note: default Pattern class behavior is single-line, not multiline, so we don't need $ at the end.
-  private static final Pattern paramPattern = Pattern.compile(PARAM + "\\s+([a-zA-Z][a-zA-Z_0-9]*)\\s+(.*)"); // @param + spaces + param_name + spaces + anything (description)
+  private static final Pattern paramPattern = Pattern.compile(PARAM + "\\s+([a-zA-Z_][a-zA-Z_0-9]*)\\s+(.*)"); // @param + spaces + param_name + spaces + anything (description)
   private static final Pattern returnPattern = Pattern.compile(RETURN + "\\s+(.+)"); // @return + spaces + anything (description, at least one character)
 
   private static String definitionName;
