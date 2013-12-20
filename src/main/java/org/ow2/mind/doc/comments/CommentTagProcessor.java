@@ -57,7 +57,7 @@ public class CommentTagProcessor {
   private static final Pattern paramPattern = Pattern.compile(PARAM + "\\s+([a-zA-Z][a-zA-Z_0-9]*)\\s+(.*)"); // @param + spaces + param_name + spaces + anything (description)
   private static final Pattern returnPattern = Pattern.compile(RETURN + "\\s+(.+)"); // @return + spaces + anything (description, at least one character)
 
-  private final String definitionName;
+  private static String definitionName;
   private int lastIndex = 0;
   private final String comment;
   private static Node node;
@@ -71,7 +71,7 @@ public class CommentTagProcessor {
    * @param isForPackage true if the tag processor is build to process tags from a package documentation.
    */
   public CommentTagProcessor(final String name, final String comment, final SourceKind sourceKind) {
-    this.definitionName = name;
+    CommentTagProcessor.definitionName = name;
     this.comment = comment;
     this.sourceKind = sourceKind;
     tags = extractTags(comment);
@@ -84,7 +84,7 @@ public class CommentTagProcessor {
    * @param isForPackage true if the tag processor is build to process tags from a package documentation.
    */
   public CommentTagProcessor(final Node node, final String name, final String comment, final SourceKind sourceKind) {
-    this.definitionName = name;
+    CommentTagProcessor.definitionName = name;
     this.comment = comment;
     this.sourceKind = sourceKind;
     CommentTagProcessor.node = node;
@@ -166,7 +166,7 @@ public class CommentTagProcessor {
     extractFigures(comment, tags);
 
     if (node != null) {
-      extractParams(node, comment, tags);
+      extractParams(node, definitionName, comment, tags);
       extractReturn(node, comment, tags);
     }
 
@@ -227,11 +227,11 @@ public class CommentTagProcessor {
     }
   }
 
-  private static void extractParams(final Node n, final String comment, final List<CommentTag> tags) {
+  private static void extractParams(final Node n, final String comment, final String definitionName, final List<CommentTag> tags) {
     final Matcher m = paramPattern.matcher(comment);
     while (m.find()) {
       final ParamTag tag;
-      tag = new ParamTag(n, m.group(1), m.group(2), m.start(), m.end());
+      tag = new ParamTag(n, definitionName, m.group(1), m.group(2), m.start(), m.end());
       tags.add(tag);
     }
   }
