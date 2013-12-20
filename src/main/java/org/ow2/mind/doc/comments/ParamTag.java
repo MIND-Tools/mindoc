@@ -20,7 +20,7 @@ public class ParamTag extends CommentTag {
    * @param beginIndex
    * @param endIndex
    */
-  public ParamTag(final Node n, final String paramName, final String paramDesc, final String definitionName, final int beginIndex, final int endIndex) {
+  public ParamTag(final Node n, final String definitionName, final String paramName, final String paramDesc, final int beginIndex, final int endIndex) {
     super(beginIndex, endIndex);
 
     boolean valid = false;

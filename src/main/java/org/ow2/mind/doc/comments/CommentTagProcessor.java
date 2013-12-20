@@ -227,7 +227,7 @@ public class CommentTagProcessor {
     }
   }
 
-  private static void extractParams(final Node n, final String comment, final String definitionName, final List<CommentTag> tags) {
+  private static void extractParams(final Node n, final String definitionName, final String comment, final List<CommentTag> tags) {
     final Matcher m = paramPattern.matcher(comment);
     while (m.find()) {
       final ParamTag tag;
