@@ -1,0 +1,23 @@
+
+interface param_test.Service {
+
+  /**
+   * @param msg The message to be printed.
+   * Print is useful.
+   */
+  void print(const char *msg);
+  
+  /**
+   * @param msg The message to be printed and go back to line.
+   * Println is very useful.
+   */
+  void println(const char *msg);
+  
+  /**
+   * This method doesn't have any parameter, so it shouldn't
+   * have a Parameters section.
+   */
+  void flush();
+
+};
+
