@@ -369,7 +369,7 @@ public class DocumentationIndexGenerator {
       }
       String documentation = sb.toString();
 
-      final CommentTagProcessor tagProcessor = new CommentTagProcessor(packageName, documentation, SourceKind.PACKAGE);
+      final CommentTagProcessor tagProcessor = new CommentTagProcessor(null, packageName, documentation, SourceKind.PACKAGE);
       documentation = tagProcessor.replaceTagsInComment();
 
       String shortDocumentation = null;

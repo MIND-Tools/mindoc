@@ -49,8 +49,8 @@ to document each of these elements. To add a comment to an entity the comment mu
 the entity in the adl file and be enclosed by "/**" and "*/". Finally, one can document 
 packages by adding named 'package.html' in the package directory.
 
-SVG figures are automatically generated for definitions, but need GraphViz installed with the 'dot'
-executable available in your path, since it's used for .dot to .svg conversion.
+SVG figures are automatically generated for definitions when GraphViz is installed and the 'dot'
+executable can be ran from your path. 'dot' is used for .dot to .svg conversion.
 Supported navigators are: any version of Firefox, IE9+. Chrome has some issues with the rendering.
 Intermediate .dot files can be kept for edition/debug with the help of the -keepdot option.
 
@@ -107,6 +107,20 @@ The syntax is as follow:
   refers to doc-files/my_image.png).
   <width> or <height> are facultative options used to resize the image. The value is in pixels and
   only one option can be used. E.g. "@link image.gif width=100px" 
+  
++ @param to detail what a parameter of a method is useful for, in interfaces definitions.
+The comment is single-line, you must use <br/> or any other html markup of your choice to define
+your desired output if you want it on multiple lines. 
+
+The syntax is as follows:  
+  @param paramName The parameter description (single-line).
+  
++ @return to detail the return type of a method in interfaces definitions.
+The comment is single-line,  you must use <br/> or any other html markup of your choice to define
+your desired output if you want it on multiple lines.
+
+The syntax is as follows:
+  @return The return type description (single-line).
 
 HTML tags are permitted in comments and package documentation.
 

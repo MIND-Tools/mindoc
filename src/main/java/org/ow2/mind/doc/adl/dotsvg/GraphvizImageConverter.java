@@ -114,10 +114,10 @@ public class GraphvizImageConverter {
       } catch (final InterruptedException e) {
         dotExeStatus = new Boolean(false);
       }
-    }
 
-    if (dotExeStatus.equals(Boolean.FALSE))
-      gicLogger.log(Level.INFO, "GraphViz 'dot' executable not found - SVG architecture graphics can't and will not be generated");
+      if (dotExeStatus.equals(Boolean.FALSE))
+        gicLogger.log(Level.INFO, "GraphViz 'dot' executable not found - SVG architecture graphics can't and will not be generated");
+    }
 
     return dotExeStatus.booleanValue();
   }

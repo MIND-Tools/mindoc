@@ -55,7 +55,7 @@ public class CommentProcessor {
   private void internalProcess(final Node n, final SourceKind sourceKind, final Map<Object, Object> context) {
     final String comment = (String)n.astGetDecoration(CommentDecoration.COMMENT_DECORATION);
     if(comment != null) {
-      final CommentTagProcessor tagProcessor = new CommentTagProcessor(rootName, comment, sourceKind);
+      final CommentTagProcessor tagProcessor = new CommentTagProcessor(n, rootName, comment, sourceKind);
 
       setShortComment(n, tagProcessor.replaceTagsInShortComment());
       setComment(n, tagProcessor.replaceTagsInComment());

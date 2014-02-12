@@ -137,6 +137,8 @@ $idl.methods:{
   <p class="full-comment">$it.astDecorations.comment$</p>
   $annotationList(it)$
 </div>
+$ParametersDetail(method=it, anchors=anchors)$
+$ReturnDetail(type=it.type, anchors=anchors)$
 }; separator="\n<hr />"$
    $endif$
 $endif$
@@ -151,6 +153,32 @@ $if (method.astNodeTypes.("parameter"))$
    $if (method.parameters)$
 $method.parameters: {$parameterDef(parameter=it, anchors=anchors)$}; separator=", "$
    $endif$
+$endif$
+>>
+
+ParametersDetail(method, anchors) ::= <<
+$if (method.astDecorations.("gen-params"))$
+$if (method.astNodeTypes.("parameter"))$
+   $if (method.parameters)$
+<p class="method-parameters">Parameters:</p>
+<div class="item-details">
+$method.parameters: {$ParameterDetail(parameter=it, anchors=anchors)$}; separator="<br/>\n"$
+</div>
+   $endif$
+$endif$
+$endif$
+>>
+
+ParameterDetail(parameter, anchors) ::= <<
+$if (parameter.astDecorations.("description"))$<code>$parameter.name$</code> - $parameter.astDecorations.("description")$$endif$
+>>
+
+ReturnDetail(type, anchors) ::= <<
+$if (type.astDecorations.("description"))$
+<p class="method-returns">Returns:</p>
+<div class="item-details">
+  <p class="return-details">$type.astDecorations.("description")$</p>
+</div>
 $endif$
 >>
 
