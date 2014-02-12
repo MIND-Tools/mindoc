@@ -34,8 +34,8 @@ Available options are :
 	-h, --help                        Print the help and exit
 	-o=<arg>, --output                The path where the documentation is generated
 	-k, --keepdot                     Specifies to keep the intermediary GraphViz Dot files used for SVG generation.
-	--overview=<arg>                  Specifies the file that contains the overview documentation.
-	--doctitle=<arg>                  Specifies the title that will be used in the overview page.
+	-O=<arg>, --overview              Specifies the file that contains the overview documentation.
+	-T=<arg>, --doctitle              Specifies the title that will be used in the overview page.
 	-v, --verbose                     Verbose output.
 
 Document ADL
