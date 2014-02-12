@@ -23,7 +23,9 @@
 package org.ow2.mind.doc;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -32,17 +34,15 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.StreamHandler;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.ow2.mind.inject.GuiceModuleExtensionHelper;
 import org.ow2.mind.plugin.PluginLoaderModule;
 import org.ow2.mind.plugin.PluginManager;
-
+import org.ow2.mind.cli.CmdArgument;
+import org.ow2.mind.cli.CmdFlag;
+import org.ow2.mind.cli.CmdOption;
+import org.ow2.mind.cli.CommandLine;
+import org.ow2.mind.cli.InvalidCommandLineException;
+import org.ow2.mind.cli.Options;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -59,14 +59,44 @@ public class Launcher {
   private static final String  DEFAULT_DESTINATION     = "./target/doc";
   static final String          HTML_RESOURCES_DIR      = "resources/html";
 
+  protected static final String ID_PREFIX              = "org.ow2.mind.doc.";
+
+
+  private static final CmdFlag HELP_OPTION = new CmdFlag(
+                                              ID_PREFIX + "Help",
+                                              "h", "help",
+                                              "Print the help and exit");
+
+  private static final CmdArgument DESTINATION_PATH_OPTION = new CmdArgument(
+                                            ID_PREFIX + "Output",
+                                            "o", "output",
+                                            "The path where the documentation is generated",
+                                            "<arg>");
+
+  private static final CmdFlag KEEPDOT_OPTION = new CmdFlag(
+                                            ID_PREFIX + "Keepdot",
+                                            "k", "keepdot",
+                                            "Specifies to keep the intermediary GraphViz Dot files used for SVG generation.");
+
+  private static final CmdArgument OVERVIEW_OPTION = new CmdArgument(
+                                            ID_PREFIX + "overview",
+                                            "O", "overview",
+                                            "Specifies the file that contains the overview documentation.",
+                                            "<arg>");
+
+  private static final CmdArgument DOCTITLE_OPTION = new CmdArgument(
+                                            ID_PREFIX + "doctitle",
+                                            "T", "doctitle",
+                                            "Specifies the title that will be used in the overview page.",
+                                            "<arg>");
+
+
+  private static final CmdFlag VERBOSE_OPTION = new CmdFlag(
+                                                  ID_PREFIX + "Verbose",
+                                                  "v", "verbose",
+                                                  "Verbose output.");
+
   private final static Options options                 = new Options();
-  private static final String  DESTINATION_PATH_OPTION = "d";
-  private static final String  VERBOSE_OPTION          = "v";
-  private static final String  HELP_OPTION             = "help";
-  private static final String  HELP_OPTION_SHORT       = "h";
-  private static final String  KEEPDOT_OPTION          = "keepdot";
-  private static final String  OVERVIEW_OPTION         = "overview";
-  private static final String  DOCTITLE_OPTION         = "doctitle";
 
   public static void main(final String[] args) {
     initLogger();
@@ -77,31 +107,6 @@ public class Launcher {
       System.exit(1);
     }
 
-    final Option destinationPathOption = new Option(DESTINATION_PATH_OPTION,
-        true, "The path where the documentation is generated.");
-    // destinationPathOption.setRequired(true);
-
-    final Option verboseOption = new Option(VERBOSE_OPTION, false,
-        "Verbose output.");
-
-    final Option helpDirectoryOption = new Option(HELP_OPTION_SHORT,
-        HELP_OPTION, false, "Print this message and exit.");
-
-    final Option overviewOption = new Option(OVERVIEW_OPTION, true,
-        "Specifies the file that contains the overview documentation.");
-
-    final Option docTitleOption = new Option(DOCTITLE_OPTION, true,
-        "Specifies the title that will be used in the the overview page.");
-
-    final Option keepDotOption = new Option(KEEPDOT_OPTION, false,
-        "Specifies to keep the intermediary GraphViz Dot files used for SVG generation.");
-
-    options.addOption(destinationPathOption);
-    options.addOption(verboseOption);
-    options.addOption(helpDirectoryOption);
-    options.addOption(overviewOption);
-    options.addOption(docTitleOption);
-    options.addOption(keepDotOption);
 
     File sourceDirectories[] = null;
     File targetDirectory = new File(DEFAULT_DESTINATION);
@@ -109,23 +114,30 @@ public class Launcher {
     String docTitle = null;
     boolean keepDot = false;
 
-    final CommandLineParser parser = new PosixParser();
+    options.addOptions(HELP_OPTION,
+                        DESTINATION_PATH_OPTION,
+                        KEEPDOT_OPTION,
+                        OVERVIEW_OPTION,
+                        DOCTITLE_OPTION,
+                        VERBOSE_OPTION);
 
     try {
-      final CommandLine cmd = parser.parse(options, args);
+    final CommandLine cmdLine = CommandLine.parseArgs(options, false, args);
 
-      if (cmd.hasOption(HELP_OPTION)) {
-        printHelp();
+      // If help is asked, print it and exit.
+      if (HELP_OPTION.isPresent(cmdLine)) {
+        printHelp(System.err);
         System.exit(0);
       }
 
-      if (cmd.hasOption(VERBOSE_OPTION)) logger.setLevel(Level.ALL);
+       // @TODO Use environment variable
+      if (VERBOSE_OPTION.isPresent(cmdLine)) logger.setLevel(Level.ALL);
 
-      if (cmd.getArgs().length >= 1) {
-        final String sourceList[] = cmd.getArgs();
-        sourceDirectories = new File[sourceList.length];
-        for (int i = 0; i < sourceList.length; i++) {
-          final File sourceDirectory = new File(sourceList[i]);
+      if (cmdLine.getArguments().size() >= 1) {
+        final List<String> sourceList = cmdLine.getArguments();
+        sourceDirectories = new File[sourceList.size()];
+        for (int i = 0; i < sourceList.size(); i++) {
+          final File sourceDirectory = new File(sourceList.get(i));
           if (!sourceDirectory.isDirectory() || !sourceDirectory.canRead()) {
             logger.severe(String.format("Cannot read source path '%s'.",
                 sourceDirectory.getPath()));
@@ -135,29 +147,30 @@ public class Launcher {
         }
       } else {
         logger.severe("You must specify a source path.");
-        printHelp();
+        printHelp(System.err);
         System.exit(1);
       }
 
-      if (cmd.hasOption(DESTINATION_PATH_OPTION)) {
-        targetDirectory = new File(cmd.getOptionValue(DESTINATION_PATH_OPTION));
+      if (DESTINATION_PATH_OPTION.isPresent(cmdLine)) {
+        targetDirectory = new File(DESTINATION_PATH_OPTION.getValue(cmdLine));
       } else {
         logger
             .info("Destination directory not specified. Documentation will be generated in default location ("
                 + DEFAULT_DESTINATION + ").");
       }
 
-      if (cmd.hasOption(OVERVIEW_OPTION)) {
-        overviewFile = new File(cmd.getOptionValue(OVERVIEW_OPTION));
+      if (OVERVIEW_OPTION.isPresent(cmdLine)) {
+        overviewFile = new File(OVERVIEW_OPTION.getValue(cmdLine));
       }
 
-      if (cmd.hasOption(DOCTITLE_OPTION)) {
-        docTitle = cmd.getOptionValue(DOCTITLE_OPTION);
+      if (DOCTITLE_OPTION.isPresent(cmdLine)) {
+        docTitle = DOCTITLE_OPTION.getValue(cmdLine);
       }
 
-      if (cmd.hasOption(KEEPDOT_OPTION))
+      if (KEEPDOT_OPTION.isPresent(cmdLine))
         keepDot = true;
-    } catch (final ParseException e) {
+
+    } catch (final InvalidCommandLineException e) {
       logger.severe("Command line parse error. Reason: " + e.getMessage());
       System.exit(1);
     }
@@ -224,11 +237,30 @@ public class Launcher {
 
   }
 
-  private static void printHelp() {
-    final HelpFormatter formatter = new HelpFormatter();
-    final String header = " generates documentation for ADL, IDL and implementation files located in <sourcepath>.";
-    formatter.printHelp(COMMAND_NAME + " [OPTION] (<sourcepath>)+", header,
-        options, null);
+  private static void printHelp(final PrintStream ps) {
+    printUsage(ps);
+    ps.println();
+    ps.println("Available options are :");
+    int maxCol = 0;
+
+    for (final CmdOption opt : options.getOptions()) {
+      final int col = 2 + opt.getPrototype().length();
+      if (col > maxCol) maxCol = col;
+    }
+    for (final CmdOption opt : options.getOptions()) {
+      final StringBuffer sb = new StringBuffer("  ");
+      sb.append(opt.getPrototype());
+      while (sb.length() < maxCol)
+        sb.append(' ');
+      sb.append("  ").append(opt.getDescription());
+      ps.println(sb);
+    }
+  }
+
+  private static void printUsage(final PrintStream ps) {
+    ps.println("Usage: " + COMMAND_NAME
+        + " generates documentation for ADL, IDL and implementation files located in <sourcepath>.");
+    ps.println(" [OPTION] (<sourcepath>)+");
   }
 
   static String getMindocHome() {

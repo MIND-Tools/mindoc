@@ -25,19 +25,18 @@ Running Mindoc
   The mindoc generates HTML documentation for a set of ADL and IDL source files.
   It is used with the following command-line arguments:
 
-# mindoc [OPTIONS] (sourcepath)+
+# mindoc -h
 
-  where sourcepath contains the ADL, IDL and implementation file to be documented.
+Usage: mindoc generates documentation for ADL, IDL and implementation files located in <sourcepath>.
+ [OPTION] (<sourcepath>)+
 
 Available options are :
- -d <arg>         The path where the documentation is generated. (default is './target/doc').
- -doctitle <arg>  Specifies the title that will be used in the the overview page.
- -overview <arg>  Specifies the file that contains the overview documentation. This document
-                  will be inserted in the overview page with the list of all packages. HTML tags
-                  can be used in this document, as well as Mindoc tags (documented below).
- -keepdot		  Specifies to keep the intermediary GraphViz Dot files used for SVG generation.
- -h,--help        Print this message and exit.
- -v               Verbose output.
+	-h, --help                        Print the help and exit
+	-o=<arg>, --output                The path where the documentation is generated
+	-k, --keepdot                     Specifies to keep the intermediary GraphViz Dot files used for SVG generation.
+	-O=<arg>, --overview              Specifies the file that contains the overview documentation.
+	-T=<arg>, --doctitle              Specifies the title that will be used in the overview page.
+	-v, --verbose                     Verbose output.
 
 Document ADL
 ============
