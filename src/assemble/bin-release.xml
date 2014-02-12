@@ -53,13 +53,5 @@
             <outputDirectory></outputDirectory>
             <filtered>true</filtered>
         </file>
-        <!-- 
-        <file>
-            <source>src/assemble/resources/ext/README.txt</source>
-            <fileMode>0644</fileMode>
-            <o"src/site/site.xml"utputDirectory>ext</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-         -->
     </files>
 </assembly>
