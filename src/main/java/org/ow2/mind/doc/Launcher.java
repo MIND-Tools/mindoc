@@ -24,9 +24,14 @@ package org.ow2.mind.doc;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -34,15 +39,22 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.StreamHandler;
 
+import org.objectweb.fractal.adl.CompilerError;
+import org.objectweb.fractal.adl.error.GenericErrors;
 import org.ow2.mind.inject.GuiceModuleExtensionHelper;
 import org.ow2.mind.plugin.PluginLoaderModule;
 import org.ow2.mind.plugin.PluginManager;
 import org.ow2.mind.cli.CmdArgument;
 import org.ow2.mind.cli.CmdFlag;
 import org.ow2.mind.cli.CmdOption;
+import org.ow2.mind.cli.CmdOptionBooleanEvaluator;
 import org.ow2.mind.cli.CommandLine;
+import org.ow2.mind.cli.CommandLineOptionExtensionHelper;
+import org.ow2.mind.cli.CommandOptionHandler;
 import org.ow2.mind.cli.InvalidCommandLineException;
 import org.ow2.mind.cli.Options;
+import org.ow2.mind.cli.OutPathOptionHandler;
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -52,7 +64,7 @@ public class Launcher {
   public static final String   DOC_FILES_DIRECTORY     = "doc-files";
 
   public static final Logger   logger                  = Logger
-                                                           .getAnonymousLogger();
+      .getAnonymousLogger();
 
   private static final String  COMMAND_NAME            = "mindoc";
 
@@ -63,47 +75,43 @@ public class Launcher {
 
 
   private static final CmdFlag HELP_OPTION = new CmdFlag(
-                                              ID_PREFIX + "Help",
-                                              "h", "help",
-                                              "Print the help and exit");
-
-  private static final CmdArgument DESTINATION_PATH_OPTION = new CmdArgument(
-                                            ID_PREFIX + "Output",
-                                            "o", "output",
-                                            "The path where the documentation is generated",
-                                            "<arg>");
+      ID_PREFIX + "Help",
+      "h", "help",
+      "Print the help and exit");
 
   private static final CmdFlag KEEPDOT_OPTION = new CmdFlag(
-                                            ID_PREFIX + "Keepdot",
-                                            "k", "keepdot",
-                                            "Specifies to keep the intermediary GraphViz Dot files used for SVG generation.");
+      ID_PREFIX + "Keepdot",
+      "k", "keepdot",
+      "Specifies to keep the intermediary GraphViz Dot files used for SVG generation.");
 
   private static final CmdArgument OVERVIEW_OPTION = new CmdArgument(
-                                            ID_PREFIX + "overview",
-                                            "O", "overview",
-                                            "Specifies the file that contains the overview documentation.",
-                                            "<arg>");
+      ID_PREFIX + "overview",
+      null, "overview",
+      "Specifies the file that contains the overview documentation.",
+      "<arg>");
 
   private static final CmdArgument DOCTITLE_OPTION = new CmdArgument(
-                                            ID_PREFIX + "doctitle",
-                                            "T", "doctitle",
-                                            "Specifies the title that will be used in the overview page.",
-                                            "<arg>");
+      ID_PREFIX + "doctitle",
+      null, "doctitle",
+      "Specifies the title that will be used in the overview page.",
+      "<arg>");
 
 
   private static final CmdFlag VERBOSE_OPTION = new CmdFlag(
-                                                  ID_PREFIX + "Verbose",
-                                                  "v", "verbose",
-                                                  "Verbose output.");
+      ID_PREFIX + "Verbose",
+      "v", "verbose",
+      "Verbose output.");
 
   private final static Options options                 = new Options();
+
+  final static Map<Object, Object> context = new HashMap<Object, Object>();
 
   public static void main(final String[] args) {
     initLogger();
 
     if (System.getenv(MINDOC_HOME) == null) {
       logger
-          .severe("MINDOC_HOME variable is not defined. MINDOC_HOME must point to the location where mindoc is installed.");
+      .severe("MINDOC_HOME variable is not defined. MINDOC_HOME must point to the location where mindoc is installed.");
       System.exit(1);
     }
 
@@ -114,15 +122,29 @@ public class Launcher {
     String docTitle = null;
     boolean keepDot = false;
 
+    /****** Initialization of the PluginManager Component *******/
+
+    final Injector bootStrapPluginManagerInjector = getBootstrapInjector();
+    final PluginManager pluginManager = bootStrapPluginManagerInjector
+        .getInstance(PluginManager.class);
+
     options.addOptions(HELP_OPTION,
-                        DESTINATION_PATH_OPTION,
-                        KEEPDOT_OPTION,
-                        OVERVIEW_OPTION,
-                        DOCTITLE_OPTION,
-                        VERBOSE_OPTION);
+        KEEPDOT_OPTION,
+        OVERVIEW_OPTION,
+        DOCTITLE_OPTION,
+        VERBOSE_OPTION);
+
+    options.addOptions(CommandLineOptionExtensionHelper
+        .getCommandOptions(pluginManager));
 
     try {
-    final CommandLine cmdLine = CommandLine.parseArgs(options, false, args);
+      // parse arguments to a CommandLine.
+      final CommandLine cmdLine = CommandLine.parseArgs(options, false, args);
+
+      checkExclusiveGroups(pluginManager, cmdLine);
+      // very important when using mind plugins with "enableWhen" in their xml descriptor
+      context.put(CmdOptionBooleanEvaluator.CMD_LINE_CONTEXT_KEY, cmdLine);
+      invokeOptionHandlers(pluginManager, cmdLine, context);
 
       // If help is asked, print it and exit.
       if (HELP_OPTION.isPresent(cmdLine)) {
@@ -130,7 +152,7 @@ public class Launcher {
         System.exit(0);
       }
 
-       // @TODO Use environment variable
+      // @TODO Use environment variable
       if (VERBOSE_OPTION.isPresent(cmdLine)) logger.setLevel(Level.ALL);
 
       if (cmdLine.getArguments().size() >= 1) {
@@ -151,13 +173,7 @@ public class Launcher {
         System.exit(1);
       }
 
-      if (DESTINATION_PATH_OPTION.isPresent(cmdLine)) {
-        targetDirectory = new File(DESTINATION_PATH_OPTION.getValue(cmdLine));
-      } else {
-        logger
-            .info("Destination directory not specified. Documentation will be generated in default location ("
-                + DEFAULT_DESTINATION + ").");
-      }
+      targetDirectory = OutPathOptionHandler.getOutPath(context);
 
       if (OVERVIEW_OPTION.isPresent(cmdLine)) {
         overviewFile = new File(OVERVIEW_OPTION.getValue(cmdLine));
@@ -192,24 +208,17 @@ public class Launcher {
       }
     }
 
-    final Injector pluginManagerInjector = Guice
-        .createInjector(new PluginLoaderModule());
-    final PluginManager pluginManager = pluginManagerInjector
-        .getInstance(PluginManager.class);
-    runGenarators(pluginManager, sourceDirectories, targetDirectory, new File(
+    runGenerators(pluginManager, sourceDirectories, targetDirectory, new File(
         getMindocHome(), RESOURCE_DIR_NAME), docTitle, overviewFile, keepDot);
     ResourceCopier.copyResources(sourceDirectories, targetDirectory);
     logger.info("Documentation generated in " + targetDirectory.getPath());
   }
 
-  private static void runGenarators(final PluginManager pluginManager,
+  private static void runGenerators(final PluginManager pluginManager,
       final File sourceDirectories[], final File targetDirectory,
       final File resourceDirectory, final String docTitle,
       final File overviewFile, final boolean keepDot) {
     try {
-      // init context
-      final Map<Object, Object> context = new HashMap<Object, Object>();
-
       // Put this in context to enable mindoc Guice modules.
       context.put("org.ow2.mind.doc.GenrateDoc", Boolean.TRUE);
       // also put info about keeping Dot files or not
@@ -297,6 +306,67 @@ public class Launcher {
     public synchronized void publish(final LogRecord arg0) {
       super.publish(arg0);
       flush();
+    }
+  }
+
+  //----------------------------------------------------------------------------
+  // Guice & command-line interface (CLI) methods - (copied from MindC Launcher)
+  // ---------------------------------------------------------------------------
+
+  protected static Injector getBootstrapInjector() {
+    return Guice.createInjector(new PluginLoaderModule());
+  }
+
+  protected static void checkExclusiveGroups(final PluginManager pluginManagerItf,
+      final CommandLine cmdLine) throws InvalidCommandLineException {
+    final Collection<Set<String>> exclusiveGroups = CommandLineOptionExtensionHelper
+        .getExclusiveGroups(pluginManagerItf);
+    for (final Set<String> exclusiveGroup : exclusiveGroups) {
+      CmdOption opt = null;
+      for (final String id : exclusiveGroup) {
+        final CmdOption opt1 = cmdLine.getOptions().getById(id);
+        if (opt1.isPresent(cmdLine)) {
+          if (opt != null) {
+            throw new InvalidCommandLineException("Options '"
+                + opt.getPrototype() + "' and '" + opt1.getPrototype()
+                + "' cannot be specified simultaneously on the command line.",
+                1);
+          }
+          opt = opt1;
+        }
+      }
+    }
+  }
+
+  protected static void invokeOptionHandlers(final PluginManager pluginManagerItf,
+      final CommandLine cmdLine, final Map<Object, Object> context)
+          throws InvalidCommandLineException {
+    final List<CmdOption> toBeExecuted = new LinkedList<CmdOption>(cmdLine
+        .getOptions().getOptions());
+    final Set<String> executedId = new HashSet<String>(toBeExecuted.size());
+    while (!toBeExecuted.isEmpty()) {
+      final int toBeExecutedSize = toBeExecuted.size();
+      final Iterator<CmdOption> iter = toBeExecuted.iterator();
+      while (iter.hasNext()) {
+        final CmdOption option = iter.next();
+        final List<String> precedenceIds = CommandLineOptionExtensionHelper
+            .getPrecedenceIds(option, pluginManagerItf);
+        if (executedId.containsAll(precedenceIds)) {
+          // task ready to be executed
+          for (final CommandOptionHandler handler : CommandLineOptionExtensionHelper
+              .getHandler(option, pluginManagerItf)) {
+            handler.processCommandOption(option, cmdLine, context);
+          }
+          executedId.add(option.getId());
+          iter.remove();
+        }
+      }
+      if (toBeExecutedSize == toBeExecuted.size()) {
+        // nothing has been executed. there is a circular dependency
+        throw new CompilerError(GenericErrors.GENERIC_ERROR,
+            "Circular dependency in command line option handlers: "
+                + toBeExecuted);
+      }
     }
   }
 }
