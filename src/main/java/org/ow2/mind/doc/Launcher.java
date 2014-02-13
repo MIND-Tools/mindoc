@@ -53,8 +53,6 @@ import org.ow2.mind.cli.CommandLineOptionExtensionHelper;
 import org.ow2.mind.cli.CommandOptionHandler;
 import org.ow2.mind.cli.InvalidCommandLineException;
 import org.ow2.mind.cli.Options;
-import org.ow2.mind.cli.OutPathOptionHandler;
-
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -79,6 +77,13 @@ public class Launcher {
       "h", "help",
       "Print the help and exit");
 
+  // Disable this if you wish to use other module-contributed command-line options
+  private static final CmdArgument DESTINATION_PATH_OPTION = new CmdArgument(
+      ID_PREFIX + "Output",
+      "o", "output",
+      "The path where the documentation is generated",
+      "<arg>");
+
   private static final CmdFlag KEEPDOT_OPTION = new CmdFlag(
       ID_PREFIX + "Keepdot",
       "k", "keepdot",
@@ -86,13 +91,13 @@ public class Launcher {
 
   private static final CmdArgument OVERVIEW_OPTION = new CmdArgument(
       ID_PREFIX + "overview",
-      null, "overview",
+      "O", "overview",
       "Specifies the file that contains the overview documentation.",
       "<arg>");
 
   private static final CmdArgument DOCTITLE_OPTION = new CmdArgument(
       ID_PREFIX + "doctitle",
-      null, "doctitle",
+      "T", "doctitle",
       "Specifies the title that will be used in the overview page.",
       "<arg>");
 
@@ -128,23 +133,30 @@ public class Launcher {
     final PluginManager pluginManager = bootStrapPluginManagerInjector
         .getInstance(PluginManager.class);
 
+    /** **/
+
     options.addOptions(HELP_OPTION,
+        DESTINATION_PATH_OPTION,
         KEEPDOT_OPTION,
         OVERVIEW_OPTION,
         DOCTITLE_OPTION,
         VERBOSE_OPTION);
 
-    options.addOptions(CommandLineOptionExtensionHelper
-        .getCommandOptions(pluginManager));
+    // Enable to allow using other modules command-line options
+    //options.addOptions(CommandLineOptionExtensionHelper
+    //    .getCommandOptions(pluginManager));
 
     try {
       // parse arguments to a CommandLine.
       final CommandLine cmdLine = CommandLine.parseArgs(options, false, args);
 
-      checkExclusiveGroups(pluginManager, cmdLine);
       // very important when using mind plugins with "enableWhen" in their xml descriptor
       context.put(CmdOptionBooleanEvaluator.CMD_LINE_CONTEXT_KEY, cmdLine);
-      invokeOptionHandlers(pluginManager, cmdLine, context);
+
+      // Enable to allow using other modules command-line options
+      //invokeOptionHandlers(pluginManager, cmdLine, context);
+      //checkExclusiveGroups(pluginManager, cmdLine);
+
 
       // If help is asked, print it and exit.
       if (HELP_OPTION.isPresent(cmdLine)) {
@@ -173,7 +185,18 @@ public class Launcher {
         System.exit(1);
       }
 
-      targetDirectory = OutPathOptionHandler.getOutPath(context);
+      /**
+       * Comment the block and use the // commented line if you enabled
+       * other modules command-line options, to get pre-handled value:
+       */
+      // targetDirectory = OutPathOptionHandler.getOutPath(context);
+      if (DESTINATION_PATH_OPTION.isPresent(cmdLine)) {
+        targetDirectory = new File(DESTINATION_PATH_OPTION.getValue(cmdLine));
+      } else {
+        logger
+        .info("Destination directory not specified. Documentation will be generated in default location ("
+            + DEFAULT_DESTINATION + ").");
+      }
 
       if (OVERVIEW_OPTION.isPresent(cmdLine)) {
         overviewFile = new File(OVERVIEW_OPTION.getValue(cmdLine));
