@@ -97,6 +97,14 @@
             <classifier>jdk15</classifier>
             <scope>test</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>fractal-runtime</artifactId>
+            <scope>test</scope>
+            <version>2.1-SNAPSHOT</version>
+        </dependency>
+        
     </dependencies>
 
     <scm>
