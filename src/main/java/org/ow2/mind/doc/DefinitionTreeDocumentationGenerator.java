@@ -28,9 +28,11 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.DirectoryWalker;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -42,6 +44,9 @@ public class DefinitionTreeDocumentationGenerator extends DirectoryWalker {
 
   @Inject
   DefinitionDocumentGenerator generator;
+
+  private final Set<String> adlDefinitionsSet = new HashSet<String>();
+  private final Set<String> itfDefinitionsSet = new HashSet<String>();
 
   public DefinitionTreeDocumentationGenerator() {
     super(FileFilterUtils.trueFileFilter(), FileFilterUtils.orFileFilter(
@@ -75,6 +80,15 @@ public class DefinitionTreeDocumentationGenerator extends DirectoryWalker {
         final String definitionName = HTMLDocumentationHelper
             .getDefinitionName(rootDirectory.getCanonicalPath(),
                 definition.getCanonicalPath());
+
+        if (definition.getName().endsWith(".adl") && !adlDefinitionsSet.add(definitionName)) {
+          Launcher.logger.warning("Duplicate definition of " + definitionName + " component - skipping");
+          continue;
+        }
+        else if (definition.getName().endsWith(".itf") && !itfDefinitionsSet.add(definitionName)) {
+          Launcher.logger.warning("Duplicate definition of " + definitionName + " interface - skipping");
+          continue;
+        }
 
         Launcher.logger.finer("Generating documentation for " + definitionName);
         if (definition.getName().endsWith(".adl")) {

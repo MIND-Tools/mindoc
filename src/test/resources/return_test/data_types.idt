@@ -1,0 +1,9 @@
+#ifndef _DATA_TYPES_IDT
+#define _DATA_TYPES_IDT
+
+
+typedef struct {
+    int bli;
+} external_struct;
+
+#endif

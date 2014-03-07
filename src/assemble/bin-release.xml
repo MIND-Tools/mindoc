@@ -37,6 +37,12 @@
             <filtered>true</filtered>
         </file>
         <file>
+            <source>src/assemble/resources/mindoc.bat</source>
+            <fileMode>0755</fileMode>
+            <outputDirectory>bin</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
             <source>src/assemble/resources/README.txt</source>
             <fileMode>0644</fileMode>
             <outputDirectory></outputDirectory>

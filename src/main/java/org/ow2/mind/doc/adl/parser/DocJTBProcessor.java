@@ -31,6 +31,7 @@ import org.ow2.mind.adl.jtb.syntaxtree.AttributeDefinition;
 import org.ow2.mind.adl.jtb.syntaxtree.BindingDefinition;
 import org.ow2.mind.adl.jtb.syntaxtree.CompositeDefinition;
 import org.ow2.mind.adl.jtb.syntaxtree.DataDefinition;
+import org.ow2.mind.adl.jtb.syntaxtree.FunctionalInterfaceDefinition;
 import org.ow2.mind.adl.jtb.syntaxtree.ImplementationDefinition;
 import org.ow2.mind.adl.jtb.syntaxtree.InterfaceDefinition;
 import org.ow2.mind.adl.jtb.syntaxtree.NodeToken;
@@ -57,7 +58,7 @@ public class DocJTBProcessor extends org.ow2.mind.adl.parser.JTBProcessor {
    */
   private String getComment(final NodeToken token) {
     if (token.specialTokens != null) {
-      return CommentProcessor.processComment(token.getSpecialAt(0).tokenImage);
+      return CommentProcessor.processComment(token.getSpecialAt(token.specialTokens.size()-1).tokenImage);
     }
     return null;
   }
@@ -121,7 +122,10 @@ public class DocJTBProcessor extends org.ow2.mind.adl.parser.JTBProcessor {
   public Node visit(final InterfaceDefinition n, final Node argu) {
     final Node result = super.visit(n, argu);
     NodeToken commentToken = getCommentFromAnnotation(n.f0);
-    if (commentToken == null) commentToken = (NodeToken) n.f1.choice;
+    // grammar node InterfaceDefinition f1 is now ambiguous since changing to
+    // ( FunctionalInterfaceDefinition() | FlowInterfaceDefinition() )
+    // so it's no more (NodeToken) n.f1.choice but one level deeper
+    if (commentToken == null) commentToken = (NodeToken) ((FunctionalInterfaceDefinition) n.f1.choice).f0.choice;
     setComment(result, getComment(commentToken));
     return result;
   }
