@@ -1,5 +1,6 @@
 /**
  * Copyright (C) 2009 STMicroelectronics
+ * Copyright (C) 2014 Schneider-Electric
  *
  * This file is part of "Mind Compiler" is free software: you can redistribute
  * it and/or modify it under the terms of the GNU Lesser General Public License
@@ -17,7 +18,7 @@
  * Contact: mind@ow2.org
  *
  * Authors: michel.metzger@st.com
- * Contributors: sseyvoz@assystem.com
+ * Contributors: sseyvoz@assystem.com, yteissier@assystem.com
  */
 package org.ow2.mind.doc;
 
@@ -30,13 +31,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateErrorListener;
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.stringtemplate.StringTemplateGroupLoader;
 import org.antlr.stringtemplate.language.DefaultTemplateLexer;
@@ -44,11 +43,10 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.ow2.mind.PathHelper;
 import org.ow2.mind.doc.HTMLDocumentationHelper.SourceKind;
 import org.ow2.mind.doc.comments.CommentTagProcessor;
-import org.ow2.mind.doc.stringtemplate.PortablePathGroupLoader;
 
 
 public class DocumentationIndexGenerator {
-  private static final String ALL_DEF_FRAME_TEMPLATE = "st/frames/all_def_frame";
+  private static final String ALL_DEF_FRAME_TEMPLATE = "st.frames.all_def_frame";
   private static final String OVERVIEW_FRAME_TEMPLATE = "st/frames/overview-frame";
   private static final String OVERVIEW_SUMMARY_TEMPLATE = "st/summaries/overview-summary";
   private static final String PACKAGE_FRAME_TEMPLATE = "st/frames/package-frame";
@@ -178,7 +176,6 @@ public class DocumentationIndexGenerator {
   private final Set<IndexEntry> adlDefinitionEntries = new TreeSet<IndexEntry>(new IndexEntryComparatorNoPackage());
   private final Set<IndexEntry> itfDefinitionEntries = new TreeSet<IndexEntry>(new IndexEntryComparatorNoPackage());
   private final Set<IndexEntry> packages = new TreeSet<IndexEntry>(new IndexEntryComparator());
-  private final StringTemplateGroupLoader groupLoader;
 
   private final StringTemplate allDefinitionTemplate;
   private final StringTemplate overviewFrameTemplate;
@@ -188,22 +185,21 @@ public class DocumentationIndexGenerator {
   private final File overviewFile;
   private final String docTitle;
 
-
-  public DocumentationIndexGenerator(final File[] sourceDirectories, final File resourceDirectory, final String docTitle, final File overviewFile) throws IOException {
+  public DocumentationIndexGenerator(final File[] sourceDirectories, final File resourceDirectory, final String docTitle, final File overviewFile, final StringTemplateGroupLoader stComponentLoaderItf) throws IOException {
     this.sourceDirectories = sourceDirectories;
     this.overviewFile = overviewFile;
     this.docTitle = docTitle;
 
-    groupLoader = new PortablePathGroupLoader(resourceDirectory.getAbsolutePath(), new StringTemplateErrorListener() {
-      public void warning(final String msg) {
-        System.out.println("String template: " + msg);
-      }
+//    groupLoader = new PortablePathGroupLoader(resourceDirectory.getAbsolutePath(), new StringTemplateErrorListener() {
+//      public void warning(final String msg) {
+//        System.out.println("String template: " + msg);
+//      }
 
-      public void error(final String msg, final Throwable e) {
-        System.out.println("String template error: " + msg);
-        e.printStackTrace(new PrintStream(System.err));
-      }
-    });
+//      public void error(final String msg, final Throwable e) {
+//        System.out.println("String template error: " + msg);
+//        e.printStackTrace(new PrintStream(System.err));
+//      }
+//    });
 
     StringTemplateGroup group = new StringTemplateGroup("indexGroup");
     group.registerRenderer(String.class, new HTMLRenderer());
@@ -213,7 +209,8 @@ public class DocumentationIndexGenerator {
     packageFrameTemplate = group.getInstanceOf(PACKAGE_FRAME_TEMPLATE);
     packageSummaryTemplate = group.getInstanceOf(PACKAGE_SUMMARY_TEMPLATE);
 
-    group = groupLoader.loadGroup(ALL_DEF_FRAME_TEMPLATE, DefaultTemplateLexer.class, null);
+    group = stComponentLoaderItf.loadGroup(ALL_DEF_FRAME_TEMPLATE, DefaultTemplateLexer.class, null);
+    //group = groupeLoader.loadGroup(ALL_DEF_FRAME_TEMPLATE, DefaultTemplateLexer.class, null);
     group.registerRenderer(String.class, new HTMLRenderer());
 
     allDefinitionTemplate = group.getInstanceOf("frame");

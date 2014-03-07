@@ -1,5 +1,6 @@
 /**
  * Copyright (C) 2009 STMicroelectronics
+ * Copyright (C) 2014 Schneider-Electric
  *
  * This file is part of "Mind Compiler" is free software: you can redistribute
  * it and/or modify it under the terms of the GNU Lesser General Public License
@@ -17,7 +18,7 @@
  * Contact: mind@ow2.org
  *
  * Authors: michel.metzger@st.com
- * Contributors:
+ * Contributors: yteissier@assystem.com
  */
 
 package org.ow2.mind.doc;
@@ -39,11 +40,13 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.StreamHandler;
 
+import org.antlr.stringtemplate.StringTemplateGroupLoader;
 import org.objectweb.fractal.adl.CompilerError;
 import org.objectweb.fractal.adl.error.GenericErrors;
 import org.ow2.mind.inject.GuiceModuleExtensionHelper;
 import org.ow2.mind.plugin.PluginLoaderModule;
 import org.ow2.mind.plugin.PluginManager;
+import org.ow2.mind.st.StringTemplateComponentLoader;
 import org.ow2.mind.cli.CmdArgument;
 import org.ow2.mind.cli.CmdFlag;
 import org.ow2.mind.cli.CmdOption;
@@ -57,7 +60,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 public class Launcher {
-  private static final String  MINDOC_HOME             = "MINDOC_HOME";
+  private static final String  MIND_ROOT             = "MIND_ROOT";
   private static final String  RESOURCE_DIR_NAME       = "resources";
   public static final String   DOC_FILES_DIRECTORY     = "doc-files";
 
@@ -82,41 +85,42 @@ public class Launcher {
       ID_PREFIX + "Output",
       "o", "output",
       "The path where the documentation is generated",
-      "<arg>");
+      "<The output path>");
 
   private static final CmdFlag KEEPDOT_OPTION = new CmdFlag(
       ID_PREFIX + "Keepdot",
-      "k", "keepdot",
+      null, "keepdot",
       "Specifies to keep the intermediary GraphViz Dot files used for SVG generation.");
 
   private static final CmdArgument OVERVIEW_OPTION = new CmdArgument(
       ID_PREFIX + "overview",
-      "O", "overview",
+      null, "overview",
       "Specifies the file that contains the overview documentation.",
-      "<arg>");
+      "<The overview file>");
 
   private static final CmdArgument DOCTITLE_OPTION = new CmdArgument(
       ID_PREFIX + "doctitle",
-      "T", "doctitle",
+      null, "doctitle",
       "Specifies the title that will be used in the overview page.",
-      "<arg>");
+      "<The title file>");
 
 
   private static final CmdFlag VERBOSE_OPTION = new CmdFlag(
       ID_PREFIX + "Verbose",
-      "v", "verbose",
+      null, "verbose",
       "Verbose output.");
 
   private final static Options options                 = new Options();
 
   final static Map<Object, Object> context = new HashMap<Object, Object>();
+  public static Injector injector = null;
 
   public static void main(final String[] args) {
     initLogger();
 
-    if (System.getenv(MINDOC_HOME) == null) {
+    if (System.getenv(MIND_ROOT) == null) {
       logger
-      .severe("MINDOC_HOME variable is not defined. MINDOC_HOME must point to the location where mindoc is installed.");
+      .severe("MIND_ROOT variable is not defined. MIND_ROOT must point to the location where mindoc is installed.");
       System.exit(1);
     }
 
@@ -248,12 +252,17 @@ public class Launcher {
       context.put("org.ow2.mind.doc.KeepDot", new Boolean(keepDot));
 
       // create injector from guice-module extensions
-      final Injector injector = Guice.createInjector(GuiceModuleExtensionHelper
+      injector = Guice.createInjector(GuiceModuleExtensionHelper
           .getModules(pluginManager, context));
 
       logger.fine("Generating indexes...");
+
+      // FIXME YTE Create instance of StringTemplaceGroupLoader here because the injection of this class in DocumentationIndexGenerator
+      // do not work.
+      final StringTemplateGroupLoader stComponentLoaderItf = injector.getInstance(StringTemplateComponentLoader.class);
+
       final DocumentationIndexGenerator indexGenerator = new DocumentationIndexGenerator(
-          sourceDirectories, resourceDirectory, docTitle, overviewFile);
+          sourceDirectories, resourceDirectory, docTitle, overviewFile, stComponentLoaderItf);
       indexGenerator.generateIndexPages(targetDirectory);
 
       logger.fine("Generating documentation...");
@@ -296,7 +305,7 @@ public class Launcher {
   }
 
   static String getMindocHome() {
-    return System.getenv(MINDOC_HOME);
+    return System.getenv(MIND_ROOT);
   }
 
   private static void initLogger() {

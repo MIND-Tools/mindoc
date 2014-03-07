@@ -31,12 +31,13 @@ Usage: mindoc generates documentation for ADL, IDL and implementation files loca
  [OPTION] (<sourcepath>)+
 
 Available options are :
-	-h, --help                        Print the help and exit
-	-o=<arg>, --output                The path where the documentation is generated
-	-k, --keepdot                     Specifies to keep the intermediary GraphViz Dot files used for SVG generation.
-	-O=<arg>, --overview              Specifies the file that contains the overview documentation.
-	-T=<arg>, --doctitle              Specifies the title that will be used in the overview page.
-	-v, --verbose                     Verbose output.
+	  -h, --help                      Print the help and exit
+	  -o=<The output path>, --output  The path where the documentation is generated
+	  --keepdot                       Specifies to keep the intermediary GraphViz Dot files used for SVG generation.
+	  --overview=<The overview file>  Specifies the file that contains the overview documentation.
+	  --doctitle=<The title file>     Specifies the title that will be used in the overview page.
+	  --verbose                       Verbose output.
+
 
 Document ADL
 ============
