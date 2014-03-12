@@ -279,6 +279,17 @@ DefinitionSourceGenerator {
     return superMap;
   }
 
+  private int getPathDeph(final String path) {
+    int depth=0;
+    int i;
+    char temp;
+    for (i=0; i < path.length(); i++) {
+      temp = path.charAt(i);
+      if (temp == 0x5C /* '\' */) depth++;
+    }
+    return depth - 1;
+  }
+
   private String copySourceToHTML(final File sourceDirectory,
       String sourceFileName, final String destFileName) {
     String dest = null;
@@ -296,17 +307,27 @@ DefinitionSourceGenerator {
         final PrintWriter writer = new PrintWriter(out);
         final InputStream in = new FileInputStream(sourceFile);
 
+        final int depth = getPathDeph(sourceFile.getPath());
+        String relativeBase = "";
+        int i;
+        for (i=0; i < depth; i++) { relativeBase += "../"; }
+
         writer.print("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
             "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" +
             "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
             "<head>\n" +
-            "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n");
+            "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n" +
+            "<!-- <script src=\"https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js\"></script> -->\n" +
+            "<link href=\"" + relativeBase + "google-code-prettify/prettify.css\" type=\"text/css\" rel=\"stylesheet\" />\n" +
+            "<script type=\"text/javascript\" src=\"" + relativeBase + "google-code-prettify/prettify.js\"></script>");
+
+
         writer.printf("<title>%s</title>\n", sourceFileName);
         writer.println("</head>");
-        writer.println("<body>");
-        writer.println("<pre>");
+        writer.println("<body onload=\"prettyPrint()\">");
+        writer.println("<xmp class=\"prettyprint linenums\" id=\"htmlXmp\">");
         IOUtils.copy(in, out);
-        writer.println("</pre>");
+        writer.println("</xmp>");
         writer.println("</body>");
         writer.println("</html>");
         writer.close();
