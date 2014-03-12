@@ -71,7 +71,7 @@ public class ResourceCopier {
   }
 
   public static void copyResources(final File sourceDirectories[], final File targetDirectory) {
-    //copy css and html resources
+    //copy js, css and html resources
     final File htmlResourceDirectory = new File(getMindocHome(), HTML_RESOURCES_DIR);
 
     if(!htmlResourceDirectory.canRead()) {
@@ -81,7 +81,7 @@ public class ResourceCopier {
 
     final FileFilter ff = new FileFilter() {
       public boolean accept(final File file) {
-        return file.getName().endsWith(".css") || file.getName().endsWith(".html") || file.getName().endsWith(".js");
+        return file.getName().endsWith(".css") || file.getName().endsWith(".html") || file.getName().endsWith(".js") || file.isDirectory();
       }
     };
     try {
