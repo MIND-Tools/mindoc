@@ -10,6 +10,8 @@ HtmlHeader(def, pathToRoot) ::= <<
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="$pathToRoot$/adl-documentation.css" />
 <title>$def.name;format="shortName"$</title>
+<script src="$pathToRoot$/svg-preserveaspectratio.js"></script>
+<script src="$pathToRoot$/SVGPan.js"></script>
 </head>
 >>
 

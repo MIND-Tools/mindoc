@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2009 STMicroelectronics
  *
- * This file is part of "Mind Compiler" is free software: you can redistribute 
- * it and/or modify it under the terms of the GNU Lesser General Public License 
- * as published by the Free Software Foundation, either version 3 of the 
+ * This file is part of "Mind Compiler" is free software: you can redistribute
+ * it and/or modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
  * details.
@@ -17,7 +17,7 @@
  * Contact: mind@ow2.org
  *
  * Authors: ali-erdem.ozcan@st.com
- * Contributors: 
+ * Contributors:
  */
 
 package org.ow2.mind.doc.adl;
@@ -78,12 +78,13 @@ import org.ow2.mind.doc.HTMLDocumentationHelper;
 import org.ow2.mind.doc.HTMLRenderer;
 import org.ow2.mind.doc.Launcher;
 import org.ow2.mind.doc.HTMLDocumentationHelper.SourceKind;
+import org.ow2.mind.doc.adl.dotsvg.Dot2SVGProcessor;
 import org.ow2.mind.doc.comments.CommentProcessor;
 import org.ow2.mind.io.IOErrors;
 
 public class HTMLDocumentGenerator extends AbstractSourceGenerator
-    implements
-      DefinitionSourceGenerator {
+implements
+DefinitionSourceGenerator {
 
   public String              pathToRoot;
   private File outputFile;
@@ -108,7 +109,10 @@ public class HTMLDocumentGenerator extends AbstractSourceGenerator
     st.setAttribute("links", getLinkMap(definition, (File)context.get("sourceDirectory")));
     st.setAttribute("pathToRoot", pathToRoot);
 
-    CommentProcessor.process(definition);
+    CommentProcessor.process(definition, context);
+
+    // Create SVG component graph
+    Dot2SVGProcessor.process(definition, context);
 
     try {
       SourceFileWriter.writeToFile(outputFile, st.toString());
@@ -198,7 +202,8 @@ public class HTMLDocumentGenerator extends AbstractSourceGenerator
     if (definition instanceof ImplementationContainer) {
       final ImplementationContainer implContainer = (ImplementationContainer) definition;
       for (final Source src : implContainer.getSources()) {
-        map.put(src.toString(), getImplementationAnchor(src.getPath()));
+        if ((src.toString() != null) && (src.getPath() != null))
+          map.put(src.toString(), getImplementationAnchor(src.getPath()));
       }
     }
     return superMap;
@@ -259,16 +264,30 @@ public class HTMLDocumentGenerator extends AbstractSourceGenerator
       final ImplementationContainer implContainer = (ImplementationContainer) definition;
       for (final Source src : implContainer.getSources()) {
 
-        final String sourceFileName = src.getPath().toString();
-        final String destFileName = "impl" + src.hashCode() + ".html";
-        String dest = null;
+        if (src.getPath() != null) {
 
-        dest = copySourceToHTML(sourceDirectory, sourceFileName, destFileName);
-        if(dest != null)
-          map.put(src.toString(), dest);
+          final String sourceFileName = src.getPath().toString();
+          final String destFileName = "impl" + src.hashCode() + ".html";
+          String dest = null;
+
+          dest = copySourceToHTML(sourceDirectory, sourceFileName, destFileName);
+          if(dest != null)
+            map.put(src.toString(), dest);
+        }
       }
     }
     return superMap;
+  }
+
+  private int getPathDeph(final String path) {
+    int depth=0;
+    int i;
+    char temp;
+    for (i=0; i < path.length(); i++) {
+      temp = path.charAt(i);
+      if (temp == 0x5C /* '\' */) depth++;
+    }
+    return depth - 1;
   }
 
   private String copySourceToHTML(final File sourceDirectory,
@@ -288,17 +307,27 @@ public class HTMLDocumentGenerator extends AbstractSourceGenerator
         final PrintWriter writer = new PrintWriter(out);
         final InputStream in = new FileInputStream(sourceFile);
 
+        final int depth = getPathDeph(sourceFile.getPath());
+        String relativeBase = "";
+        int i;
+        for (i=0; i < depth; i++) { relativeBase += "../"; }
+
         writer.print("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
-        		"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" +
-        		"<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
-        		"<head>\n" +
-        		"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n");
+            "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" +
+            "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
+            "<head>\n" +
+            "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n" +
+            "<!-- <script src=\"https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js\"></script> -->\n" +
+            "<link href=\"" + relativeBase + "google-code-prettify/prettify.css\" type=\"text/css\" rel=\"stylesheet\" />\n" +
+            "<script type=\"text/javascript\" src=\"" + relativeBase + "google-code-prettify/prettify.js\"></script>");
+
+
         writer.printf("<title>%s</title>\n", sourceFileName);
         writer.println("</head>");
-        writer.println("<body>");
-        writer.println("<pre>");
+        writer.println("<body onload=\"prettyPrint()\">");
+        writer.println("<xmp class=\"prettyprint linenums\" id=\"htmlXmp\">");
         IOUtils.copy(in, out);
-        writer.println("</pre>");
+        writer.println("</xmp>");
         writer.println("</body>");
         writer.println("</html>");
         writer.close();
@@ -319,6 +348,11 @@ public class HTMLDocumentGenerator extends AbstractSourceGenerator
   private void addTypeArgumentLinks(final Definition definition, final Map<String, String> map, final TypeArgumentContainer typeArgumentContainer) {
     for (final TypeArgument typeArg : typeArgumentContainer.getTypeArguments()) {
       final DefinitionReference argDefRef = typeArg.getDefinitionReference();
+
+      // TODO: Handle this case more finely
+      if (argDefRef == null)
+        continue;
+
       addDefinitionReferenceLink(definition, map, argDefRef);
       if(argDefRef instanceof TypeArgumentContainer) {
         addTypeArgumentLinks(definition, map, (TypeArgumentContainer)argDefRef);
@@ -387,7 +421,9 @@ public class HTMLDocumentGenerator extends AbstractSourceGenerator
 
     if (definition instanceof FormalTypeParameterContainer) {
       for (final FormalTypeParameter typeParam: ((FormalTypeParameterContainer)definition).getFormalTypeParameters()) {
-        setDefinitionReferenceKind(typeParam.getDefinitionReference());
+        final DefinitionReference defRef = typeParam.getDefinitionReference();
+        if (defRef != null)
+        setDefinitionReferenceKind(defRef);
       }
     }
 

@@ -8,19 +8,24 @@
     <includeBaseDirectory>true</includeBaseDirectory>
     <dependencySets>
         <dependencySet>
-            <outputDirectory>lib</outputDirectory>
+            <outputDirectory>ext</outputDirectory>
+            <includes>
+                <include>${project.groupId}:mindoc</include>
+                <include>commons-io:commons-io</include>
+            </includes>
+            <fileMode>0644</fileMode>
         </dependencySet>
     </dependencySets>
     <fileSets>
         <fileSet>
-            <directory>src/main/resources</directory>
+            <directory>src/main/resources/html</directory>
             <filtered>false</filtered>
-            <outputDirectory>resources</outputDirectory>
+            <outputDirectory>resources/html</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>src/assemble/resources/example</directory>
+            <directory>src/assemble/resources/examples/doc</directory>
             <filtered>false</filtered>
-            <outputDirectory>example</outputDirectory>
+            <outputDirectory>examples/doc</outputDirectory>
         </fileSet>
     </fileSets>
     <files>
@@ -37,15 +42,15 @@
             <filtered>true</filtered>
         </file>
         <file>
-            <source>src/assemble/resources/README.txt</source>
-            <fileMode>0644</fileMode>
-            <outputDirectory></outputDirectory>
+            <source>src/assemble/resources/mindoc.bat</source>
+            <fileMode>0755</fileMode>
+            <outputDirectory>bin</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
-            <source>src/assemble/resources/ext/README.txt</source>
+            <source>src/assemble/resources/README_DOC.txt</source>
             <fileMode>0644</fileMode>
-            <outputDirectory>ext</outputDirectory>
+            <outputDirectory></outputDirectory>
             <filtered>true</filtered>
         </file>
     </files>

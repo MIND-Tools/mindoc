@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2009 STMicroelectronics
  *
- * This file is part of "Mind Compiler" is free software: you can redistribute 
- * it and/or modify it under the terms of the GNU Lesser General Public License 
- * as published by the Free Software Foundation, either version 3 of the 
+ * This file is part of "Mind Compiler" is free software: you can redistribute
+ * it and/or modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
  * details.
@@ -17,7 +17,7 @@
  * Contact: mind@ow2.org
  *
  * Authors: michel.metzger@st.com
- * Contributors: 
+ * Contributors:
  */
 package org.ow2.mind.doc;
 
@@ -71,7 +71,7 @@ public class ResourceCopier {
   }
 
   public static void copyResources(final File sourceDirectories[], final File targetDirectory) {
-    //copy css and html resources
+    //copy js, css and html resources
     final File htmlResourceDirectory = new File(getMindocHome(), HTML_RESOURCES_DIR);
 
     if(!htmlResourceDirectory.canRead()) {
@@ -81,7 +81,7 @@ public class ResourceCopier {
 
     final FileFilter ff = new FileFilter() {
       public boolean accept(final File file) {
-        return file.getName().endsWith(".css") || file.getName().endsWith(".html");
+        return file.getName().endsWith(".css") || file.getName().endsWith(".html") || file.getName().endsWith(".js") || file.isDirectory();
       }
     };
     try {

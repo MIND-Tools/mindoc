@@ -41,6 +41,8 @@ $DefinitionSection(definition = definition)$
 <hr/>
 $ComponentCommentSection(definition = definition, anchors = anchors)$
 
+$SVGFigureSection(definition = definition)$
+
 $dataSection(definition = definition)$
 
 $AttributeSummary(definition = definition, anchors = anchors)$
@@ -116,6 +118,15 @@ $if(definition.astDecorations.comment)$
 <div class="component-comment">
 <p>$definition.astDecorations.comment$</p>
 $annotationList(definition)$
+</div>
+<hr/>
+$endif$
+>>
+
+SVGFigureSection(definition) ::= <<
+$if(definition.astDecorations.("embed-svg"))$
+<div class="svg-figure-section">
+<embed src="doc-files/$definition.name; format="shortName"$.svg" class="svgFigure" %s type="image/svg+xml"/>
 </div>
 <hr/>
 $endif$

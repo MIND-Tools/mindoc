@@ -1,12 +1,13 @@
 /**
  * Copyright (C) 2009 STMicroelectronics
+ * Copyright (C) 2014 Schneider-Electric
  *
- * This file is part of "Mind Compiler" is free software: you can redistribute 
- * it and/or modify it under the terms of the GNU Lesser General Public License 
- * as published by the Free Software Foundation, either version 3 of the 
+ * This file is part of "Mind Compiler" is free software: you can redistribute
+ * it and/or modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
  * details.
@@ -17,13 +18,12 @@
  * Contact: mind@ow2.org
  *
  * Authors: michel.metzger@st.com
- * Contributors: 
+ * Contributors: sseyvoz@assystem.com, yteissier@assystem.com
  */
 package org.ow2.mind.doc;
 
 import static org.ow2.mind.PathHelper.packageNameToDirName;
 import static org.ow2.mind.doc.HTMLDocumentationHelper.getDefinitionName;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
@@ -31,15 +31,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
-import org.antlr.stringtemplate.PathGroupLoader;
 import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateErrorListener;
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.stringtemplate.StringTemplateGroupLoader;
 import org.antlr.stringtemplate.language.DefaultTemplateLexer;
@@ -50,7 +46,7 @@ import org.ow2.mind.doc.comments.CommentTagProcessor;
 
 
 public class DocumentationIndexGenerator {
-  private static final String ALL_DEF_FRAME_TEMPLATE = "st/frames/all_def_frame";
+  private static final String ALL_DEF_FRAME_TEMPLATE = "st.frames.all_def_frame";
   private static final String OVERVIEW_FRAME_TEMPLATE = "st/frames/overview-frame";
   private static final String OVERVIEW_SUMMARY_TEMPLATE = "st/summaries/overview-summary";
   private static final String PACKAGE_FRAME_TEMPLATE = "st/frames/package-frame";
@@ -83,9 +79,9 @@ public class DocumentationIndexGenerator {
      */
     public File file;
 
-    public List<IndexEntry> adl;
+    public Set<IndexEntry> adl;
 
-    public List<IndexEntry> itf;
+    public Set<IndexEntry> itf;
 
     private IndexEntry(final EntryKind kind, final String name, final String frameHtmlFileName, final String summaryHtmlFileName, final File file) {
       this(kind, name, frameHtmlFileName, summaryHtmlFileName, file, null, null);
@@ -93,7 +89,7 @@ public class DocumentationIndexGenerator {
 
     private IndexEntry(final EntryKind kind, final String name,
         final String frameHtmlFileName, final String summaryHtmlFileName,
-        final File file, final List<IndexEntry> adl, final List<IndexEntry> itf) {
+        final File file, final Set<IndexEntry> adl, final Set<IndexEntry> itf) {
       this.name = name;
       this.frameHtmlFileName = frameHtmlFileName;
       this.summaryHtmlFileName = summaryHtmlFileName;
@@ -108,7 +104,7 @@ public class DocumentationIndexGenerator {
     public static IndexEntry createADLEntry(final File rootDirectory, final File file) throws IOException {
       final String definitionName = getDefinitionName(rootDirectory.getCanonicalPath(), file.getCanonicalPath());
       String summaryHtmlFileName = HTMLDocumentationHelper.getPathToADL(definitionName);
-      if(summaryHtmlFileName.startsWith(File.separator)) {
+      if(summaryHtmlFileName.startsWith("/")) {
         summaryHtmlFileName = summaryHtmlFileName.substring(1);
       }
       return new IndexEntry(EntryKind.ADL, definitionName, null, summaryHtmlFileName, file);
@@ -117,7 +113,7 @@ public class DocumentationIndexGenerator {
     public static IndexEntry createITFEntry(final File rootDirectory, final File file) throws IOException {
       final String definitionName = getDefinitionName(rootDirectory.getCanonicalPath(), file.getCanonicalPath());
       String summaryHtmlFileName = HTMLDocumentationHelper.getPathToITF(definitionName);
-      if(summaryHtmlFileName.startsWith(File.separator)) {
+      if(summaryHtmlFileName.startsWith("/")) {
         summaryHtmlFileName = summaryHtmlFileName.substring(1);
       }
       return new IndexEntry(EntryKind.ITF, definitionName, null, summaryHtmlFileName, file);
@@ -126,21 +122,32 @@ public class DocumentationIndexGenerator {
     public static IndexEntry createPackageEntry(
         final File rootDirectory,
         final File directory,
-        final List<IndexEntry> adl,
-        final List<IndexEntry> itf) throws IOException {
+        final Set<IndexEntry> adl,
+        final Set<IndexEntry> itf) throws IOException {
         final String packageName = getDefinitionName(rootDirectory.getCanonicalPath(), directory.getCanonicalPath());
 
-        String frameHtmlFileName = packageNameToDirName(packageName) + File.separatorChar + PACKAGE_FRAME_HTML;
-        String summaryHtmlFileName = packageNameToDirName(packageName) + File.separatorChar + PACKAGE_SUMMARY_HTML;
+        String frameHtmlFileName = packageNameToDirName(packageName) + '/' + PACKAGE_FRAME_HTML;
+        String summaryHtmlFileName = packageNameToDirName(packageName) + '/' + PACKAGE_SUMMARY_HTML;
 
-        if(frameHtmlFileName.startsWith(File.separator)) {
+        if(frameHtmlFileName.startsWith("/")) {
           frameHtmlFileName = frameHtmlFileName.substring(1);
         }
 
-        if(summaryHtmlFileName.startsWith(File.separator)) {
+        if(summaryHtmlFileName.startsWith("/")) {
           summaryHtmlFileName = summaryHtmlFileName.substring(1);
         }
         return new IndexEntry(EntryKind.PACKAGE, packageName, frameHtmlFileName, summaryHtmlFileName, directory, adl, itf);
+    }
+
+    public static IndexEntry mergePackageEntries(final IndexEntry existingEntry, final IndexEntry newEntry) {
+      // ignore packages duplicates by removing them before adding new entries
+      newEntry.adl.removeAll(existingEntry.adl);
+      newEntry.itf.removeAll(existingEntry.itf);
+
+      // add new content
+      existingEntry.adl.addAll(newEntry.adl);
+      existingEntry.itf.addAll(newEntry.itf);
+      return existingEntry;
     }
 
     @Override
@@ -166,10 +173,9 @@ public class DocumentationIndexGenerator {
 
   private final File[] sourceDirectories;
 
-  private final List<IndexEntry> adlDefinitionEntries = new LinkedList<IndexEntry>();
-  private final List<IndexEntry> itfDefinitionEntries = new LinkedList<IndexEntry>();
-  private final List<IndexEntry> packages = new LinkedList<IndexEntry>();
-  private final StringTemplateGroupLoader groupLoader;
+  private final Set<IndexEntry> adlDefinitionEntries = new TreeSet<IndexEntry>(new IndexEntryComparatorNoPackage());
+  private final Set<IndexEntry> itfDefinitionEntries = new TreeSet<IndexEntry>(new IndexEntryComparatorNoPackage());
+  private final Set<IndexEntry> packages = new TreeSet<IndexEntry>(new IndexEntryComparator());
 
   private final StringTemplate allDefinitionTemplate;
   private final StringTemplate overviewFrameTemplate;
@@ -179,22 +185,21 @@ public class DocumentationIndexGenerator {
   private final File overviewFile;
   private final String docTitle;
 
-
-  public DocumentationIndexGenerator(final File[] sourceDirectories, final File resourceDirectory, final String docTitle, final File overviewFile) throws IOException {
+  public DocumentationIndexGenerator(final File[] sourceDirectories, final File resourceDirectory, final String docTitle, final File overviewFile, final StringTemplateGroupLoader stComponentLoaderItf) throws IOException {
     this.sourceDirectories = sourceDirectories;
     this.overviewFile = overviewFile;
     this.docTitle = docTitle;
 
-    groupLoader = new PathGroupLoader(resourceDirectory.getAbsolutePath(), new StringTemplateErrorListener() {
-      public void warning(final String msg) {
-        System.out.println("String template: " + msg);
-      }
+//    groupLoader = new PortablePathGroupLoader(resourceDirectory.getAbsolutePath(), new StringTemplateErrorListener() {
+//      public void warning(final String msg) {
+//        System.out.println("String template: " + msg);
+//      }
 
-      public void error(final String msg, final Throwable e) {
-        System.out.println("String template error: " + msg);
-        e.printStackTrace(new PrintStream(System.err));
-      }
-    });
+//      public void error(final String msg, final Throwable e) {
+//        System.out.println("String template error: " + msg);
+//        e.printStackTrace(new PrintStream(System.err));
+//      }
+//    });
 
     StringTemplateGroup group = new StringTemplateGroup("indexGroup");
     group.registerRenderer(String.class, new HTMLRenderer());
@@ -204,8 +209,10 @@ public class DocumentationIndexGenerator {
     packageFrameTemplate = group.getInstanceOf(PACKAGE_FRAME_TEMPLATE);
     packageSummaryTemplate = group.getInstanceOf(PACKAGE_SUMMARY_TEMPLATE);
 
-    group = groupLoader.loadGroup(ALL_DEF_FRAME_TEMPLATE, DefaultTemplateLexer.class, null);
+    group = stComponentLoaderItf.loadGroup(ALL_DEF_FRAME_TEMPLATE, DefaultTemplateLexer.class, null);
+    //group = groupeLoader.loadGroup(ALL_DEF_FRAME_TEMPLATE, DefaultTemplateLexer.class, null);
     group.registerRenderer(String.class, new HTMLRenderer());
+
     allDefinitionTemplate = group.getInstanceOf("frame");
 
     generateIndexLists();
@@ -223,16 +230,13 @@ public class DocumentationIndexGenerator {
     for (final File directory : sourceDirectories) {
       exploreDirectory(directory.getCanonicalFile(), directory.getCanonicalFile());
     }
-    Collections.sort(adlDefinitionEntries, new IndexEntryComparatorNoPackage());
-    Collections.sort(itfDefinitionEntries, new IndexEntryComparatorNoPackage());
-    Collections.sort(packages, new IndexEntryComparator());
   }
 
   private void exploreDirectory(final File rootDirectory, final File directory) throws IOException {
     if(directory.isHidden()) return;
 
-    final List<IndexEntry> packageADLDefinition = new LinkedList<IndexEntry>();
-    final List<IndexEntry> packageITFDefinition = new LinkedList<IndexEntry>();
+    final Set<IndexEntry> packageADLDefinition = new TreeSet<IndexEntry>(new IndexEntryComparatorNoPackage());
+    final Set<IndexEntry> packageITFDefinition = new TreeSet<IndexEntry>(new IndexEntryComparatorNoPackage());
 
     for (final File file : directory.listFiles((FileFilter)FileFilterUtils.suffixFileFilter(".adl"))) {
       final IndexEntry entry = IndexEntry.createADLEntry(rootDirectory, file);
@@ -247,9 +251,20 @@ public class DocumentationIndexGenerator {
     }
 
     if(!packageADLDefinition.isEmpty() || !packageITFDefinition.isEmpty()) {
-      packages.add(IndexEntry.createPackageEntry(rootDirectory, directory, packageADLDefinition, packageITFDefinition));
-      Collections.sort(packageADLDefinition, new IndexEntryComparatorNoPackage());
-      Collections.sort(packageITFDefinition, new IndexEntryComparatorNoPackage());
+      final IndexEntry packageEntry = IndexEntry.createPackageEntry(rootDirectory, directory, packageADLDefinition, packageITFDefinition);
+
+      // Avoid erroneous package duplicates: merge when needed
+      IndexEntry existingPackageEntry = null;
+      for (final IndexEntry currentPackage : packages) {
+        if (currentPackage.name.equals(packageEntry.name)) {
+          existingPackageEntry = currentPackage;
+          break;
+        }
+      }
+      if (existingPackageEntry == null)
+        packages.add(packageEntry);
+      else
+        IndexEntry.mergePackageEntries(existingPackageEntry, packageEntry);
     }
 
     for (final File subDirectory: directory.listFiles(new FileFilter() {
@@ -351,16 +366,17 @@ public class DocumentationIndexGenerator {
       }
       String documentation = sb.toString();
 
-      final CommentTagProcessor tagProcessor = new CommentTagProcessor(packageName, documentation, SourceKind.PACKAGE);
+      final CommentTagProcessor tagProcessor = new CommentTagProcessor(null, packageName, documentation, SourceKind.PACKAGE);
       documentation = tagProcessor.replaceTagsInComment();
 
       String shortDocumentation = null;
-      final int index = documentation.indexOf('.');
+      final int index = documentation.indexOf(".");
       if(index != -1) {
-        shortDocumentation = documentation.substring(0, index);
+        shortDocumentation = documentation.substring(0, index + 1);
       } else {
         shortDocumentation = documentation;
       }
+      documentation = documentation.substring(index + 1);
       template.setAttribute("documentation", documentation);
       template.setAttribute("shortDocumentation", shortDocumentation);
     }
