@@ -51,6 +51,7 @@ import org.ow2.mind.cli.CmdArgument;
 import org.ow2.mind.cli.CmdFlag;
 import org.ow2.mind.cli.CmdOption;
 import org.ow2.mind.cli.CmdOptionBooleanEvaluator;
+import org.ow2.mind.cli.CmdPathOption;
 import org.ow2.mind.cli.CommandLine;
 import org.ow2.mind.cli.CommandLineOptionExtensionHelper;
 import org.ow2.mind.cli.CommandOptionHandler;
@@ -110,6 +111,14 @@ public class Launcher {
       null, "verbose",
       "Verbose output.");
 
+  private static final CmdPathOption SRC_PATH_HANDLER = new CmdPathOption(
+      ID_PREFIX + "src parh",
+      "S",
+      "src-path",
+      "the search path of ADL,IDL and implementation files (list of path separated by ':' on Linux or ';' on Windows)",
+      "<path list>"
+      );
+
   private final static Options options                 = new Options();
 
   final static Map<Object, Object> context = new HashMap<Object, Object>();
@@ -144,7 +153,8 @@ public class Launcher {
         KEEPDOT_OPTION,
         OVERVIEW_OPTION,
         DOCTITLE_OPTION,
-        VERBOSE_OPTION);
+        VERBOSE_OPTION,
+        SRC_PATH_HANDLER);
 
     // Enable to allow using other modules command-line options
     //options.addOptions(CommandLineOptionExtensionHelper
@@ -171,19 +181,39 @@ public class Launcher {
       // @TODO Use environment variable
       if (VERBOSE_OPTION.isPresent(cmdLine)) logger.setLevel(Level.ALL);
 
+      List<String> sourceListExtra = null;
+      List<String> sourceList = null;
+
       if (cmdLine.getArguments().size() >= 1) {
-        final List<String> sourceList = cmdLine.getArguments();
-        sourceDirectories = new File[sourceList.size()];
+        sourceListExtra = cmdLine.getArguments();
+      }
+      if (SRC_PATH_HANDLER.isPresent(cmdLine)) {
+        sourceList = SRC_PATH_HANDLER.getPathValue(cmdLine);
+      }
+      sourceDirectories = new File[((sourceList != null)?sourceList.size():0) + ((sourceListExtra != null)?sourceListExtra.size():0)];
+
+      if (sourceList != null) {
+
         for (int i = 0; i < sourceList.size(); i++) {
           final File sourceDirectory = new File(sourceList.get(i));
           if (!sourceDirectory.isDirectory() || !sourceDirectory.canRead()) {
-            logger.severe(String.format("Cannot read source path '%s'.",
-                sourceDirectory.getPath()));
+            logger.severe(String.format("Cannot read source path '%s'.", sourceDirectory.getPath()));
             System.exit(2);
           }
           sourceDirectories[i] = sourceDirectory;
         }
-      } else {
+      }
+      if (sourceListExtra != null) {
+        for (int i = 0; i < sourceListExtra.size(); i++) {
+            final File sourceDirectory = new File(sourceListExtra.get(i));
+            if (!sourceDirectory.isDirectory() || !sourceDirectory.canRead()) {
+              logger.severe(String.format("Cannot read source path '%s'.", sourceDirectory.getPath()));
+              System.exit(2);
+            }
+            sourceDirectories[((sourceList != null)?sourceList.size():0) + i] = sourceDirectory;
+          }
+      }
+      if (sourceListExtra == null && sourceList == null) {
         logger.severe("You must specify a source path.");
         printHelp(System.err);
         System.exit(1);
