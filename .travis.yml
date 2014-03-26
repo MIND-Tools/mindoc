@@ -1,0 +1,10 @@
+language: java
+before_install:
+  - "git clone https://github.com/Mind4SE/mind-compiler.git"
+  - "cd mind-compiler"
+  - "mvn -U install -DskipTests -PCI-profile"
+  - "cd .."
+install:
+  - "mvn -U clean"
+script:
+  - "mvn -U verify"
