@@ -1,0 +1,3 @@
+SCOPE OF THE LICENSE OF THE MIND COMPILER TOOL
+
+For the avoidance of any doubt, copyright holders of the Mind Compiler ("MC") clarify herein the scope of the open source license chosen for covering MC: the terms of the copyrights and of the license of MC are not propagated to the generated software.
