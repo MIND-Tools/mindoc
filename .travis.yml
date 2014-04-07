@@ -8,3 +8,4 @@ install:
   - "mvn -U clean"
 script:
   - "mvn -U verify"
+  
