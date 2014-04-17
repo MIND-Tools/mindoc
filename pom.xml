@@ -170,7 +170,7 @@
                 </executions>
             </plugin>
 
-            <!-- @TODO Transfer this test has a new task in the continuous integration 
+            <!-- @TODO Transfer this test as a new task in the continuous integration 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>

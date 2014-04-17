@@ -20,7 +20,7 @@
  * Contributors: Stéphane Seyvoz
  */
 
-package org.ow2.mind.doc.adl.dotsvg;
+package org.ow2.mind.doc.adl.graph;
 
 import java.util.Comparator;
 import org.ow2.mind.adl.ast.Binding;
