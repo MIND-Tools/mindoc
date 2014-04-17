@@ -19,7 +19,7 @@
  * Authors: Stéphane Seyvoz
  */
 
-package org.ow2.mind.doc.adl.dotsvg;
+package org.ow2.mind.doc.adl.graph;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,16 +40,14 @@ public class GraphvizImageConverter {
   }
 
   /**
-   * This method does nothing in the default configuration.
-   * If the user specified "@DumpDot(generateImage=<format>)" where format is svg or png,
-   * create a picture from the previously generated dot file.
+   * Create a picture from the previously generated dot file.
    */
-  public void convertDotToImage(final String dir, final String name) {
+  public void convertGvToImage(final String dir, final String name) {
 
     if (imageFormat.equals("none"))
       return;
 
-    final String graphVizCommand[] = {"dot", "-T" + imageFormat, dir + name + ".dot"};
+    final String graphVizCommand[] = {"dot", "-T" + imageFormat, dir + name + ".gv"};
 
     // Better than Runtime getRuntime exec !
     final ProcessBuilder builder = new ProcessBuilder(graphVizCommand);
@@ -64,14 +62,14 @@ public class GraphvizImageConverter {
   }
 
   /**
-   * Convert dot file to image with the help of the external GraphViz dot tool.
+   * Convert gv file to image with the help of the external GraphViz dot tool.
    */
-  public void convertDotToImage(final String dir, final String name, final String outputDir, final String shortDefName) {
+  public void convertGvToImage(final String dir, final String name, final String outputDir, final String shortDefName) {
 
     if (imageFormat.equals("none"))
       return;
 
-    final String graphVizCommand[] = {"dot", "-T" + imageFormat, dir + name + ".dot"};
+    final String graphVizCommand[] = {"dot", "-T" + imageFormat, dir + name + ".gv"};
 
     // Better than Runtime getRuntime exec !
     final ProcessBuilder builder = new ProcessBuilder(graphVizCommand);

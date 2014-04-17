@@ -33,7 +33,7 @@ Usage: mindoc generates documentation for ADL, IDL and implementation files loca
 Available options are :
 	  -h, --help                      Print the help and exit
 	  -o=<The output path>, --output  The path where the documentation is generated
-	  --keepdot                       Specifies to keep the intermediary GraphViz Dot files used for SVG generation.
+	  --keepGV                       Specifies to keep the intermediary GraphViz GV files used for SVG generation.
 	  --overview=<The overview file>  Specifies the file that contains the overview documentation.
 	  --doctitle=<The title file>     Specifies the title that will be used in the overview page.
 	  --verbose                       Verbose output.
@@ -50,9 +50,9 @@ the entity in the adl file and be enclosed by "/**" and "*/". Finally, one can d
 packages by adding named 'package.html' in the package directory.
 
 SVG figures are automatically generated for definitions when GraphViz is installed and the 'dot'
-executable can be ran from your path. 'dot' is used for .dot to .svg conversion.
+executable can be ran from your path. 'dot' is used for .gv to .svg conversion.
 Supported navigators are: any version of Firefox, IE9+. Chrome has some issues with the rendering.
-Intermediate .dot files can be kept for edition/debug with the help of the -keepdot option.
+Intermediate .gv files can be kept for edition/debug with the help of the -keepgv option.
 
 Tags can be used in comments, in package documentations and in the overview page to add links
 and images. The tags currently supported are:

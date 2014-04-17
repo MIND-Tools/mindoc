@@ -20,7 +20,7 @@
  * Contributors: Stéphane Seyvoz
  */
 
-package org.ow2.mind.doc.adl.dotsvg;
+package org.ow2.mind.doc.adl.graph;
 
 import java.io.File;
 import java.util.Map;
@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.adl.Definition;
+import org.objectweb.fractal.adl.Loader;
 import org.objectweb.fractal.adl.interfaces.Interface;
 import org.objectweb.fractal.adl.interfaces.InterfaceContainer;
 import org.objectweb.fractal.adl.types.TypeInterface;
@@ -43,22 +44,40 @@ import org.ow2.mind.adl.ast.ComponentContainer;
 import org.ow2.mind.adl.ast.ImplementationContainer;
 import org.ow2.mind.adl.ast.MindInterface;
 import org.ow2.mind.adl.ast.Source;
+import org.ow2.mind.idl.IDLLoader;
 import org.ow2.mind.io.BasicOutputFileLocator;
+
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 
 /**
  * @author Julien TOUS
  * @author Stephane Seyvoz
  */
-public class Dot2SVGProcessor {
+public class Gv2SVGProcessor {
+
+  /*
+   * Works because our Loader is itself loaded by Google Guice.
+   */
+  @Inject
+  protected Injector injector;
+
+  @Inject
+  protected IDLLoader idlLoaderItf;
+
+  @Inject
+  protected Loader adlLoaderItf;
 
   private String buildDir;
-  private GraphvizImageConverter gic;
+  private final GraphvizImageConverter gic;
 
-  private static Dot2SVGProcessor instance = null;
+  // The Gv2SVGProcessor logger
+  protected Logger dotLogger = FractalADLLogManager
+      .getLogger("Gv2SVG");
 
-  // The Dot2SVGProcessor logger
-  protected static Logger dotLogger = FractalADLLogManager
-      .getLogger("Dot2SVG");
+  public Gv2SVGProcessor() {
+    gic = new GraphvizImageConverter("svg");
+  }
 
   private void showComposite(final Definition definition, final DotWriter currentDefinitionDot) {
     final Component[] subComponents = ((ComponentContainer) definition)
@@ -79,9 +98,9 @@ public class Dot2SVGProcessor {
 
     for (final MindInterface itf : interfaces) {
       if (itf.getRole()==TypeInterface.SERVER_ROLE)
-        currentDefinitionDot.addServer(itf.getName());
+        currentDefinitionDot.addServer(itf.getName(), itf.getSignature());
       if (itf.getRole()==TypeInterface.CLIENT_ROLE)
-        currentDefinitionDot.addClient(itf.getName());
+        currentDefinitionDot.addClient(itf.getName(), itf.getSignature());
     }
   }
 
@@ -97,9 +116,9 @@ public class Dot2SVGProcessor {
 
     for (final MindInterface itf : interfaces) {
       if (itf.getRole()==TypeInterface.SERVER_ROLE)
-        currentDefinitionDot.addServer(itf.getName());
+        currentDefinitionDot.addServer(itf.getName(), itf.getSignature());
       if (itf.getRole()==TypeInterface.CLIENT_ROLE)
-        currentDefinitionDot.addClient(itf.getName());
+        currentDefinitionDot.addClient(itf.getName(), itf.getSignature());
     }
   }
 
@@ -111,20 +130,11 @@ public class Dot2SVGProcessor {
 
     for (final MindInterface itf : interfaces) {
       if (itf.getRole()==TypeInterface.SERVER_ROLE)
-        currentDefinitionDot.addServer(itf.getName());
+        currentDefinitionDot.addServer(itf.getName(), itf.getSignature());
       if (itf.getRole()==TypeInterface.CLIENT_ROLE)
-        currentDefinitionDot.addClient(itf.getName());
+        currentDefinitionDot.addClient(itf.getName(), itf.getSignature());
     }
   }
-
-  private Dot2SVGProcessor(final Map<Object, Object> cont) {
-    gic = new GraphvizImageConverter("svg");
-    final File outputDir = (File) cont.get(BasicOutputFileLocator.OUTPUT_DIR_CONTEXT_KEY);
-    // useful for some test cases where output directory isn't configured
-    if (outputDir == null) return;
-    buildDir = outputDir.getPath() + File.separator;
-  }
-
 
   /**
    * Entry point
@@ -132,14 +142,14 @@ public class Dot2SVGProcessor {
    * @param cont
    * @throws ADLException
    */
-  public static void process(final Definition definition, final Map<Object, Object> cont) {
+  public void process(final Definition definition, final Map<Object, Object> cont) {
 
-    final DotWriter dotWriter;
+    final File outputDir = (File) cont.get(BasicOutputFileLocator.OUTPUT_DIR_CONTEXT_KEY);
+    // useful for some test cases where output directory isn't configured
+    if (outputDir == null) return;
+    buildDir = outputDir.getPath() + File.separator;
 
-    if (instance == null)
-      instance = new Dot2SVGProcessor(cont);
-
-    if (!instance.gic.canDotExecutableBeRan()) {
+    if (!gic.canDotExecutableBeRan()) {
       return;
     }
 
@@ -147,23 +157,25 @@ public class Dot2SVGProcessor {
     definition.astSetDecoration("embed-svg", true);
 
     // Create files
-    dotLogger.log(Level.FINE, "Building Dot file for " + definition.getName() + " definition");
+    dotLogger.log(Level.FINE, "Building GV file for " + definition.getName() + " definition");
 
+    // Get instance from the injector so its @Inject fields get properly injected (ADL Loader especially)
+    final DotWriter dotWriter = injector.getInstance(DotWriter.class);
 
     // Select surrounding digraph style according to type
     if (ASTHelper.isType(definition))
-      dotWriter = new DotWriter(instance.buildDir, definition.getName(), true);
+      dotWriter.init(buildDir, definition, null, true, cont);
     else
       // standard mode
-      dotWriter = new DotWriter(instance.buildDir, definition.getName());
+      dotWriter.init(buildDir, definition, null, false, cont);
 
     // Start file write
     if (ASTHelper.isComposite(definition)) {
-      instance.showComposite(definition, dotWriter);
+      showComposite(definition, dotWriter);
     } else if (ASTHelper.isPrimitive(definition)) {
-      instance.showPrimitive(definition, dotWriter);
+      showPrimitive(definition, dotWriter);
     } else if (ASTHelper.isType(definition)) {
-      instance.showType(definition, dotWriter);
+      showType(definition, dotWriter);
     }
 
     dotWriter.close();
@@ -172,7 +184,7 @@ public class Dot2SVGProcessor {
     final String packageDirName = PathHelper.fullyQualifiedNameToDirName(definition.getName());
     // here the return dirName will start with "/" : careful !
     // and add the mindoc "doc-files" folder as a convention
-    final String targetDocFilesDirName = instance.buildDir + packageDirName.substring(1) + File.separator + "doc-files" + File.separator;
+    final String targetDocFilesDirName = buildDir + packageDirName.substring(1) + File.separator + "doc-files" + File.separator;
     final File currentDocFilesDir = new File(targetDocFilesDirName);
     currentDocFilesDir.mkdirs();
 
@@ -182,12 +194,12 @@ public class Dot2SVGProcessor {
     if (i == -1) shortDefName = definition.getName();
     else shortDefName = definition.getName().substring(i + 1);
 
-    dotLogger.log(Level.FINE, "Converting " + instance.buildDir.toString() + definition.getName() + ".dot to " + targetDocFilesDirName + shortDefName + ".svg");
-    instance.gic.convertDotToImage(instance.buildDir, definition.getName(), targetDocFilesDirName, shortDefName);
+    dotLogger.log(Level.FINE, "Converting " + buildDir.toString() + definition.getName() + ".gv to " + targetDocFilesDirName + shortDefName + ".svg");
+    gic.convertGvToImage(buildDir, definition.getName(), targetDocFilesDirName, shortDefName);
 
     // cleanup
-    final Boolean keepDotStatus = (Boolean) cont.get("org.ow2.mind.doc.KeepDot");
-    if (keepDotStatus != null && !keepDotStatus)
+    final Boolean keepGVStatus = (Boolean) cont.get("org.ow2.mind.doc.KeepGV");
+    if (keepGVStatus != null && !keepGVStatus)
       dotWriter.deleteFile();
   }
 

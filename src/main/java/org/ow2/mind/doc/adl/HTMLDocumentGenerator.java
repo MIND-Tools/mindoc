@@ -78,9 +78,12 @@ import org.ow2.mind.doc.HTMLDocumentationHelper;
 import org.ow2.mind.doc.HTMLRenderer;
 import org.ow2.mind.doc.Launcher;
 import org.ow2.mind.doc.HTMLDocumentationHelper.SourceKind;
-import org.ow2.mind.doc.adl.dotsvg.Dot2SVGProcessor;
+import org.ow2.mind.doc.adl.graph.Gv2SVGProcessor;
 import org.ow2.mind.doc.comments.CommentProcessor;
 import org.ow2.mind.io.IOErrors;
+
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 
 public class HTMLDocumentGenerator extends AbstractSourceGenerator
 implements
@@ -88,6 +91,9 @@ DefinitionSourceGenerator {
 
   public String              pathToRoot;
   private File outputFile;
+
+  @Inject
+  protected Injector injector;
 
   public HTMLDocumentGenerator() {
     super("st.definitions.documentation.Component");
@@ -106,13 +112,14 @@ DefinitionSourceGenerator {
     final Map<String, Map<String, String>> anchorMap = getAnchorMap(definition);
     st.setAttribute("anchors", anchorMap);
     st.setAttribute("sectionAnchors", getSectionAnchors(definition, anchorMap));
-    st.setAttribute("links", getLinkMap(definition, (File)context.get("sourceDirectory")));
+    st.setAttribute("links", getLinkMap(definition, (File)context.get("sourceDirectory"))); //
     st.setAttribute("pathToRoot", pathToRoot);
 
     CommentProcessor.process(definition, context);
 
     // Create SVG component graph
-    Dot2SVGProcessor.process(definition, context);
+    final Gv2SVGProcessor graphProcessor = injector.getInstance(Gv2SVGProcessor.class);
+    graphProcessor.process(definition, context);
 
     try {
       SourceFileWriter.writeToFile(outputFile, st.toString());
@@ -285,9 +292,9 @@ DefinitionSourceGenerator {
     char temp;
     for (i=0; i < path.length(); i++) {
       temp = path.charAt(i);
-      if (temp == 0x5C /* '\' */) depth++;
+      if (temp == '/') depth++;
     }
-    return depth - 1;
+    return depth;
   }
 
   private String copySourceToHTML(final File sourceDirectory,
@@ -307,7 +314,7 @@ DefinitionSourceGenerator {
         final PrintWriter writer = new PrintWriter(out);
         final InputStream in = new FileInputStream(sourceFile);
 
-        final int depth = getPathDeph(sourceFile.getPath());
+        final int depth = getPathDeph(sourceFileName);
         String relativeBase = "";
         int i;
         for (i=0; i < depth; i++) { relativeBase += "../"; }
@@ -423,7 +430,7 @@ DefinitionSourceGenerator {
       for (final FormalTypeParameter typeParam: ((FormalTypeParameterContainer)definition).getFormalTypeParameters()) {
         final DefinitionReference defRef = typeParam.getDefinitionReference();
         if (defRef != null)
-        setDefinitionReferenceKind(defRef);
+          setDefinitionReferenceKind(defRef);
       }
     }
 
