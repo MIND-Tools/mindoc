@@ -47,8 +47,8 @@ public class MindInterfaceComparator  implements Comparator<MindInterface> {
 		private int compareRoles(final MindInterface a, final MindInterface b) {
 			final String aRole = a.getRole();
 			final String bRole = b.getRole();
-			if (aRole == bRole) return 0; // == or .equals ???
-			else if (aRole ==TypeInterface.SERVER_ROLE) return 1;
+			if (aRole.equals(bRole)) return 0; // == or .equals ???
+			else if (aRole.equals(TypeInterface.SERVER_ROLE)) return 1;
 			else return -1;
 		}
 

@@ -97,9 +97,9 @@ public class Gv2SVGProcessor {
       interfaces.add((MindInterface) itf);
 
     for (final MindInterface itf : interfaces) {
-      if (itf.getRole()==TypeInterface.SERVER_ROLE)
+      if (itf.getRole().equals(TypeInterface.SERVER_ROLE))
         currentDefinitionDot.addServer(itf.getName(), itf.getSignature());
-      if (itf.getRole()==TypeInterface.CLIENT_ROLE)
+      if (itf.getRole().equals(TypeInterface.CLIENT_ROLE))
         currentDefinitionDot.addClient(itf.getName(), itf.getSignature());
     }
   }
@@ -115,9 +115,9 @@ public class Gv2SVGProcessor {
       interfaces.add((MindInterface) itf);
 
     for (final MindInterface itf : interfaces) {
-      if (itf.getRole()==TypeInterface.SERVER_ROLE)
+      if (itf.getRole().equals(TypeInterface.SERVER_ROLE))
         currentDefinitionDot.addServer(itf.getName(), itf.getSignature());
-      if (itf.getRole()==TypeInterface.CLIENT_ROLE)
+      if (itf.getRole().equals(TypeInterface.CLIENT_ROLE))
         currentDefinitionDot.addClient(itf.getName(), itf.getSignature());
     }
   }
@@ -129,9 +129,9 @@ public class Gv2SVGProcessor {
       interfaces.add((MindInterface) itf);
 
     for (final MindInterface itf : interfaces) {
-      if (itf.getRole()==TypeInterface.SERVER_ROLE)
+      if (itf.getRole().equals(TypeInterface.SERVER_ROLE))
         currentDefinitionDot.addServer(itf.getName(), itf.getSignature());
-      if (itf.getRole()==TypeInterface.CLIENT_ROLE)
+      if (itf.getRole().equals(TypeInterface.CLIENT_ROLE))
         currentDefinitionDot.addClient(itf.getName(), itf.getSignature());
     }
   }
