@@ -31,6 +31,7 @@ import org.ow2.mind.inject.GuiceModuleExtensionHelper;
 import org.ow2.mind.plugin.PluginLoaderModule;
 import org.ow2.mind.plugin.PluginManager;
 import org.ow2.mind.st.StringTemplateComponentLoader;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import com.google.inject.Guice;
@@ -49,11 +50,28 @@ public class DocumentationIndexGeneratorTest {
 
   final private Map<Object, Object> context = new HashMap<Object, Object>();
 
-  final private Injector injector = Guice.createInjector(GuiceModuleExtensionHelper
-      .getModules(pluginManager, context));
+  protected Injector injector;
 
   private Injector getBootstrapInjector() {
     return Guice.createInjector(new PluginLoaderModule());
+  }
+
+  /**
+   * Added this method since this class doesn't inherit from {@link AbstractDocumentationGeneratorTest},
+   * which led to different test output from the original mindoc: We would find standard compiler-generated
+   * code for ADLs and ITFs next to our HTML, since the GenrateDoc key wasn't in the context, and our
+   * 4 modules and Google Guice overrides (@see src/main/resources/plugin.xml) wouldn't be enabled.
+   *
+   * @throws Exception
+   */
+  @BeforeTest(alwaysRun = true)
+  public void setUp() throws Exception {
+
+    // Put this in context to enable mindoc Guice modules.
+    context.put("org.ow2.mind.doc.GenrateDoc", Boolean.TRUE);
+
+    injector = Guice.createInjector(GuiceModuleExtensionHelper
+        .getModules(pluginManager, context));
   }
 
   @Test
