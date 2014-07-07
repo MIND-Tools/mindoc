@@ -220,20 +220,13 @@ public class DotWriter {
 
       boolean isFormalTypeParameterReference = false;
       Definition definition = null;
-      DefinitionReference defRef = null;
+      final DefinitionReference defRef = null;
 
       // Templates support, inspired from TemplateInstantiatorImpl logic
       if ((component instanceof FormalTypeParameterReference) && (((FormalTypeParameterReference) component).getTypeParameterReference() !=null))
         isFormalTypeParameterReference = true;
 
-      if (!isFormalTypeParameterReference) {
-        // Standard sub-component
-        defRef = component.getDefinitionReference();
-        definition = ASTHelper.getResolvedDefinition(defRef, adlLoaderItf, context);
-      } else {
-        // sub-component is "templated"
-        definition = ASTHelper.getResolvedComponentDefinition(component, adlLoaderItf, context);
-      }
+      definition = ASTHelper.getResolvedComponentDefinition(component, adlLoaderItf, context);
 
       // the mindoc @figure tag uses the package name for folders and subfolder "doc-files"
       // calculate strings
@@ -253,12 +246,7 @@ public class DotWriter {
       final String targetHtmlFileDirName = packageDirName.substring(1) + "/";
 
       // compute definition short name (removing package)
-      String shortDefName = null;
-      final int i = definition.getName().lastIndexOf('.');
-      if (i == -1)
-        shortDefName = definition.getName();
-      else
-        shortDefName = definition.getName().substring(i + 1);
+      final String shortDefName = HTMLDocumentationHelper.getShortName(definition.getName());
 
       // mindoc naming convention includes ".ADL"
       // please note we use target="main-frame" for SVG to replace the current frame (otherwise only the embed containing SVG is replaced)
