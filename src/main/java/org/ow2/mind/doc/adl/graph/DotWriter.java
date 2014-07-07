@@ -33,24 +33,23 @@ import java.net.URL;
 import java.util.Map;
 import java.util.TreeSet;
 
-import org.objectweb.fractal.adl.interfaces.Interface;
-import org.objectweb.fractal.adl.interfaces.InterfaceContainer;
-import org.ow2.mind.NameHelper;
-import org.ow2.mind.PathHelper;
-import org.ow2.mind.adl.ast.ASTHelper;
-import org.ow2.mind.adl.ast.Component;
-import org.ow2.mind.adl.ast.DefinitionReference;
-import org.ow2.mind.adl.ast.MindInterface;
-import org.ow2.mind.adl.ast.Source;
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.adl.Definition;
 import org.objectweb.fractal.adl.Loader;
+import org.objectweb.fractal.adl.interfaces.Interface;
+import org.objectweb.fractal.adl.interfaces.InterfaceContainer;
+import org.objectweb.fractal.adl.types.TypeInterface;
+import org.ow2.mind.NameHelper;
+import org.ow2.mind.PathHelper;
+import org.ow2.mind.adl.ast.ASTHelper;
 import org.ow2.mind.adl.ast.Binding;
+import org.ow2.mind.adl.ast.Component;
+import org.ow2.mind.adl.ast.MindInterface;
+import org.ow2.mind.adl.ast.Source;
 import org.ow2.mind.adl.generic.ast.FormalTypeParameterReference;
 import org.ow2.mind.adl.implementation.ImplementationLocator;
 import org.ow2.mind.doc.HTMLDocumentationHelper;
 import org.ow2.mind.io.OutputFileLocator;
-import org.objectweb.fractal.adl.types.TypeInterface;
 
 import com.google.inject.Inject;
 
@@ -220,20 +219,12 @@ public class DotWriter {
 
       boolean isFormalTypeParameterReference = false;
       Definition definition = null;
-      DefinitionReference defRef = null;
 
       // Templates support, inspired from TemplateInstantiatorImpl logic
       if ((component instanceof FormalTypeParameterReference) && (((FormalTypeParameterReference) component).getTypeParameterReference() !=null))
         isFormalTypeParameterReference = true;
 
-      if (!isFormalTypeParameterReference) {
-        // Standard sub-component
-        defRef = component.getDefinitionReference();
-        definition = ASTHelper.getResolvedDefinition(defRef, adlLoaderItf, context);
-      } else {
-        // sub-component is "templated"
-        definition = ASTHelper.getResolvedComponentDefinition(component, adlLoaderItf, context);
-      }
+      definition = ASTHelper.getResolvedComponentDefinition(component, adlLoaderItf, context);
 
       // the mindoc @figure tag uses the package name for folders and subfolder "doc-files"
       // calculate strings
@@ -253,12 +244,7 @@ public class DotWriter {
       final String targetHtmlFileDirName = packageDirName.substring(1) + "/";
 
       // compute definition short name (removing package)
-      String shortDefName = null;
-      final int i = definition.getName().lastIndexOf('.');
-      if (i == -1)
-        shortDefName = definition.getName();
-      else
-        shortDefName = definition.getName().substring(i + 1);
+      final String shortDefName = HTMLDocumentationHelper.getShortName(definition.getName());
 
       // mindoc naming convention includes ".ADL"
       // please note we use target="main-frame" for SVG to replace the current frame (otherwise only the embed containing SVG is replaced)
