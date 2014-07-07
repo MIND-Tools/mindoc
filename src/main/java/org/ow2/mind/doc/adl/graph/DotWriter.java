@@ -33,24 +33,23 @@ import java.net.URL;
 import java.util.Map;
 import java.util.TreeSet;
 
-import org.objectweb.fractal.adl.interfaces.Interface;
-import org.objectweb.fractal.adl.interfaces.InterfaceContainer;
-import org.ow2.mind.NameHelper;
-import org.ow2.mind.PathHelper;
-import org.ow2.mind.adl.ast.ASTHelper;
-import org.ow2.mind.adl.ast.Component;
-import org.ow2.mind.adl.ast.DefinitionReference;
-import org.ow2.mind.adl.ast.MindInterface;
-import org.ow2.mind.adl.ast.Source;
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.adl.Definition;
 import org.objectweb.fractal.adl.Loader;
+import org.objectweb.fractal.adl.interfaces.Interface;
+import org.objectweb.fractal.adl.interfaces.InterfaceContainer;
+import org.objectweb.fractal.adl.types.TypeInterface;
+import org.ow2.mind.NameHelper;
+import org.ow2.mind.PathHelper;
+import org.ow2.mind.adl.ast.ASTHelper;
 import org.ow2.mind.adl.ast.Binding;
+import org.ow2.mind.adl.ast.Component;
+import org.ow2.mind.adl.ast.MindInterface;
+import org.ow2.mind.adl.ast.Source;
 import org.ow2.mind.adl.generic.ast.FormalTypeParameterReference;
 import org.ow2.mind.adl.implementation.ImplementationLocator;
 import org.ow2.mind.doc.HTMLDocumentationHelper;
 import org.ow2.mind.io.OutputFileLocator;
-import org.objectweb.fractal.adl.types.TypeInterface;
 
 import com.google.inject.Inject;
 
@@ -220,7 +219,6 @@ public class DotWriter {
 
       boolean isFormalTypeParameterReference = false;
       Definition definition = null;
-      final DefinitionReference defRef = null;
 
       // Templates support, inspired from TemplateInstantiatorImpl logic
       if ((component instanceof FormalTypeParameterReference) && (((FormalTypeParameterReference) component).getTypeParameterReference() !=null))
