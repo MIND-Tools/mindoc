@@ -30,5 +30,5 @@ setlocal
 @REM Launcher class name
 set LAUNCHER=org.ow2.mind.doc.Launcher
 
-echo %~dp0\jar_launcher.bat %LAUNCHER% %MINDOC_OPTS% %LAUNCHER% %*
+@rem echo %~dp0\jar_launcher.bat %LAUNCHER% %MINDOC_OPTS% %LAUNCHER% %*
 %~dp0\jar_launcher.bat %LAUNCHER% %MINDOC_OPTS% %LAUNCHER% %*

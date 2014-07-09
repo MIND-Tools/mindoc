@@ -28,5 +28,5 @@
 ## Launcher class name
 LAUNCHER=org.ow2.mind.doc.Launcher
 
-#echo $(dirname $(readlink -m $0))/jar_launcher ${LAUNCHER} ${MINDOC_OPTS} ${LAUNCHER} $*
-exec $(dirname $(readlink -m $0))/jar_launcher ${LAUNCHER} ${MINDOC_OPTS} ${LAUNCHER} $*
+#echo $(dirname $0)/jar_launcher ${LAUNCHER} ${MINDOC_OPTS} ${LAUNCHER} "$@"
+exec $(dirname $0)/jar_launcher ${LAUNCHER} ${MINDOC_OPTS} ${LAUNCHER} "$@"
