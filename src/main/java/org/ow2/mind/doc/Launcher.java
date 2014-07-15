@@ -25,6 +25,8 @@ package org.ow2.mind.doc;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -127,9 +129,15 @@ public class Launcher {
   public static void main(final String[] args) {
     initLogger();
 
-    if (System.getenv(MIND_ROOT) == null) {
+    /**
+     * Developers running the Launcher from Eclipse should define
+     * MIND_ROOT=${project_loc}/src/main in their Java launch configuration,
+     * if it's not ready in the environment.
+     * Computed path will be wrong otherwise (from target/classes/Launcher.class)
+     */
+    if (getMindRoot() == null) {
       logger
-      .severe("MIND_ROOT variable is not defined. MIND_ROOT must point to the location where mindoc is installed.");
+      .severe("Could not find compiler base location. MIND_ROOT environment variable must point to the location where mindoc is installed.");
       System.exit(1);
     }
 
@@ -265,15 +273,14 @@ public class Launcher {
       }
     }
 
-    runGenerators(pluginManager, sourceDirectories, targetDirectory, new File(
-        getMindocHome(), RESOURCE_DIR_NAME), docTitle, overviewFile, keepGV);
+    runGenerators(pluginManager, sourceDirectories, targetDirectory, docTitle, overviewFile, keepGV);
     ResourceCopier.copyResources(sourceDirectories, targetDirectory);
     logger.info("Documentation generated in " + targetDirectory.getPath());
   }
 
   private static void runGenerators(final PluginManager pluginManager,
       final File sourceDirectories[], final File targetDirectory,
-      final File resourceDirectory, final String docTitle,
+      /* final File resourceDirectory, */ final String docTitle,
       final File overviewFile, final boolean keepGV) {
     try {
       // Put this in context to enable mindoc Guice modules.
@@ -287,12 +294,11 @@ public class Launcher {
 
       logger.fine("Generating indexes...");
 
-      // FIXME YTE Create instance of StringTemplaceGroupLoader here because the injection of this class in DocumentationIndexGenerator
-      // do not work.
+      // The compiler ST loader allows us to get StringTemplates resources from our Jar file
       final StringTemplateGroupLoader stComponentLoaderItf = injector.getInstance(StringTemplateComponentLoader.class);
 
       final DocumentationIndexGenerator indexGenerator = new DocumentationIndexGenerator(
-          sourceDirectories, resourceDirectory, docTitle, overviewFile, stComponentLoaderItf);
+          sourceDirectories, docTitle, overviewFile, stComponentLoaderItf);
       indexGenerator.generateIndexPages(targetDirectory);
 
       logger.fine("Generating documentation...");
@@ -334,8 +340,29 @@ public class Launcher {
     ps.println(" [OPTION] (<sourcepath>)+");
   }
 
-  static String getMindocHome() {
-    return System.getenv(MIND_ROOT);
+  /**
+   * Developers running the Launcher from Eclipse should define
+   * MIND_ROOT=${project_loc}/src/main in their Java launch configuration,
+   * if it's not ready in the environment.
+   * Computed path will be wrong otherwise (from target/classes/Launcher.class)
+   */
+  public static String getMindRoot() {
+    // default get from env
+    final String env_MIND_ROOT = System.getenv(MIND_ROOT);
+    if (env_MIND_ROOT != null)
+      return env_MIND_ROOT;
+
+    // if env variable doesn't exist, access "to be copied"-resources from the compiler
+    // jars location (careful: this doesn't work for tests from an IDE with classes output !)
+    final URL jarURL = Launcher.class.getProtectionDomain().getCodeSource().getLocation();
+    try {
+      final File jarFile = new File(jarURL.toURI());
+      final File extFolder = jarFile.getParentFile();
+      final File mindRootFolder = extFolder.getParentFile();
+      return mindRootFolder.getAbsolutePath();
+    } catch (final URISyntaxException e) {
+      return null;
+    }
   }
 
   private static void initLogger() {

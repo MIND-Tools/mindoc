@@ -37,7 +37,12 @@ import org.antlr.stringtemplate.StringTemplateErrorListener;
  * an error, and used to be an issue when running our program
  * from a different drive than where its files (including
  * StringTemplates...) are stored.
+ *
+ * @deprecated
+ * Now useless since we load the StringTemplates from our jar.
+ * Keeping the class just in case.
  */
+@Deprecated
 public class PortablePathGroupLoader extends PathGroupLoader {
 
   /** Pass a single dir or multiple dirs separated by platform-specific
