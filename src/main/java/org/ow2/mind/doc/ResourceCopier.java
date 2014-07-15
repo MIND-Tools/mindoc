@@ -23,7 +23,6 @@ package org.ow2.mind.doc;
 
 import static org.ow2.mind.doc.Launcher.DOC_FILES_DIRECTORY;
 import static org.ow2.mind.doc.Launcher.HTML_RESOURCES_DIR;
-import static org.ow2.mind.doc.Launcher.getMindocHome;
 import static org.ow2.mind.doc.Launcher.logger;
 
 import java.io.File;
@@ -72,7 +71,7 @@ public class ResourceCopier {
 
   public static void copyResources(final File sourceDirectories[], final File targetDirectory) {
     //copy js, css and html resources
-    final File htmlResourceDirectory = new File(getMindocHome(), HTML_RESOURCES_DIR);
+    final File htmlResourceDirectory = new File(Launcher.getMindRoot(), HTML_RESOURCES_DIR);
 
     if(!htmlResourceDirectory.canRead()) {
       logger.severe("Cannot read resource directory: " + htmlResourceDirectory.getPath());

@@ -185,21 +185,10 @@ public class DocumentationIndexGenerator {
   private final File overviewFile;
   private final String docTitle;
 
-  public DocumentationIndexGenerator(final File[] sourceDirectories, final File resourceDirectory, final String docTitle, final File overviewFile, final StringTemplateGroupLoader stComponentLoaderItf) throws IOException {
+  public DocumentationIndexGenerator(final File[] sourceDirectories, final String docTitle, final File overviewFile, final StringTemplateGroupLoader stComponentLoaderItf) throws IOException {
     this.sourceDirectories = sourceDirectories;
     this.overviewFile = overviewFile;
     this.docTitle = docTitle;
-
-//    groupLoader = new PortablePathGroupLoader(resourceDirectory.getAbsolutePath(), new StringTemplateErrorListener() {
-//      public void warning(final String msg) {
-//        System.out.println("String template: " + msg);
-//      }
-
-//      public void error(final String msg, final Throwable e) {
-//        System.out.println("String template error: " + msg);
-//        e.printStackTrace(new PrintStream(System.err));
-//      }
-//    });
 
     StringTemplateGroup group = new StringTemplateGroup("indexGroup");
     group.registerRenderer(String.class, new HTMLRenderer());
@@ -210,7 +199,6 @@ public class DocumentationIndexGenerator {
     packageSummaryTemplate = group.getInstanceOf(PACKAGE_SUMMARY_TEMPLATE);
 
     group = stComponentLoaderItf.loadGroup(ALL_DEF_FRAME_TEMPLATE, DefaultTemplateLexer.class, null);
-    //group = groupeLoader.loadGroup(ALL_DEF_FRAME_TEMPLATE, DefaultTemplateLexer.class, null);
     group.registerRenderer(String.class, new HTMLRenderer());
 
     allDefinitionTemplate = group.getInstanceOf("frame");

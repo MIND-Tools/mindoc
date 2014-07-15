@@ -41,7 +41,7 @@ public class DocumentationIndexGeneratorTest {
 
   private final File target = new File("target/doc");
   private final File source[] = new File []{new File ("src/test/resources")};
-  private final File resource = new File ("src/main/resources");
+/*  private final File resource = new File ("src/main/resources");*/
   private final File overview = new File ("src/test/resources/overview.html");
   private final String title = "Test Documentation<br/><font size=\"-1\">small text</font>";
 
@@ -77,35 +77,35 @@ public class DocumentationIndexGeneratorTest {
   @Test
   public void testAllDefinitionFrame() throws Exception {
     final DocumentationIndexGenerator generator =
-      new DocumentationIndexGenerator(source, resource, title, overview, this.injector.getInstance(StringTemplateComponentLoader.class));
+      new DocumentationIndexGenerator(source, /* resource, */ title, overview, this.injector.getInstance(StringTemplateComponentLoader.class));
     generator.generateAllDefinitionFrame(target);
   }
 
   @Test
   public void testOverviewFrame() throws Exception {
     final DocumentationIndexGenerator generator =
-      new DocumentationIndexGenerator(source, resource, title, overview, this.injector.getInstance(StringTemplateComponentLoader.class));
+      new DocumentationIndexGenerator(source, /* resource, */ title, overview, this.injector.getInstance(StringTemplateComponentLoader.class));
     generator.generateOverviewFrame(target);
   }
 
   @Test
   public void testPackageFrame() throws Exception {
     final DocumentationIndexGenerator generator =
-      new DocumentationIndexGenerator(source, resource, title, overview, this.injector.getInstance(StringTemplateComponentLoader.class));
+      new DocumentationIndexGenerator(source, /* resource, */ title, overview, this.injector.getInstance(StringTemplateComponentLoader.class));
     generator.generatePackageFrame(target);
   }
 
   @Test
   public void testOverviewSummary() throws Exception {
     final DocumentationIndexGenerator generator =
-      new DocumentationIndexGenerator(source, resource, title, overview, this.injector.getInstance(StringTemplateComponentLoader.class));
+      new DocumentationIndexGenerator(source, /* resource, */ title, overview, this.injector.getInstance(StringTemplateComponentLoader.class));
     generator.generateOverviewSummary(target);
   }
 
   @Test
   public void testPackageSummary() throws Exception {
     final DocumentationIndexGenerator generator =
-      new DocumentationIndexGenerator(source, resource, title, overview, this.injector.getInstance(StringTemplateComponentLoader.class));
+      new DocumentationIndexGenerator(source, /* resource, */ title, overview, this.injector.getInstance(StringTemplateComponentLoader.class));
     generator.generatePackageSummary(target);
   }
 }
