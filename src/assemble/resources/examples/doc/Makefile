@@ -18,11 +18,11 @@ endif
 all: doc
 
 doc:
-	$(MINDOC) --overview=template_test/overview.html --doctitle="Mindoc Example Application" .
+	@$(MINDOC) --overview=template_test/overview.html --doctitle="Mindoc Example Application" .
 
 check-doc:
 	@if [ -x $(LINKLINT) ]; then echo "Using linklint: $(LINKLINT)" && $(LINKLINT) -error -warn -doc $(REPORT_ROOT) -root ./target/doc/ /@; fi 
 
-clean_all:
-	-rm */*~ -f
-	-rm target/* -rf
+clean:
+	@rm */*~ -f
+	@rm target/* -rf
