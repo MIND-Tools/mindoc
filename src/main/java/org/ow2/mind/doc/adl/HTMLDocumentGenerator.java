@@ -71,6 +71,7 @@ import org.ow2.mind.adl.ast.DefinitionReference;
 import org.ow2.mind.adl.ast.ExtendsDecoration;
 import org.ow2.mind.adl.ast.ImplementationContainer;
 import org.ow2.mind.adl.ast.Source;
+import org.ow2.mind.adl.ast.SubDefinitionsDecoration;
 import org.ow2.mind.adl.generic.ast.FormalTypeParameter;
 import org.ow2.mind.adl.generic.ast.FormalTypeParameterContainer;
 import org.ow2.mind.adl.generic.ast.TypeArgument;
@@ -263,6 +264,13 @@ DefinitionSourceGenerator {
       final ExtendsDecoration extendsList = (ExtendsDecoration) definition.astGetDecoration("extends");
       for (final DefinitionReference defRef : extendsList.getExtends()) {
         addDefinitionReferenceLink(definition, map, defRef);
+      }
+    }
+
+    if(definition.astGetDecoration("sub-definitions") != null) {
+      final SubDefinitionsDecoration subDefsList = (SubDefinitionsDecoration) definition.astGetDecoration("sub-definitions");
+      for (final Definition subDef : subDefsList.getSubDefinitions()) {
+        map.put(subDef.getName(), HTMLDocumentationHelper.getRelativePathToADL(definition.getName(), subDef.getName(), SourceKind.COMPONENT));
       }
     }
 

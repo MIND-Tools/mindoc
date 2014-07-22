@@ -98,6 +98,7 @@ DefinitionSection(definition) ::= <<
 <h1 class="component-name">$definition.astDecorations.kind$ $fullDefinitionName(definition)$</h1>
 <div>
 <p>$inheritanceInfo(definition)$</p>
+<p>$subDefinitionsInfo(definition)$</p>
 </div>
 >>
 
@@ -105,6 +106,15 @@ inheritanceInfo(definition) ::= <<
 $if(definition.astDecorations.extends)$
 <h3>All extended definitions:</h3>
 <p class="indent">$definition.astDecorations.extends.extends:{$definitionLink(definition=it)$};separator=", "$</p>
+  $endif$
+$endif$
+
+>>
+
+subDefinitionsInfo(definition) ::= <<
+$if(definition.astDecorations.("sub-definitions"))$
+<h3>Direct known sub-definitions:</h3>
+<p class="indent">$definition.astDecorations.("sub-definitions").subDefinitions:{$definitionLink(definition=it)$};separator=", "$</p>
   $endif$
 $endif$
 
