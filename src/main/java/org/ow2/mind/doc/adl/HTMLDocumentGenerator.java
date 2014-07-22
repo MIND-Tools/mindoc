@@ -68,6 +68,7 @@ import org.ow2.mind.adl.ast.Component;
 import org.ow2.mind.adl.ast.ComponentContainer;
 import org.ow2.mind.adl.ast.Data;
 import org.ow2.mind.adl.ast.DefinitionReference;
+import org.ow2.mind.adl.ast.ExtendsDecoration;
 import org.ow2.mind.adl.ast.ImplementationContainer;
 import org.ow2.mind.adl.ast.Source;
 import org.ow2.mind.adl.generic.ast.FormalTypeParameter;
