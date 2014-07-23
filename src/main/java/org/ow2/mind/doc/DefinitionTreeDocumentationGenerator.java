@@ -75,6 +75,25 @@ public class DefinitionTreeDocumentationGenerator extends DirectoryWalker {
         Launcher.class.getClassLoader());
     context.put("classloader", srcClassLoader);
 
+    /*
+     * First LOAD all in cache so we can do global coherent generation.
+     * This is critical for inheritance information management.
+     *
+     * Previous documentation generation used for each file to both do
+     * in the same loop:
+     * - load
+     * - generate
+     *
+     * However, if mindoc first handled a super type and generated its
+     * documentation, the child type "extends" information and its
+     * reverse "sub-definition" info were computed afterwards, leading
+     * to missing information (since no super-type generation was triggered).
+     *
+     * Issue solved with 2 consecutive loops.
+     * Standard generator behaviour with "load" is kept since the cache
+     * mecanism will be triggered and the pre-loaded definition will be
+     * directly returned: No performance issue.
+     */
     for (final File rootDirectory : sourceDirectories) {
       final List<File> definitions = new LinkedList<File>();
 
@@ -82,25 +101,6 @@ public class DefinitionTreeDocumentationGenerator extends DirectoryWalker {
 
       context.put("sourceDirectory", rootDirectory);
 
-      /*
-       * First load all in cache so we can do global coherent generation.
-       * This is critical for inheritance information management.
-       *
-       * Previous documentation generation used for each file to both do
-       * in the same loop:
-       * - load
-       * - generate
-       *
-       * However, if mindoc first handled a super type and generated its
-       * documentation, the child type "extends" information and its
-       * reverse "sub-definition" info were computed afterwards, leading
-       * to missing information (since no super-type generation was triggered).
-       *
-       * Issue solved with 2 consecutive loops.
-       * Standard generator behaviour with "load" is kept since the cache
-       * mecanism will be triggered and the pre-loaded definition will be
-       * directly returned: No performance issue.
-       */
       for (final File definition : definitions) {
         final String definitionName = HTMLDocumentationHelper
             .getDefinitionName(rootDirectory.getCanonicalPath(),
@@ -123,6 +123,15 @@ public class DefinitionTreeDocumentationGenerator extends DirectoryWalker {
           idlLoader.load(definitionName, context);
         }
       }
+    }
+    // Now GENERATE
+    for (final File rootDirectory : sourceDirectories) {
+      final List<File> definitions = new LinkedList<File>();
+
+      walk(rootDirectory, definitions);
+
+      context.put("sourceDirectory", rootDirectory);
+
       for (final File definition : definitions) {
         final String definitionName = HTMLDocumentationHelper
             .getDefinitionName(rootDirectory.getCanonicalPath(),
