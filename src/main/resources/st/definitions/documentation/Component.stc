@@ -2,30 +2,27 @@ template st.definitions.documentation.Component : st.definitions.documentation.H
  
 $${
 /**
+ * Copyright (C) 2009 STMicroelectronics
+ * Copyright (C) 2014 Schneider-Electric
+ *
+ * This file is part of "Mind Compiler".
+ * "Mind Compiler" is a free software tool.
+ * This file is licensed under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Contact: mind@ow2.org
+ *
+ * Authors: Michel Metzger
+ * Contributors: Stephane Seyvoz
+ */
+
+/**
  \file st/definitions/documentation/Component.stc
  \brief The template for the HTML documentation of a component 
-
-
- <B>
- \n
- This file is part of the Platform 2012 program,
- a cooperation between STMicroelectronics and CEA.\n
- Redistribution of this file to outside parties is
- strictly prohibited without the written consent
- of the module owner indicated below.\n
- </B>
-
- \par  Module owner: michel.metzger@st.com
-
-
- \par  Copyright (C) 2009 STMicroelectronics
-
- \par  Authors: michel.metzger@st.com
-
- \par  Id: $Id$
- \par  Date: $Date$
- \par  Revision: $Rev$
-
  */
 
 
@@ -40,6 +37,8 @@ $navBar(sectionAnchors = sectionAnchors, pathToRoot = pathToRoot)$
 $DefinitionSection(definition = definition)$	
 <hr/>
 $ComponentCommentSection(definition = definition, anchors = anchors)$
+
+$SVGFigureSection(definition = definition)$
 
 $dataSection(definition = definition)$
 
@@ -99,6 +98,7 @@ DefinitionSection(definition) ::= <<
 <h1 class="component-name">$definition.astDecorations.kind$ $fullDefinitionName(definition)$</h1>
 <div>
 <p>$inheritanceInfo(definition)$</p>
+<p>$subDefinitionsInfo(definition)$</p>
 </div>
 >>
 
@@ -111,11 +111,29 @@ $endif$
 
 >>
 
+subDefinitionsInfo(definition) ::= <<
+$if(definition.astDecorations.("sub-definitions"))$
+<h3>Direct known sub-definitions:</h3>
+<p class="indent">$definition.astDecorations.("sub-definitions").subDefinitions:{$definitionLink(definition=it)$};separator=", "$</p>
+  $endif$
+$endif$
+
+>>
+
 ComponentCommentSection(definition, anchors) ::= <<
 $if(definition.astDecorations.comment)$
 <div class="component-comment">
 <p>$definition.astDecorations.comment$</p>
 $annotationList(definition)$
+</div>
+<hr/>
+$endif$
+>>
+
+SVGFigureSection(definition) ::= <<
+$if(definition.astDecorations.("embed-svg"))$
+<div class="svg-figure-section">
+<embed src="doc-files/$definition.name; format="shortName"$.svg" class="svgFigure" %s type="image/svg+xml"/>
 </div>
 <hr/>
 $endif$

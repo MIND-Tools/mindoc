@@ -25,18 +25,19 @@ Running Mindoc
   The mindoc generates HTML documentation for a set of ADL and IDL source files.
   It is used with the following command-line arguments:
 
-# mindoc [OPTIONS] (sourcepath)+
+# mindoc -h
 
-  where sourcepath contains the ADL, IDL and implementation file to be documented.
+Usage: mindoc generates documentation for ADL, IDL and implementation files located in <sourcepath>.
+ [OPTION] (<sourcepath>)+
 
 Available options are :
- -d <arg>         The path where the documentation is generated. (default is './target/doc').
- -doctitle <arg>  Specifies the title that will be used in the the overview page.
- -overview <arg>  Specifies the file that contains the overview documentation. This document
-                  will be inserted in the overview page with the list of all packages. HTML tags
-                  can be used in this document, as well as Mindoc tags (documented below).
- -h,--help        Print this message and exit.
- -v               Verbose output.
+	  -h, --help                      Print the help and exit
+	  -o=<The output path>, --output  The path where the documentation is generated
+	  --keepGV                       Specifies to keep the intermediary GraphViz GV files used for SVG generation.
+	  --overview=<The overview file>  Specifies the file that contains the overview documentation.
+	  --doctitle=<The title file>     Specifies the title that will be used in the overview page.
+	  --verbose                       Verbose output.
+
 
 Document ADL
 ============
@@ -47,6 +48,11 @@ interfaces, attributes, implementations and bindings. Moreover, Mindoc parses co
 to document each of these elements. To add a comment to an entity the comment must precede 
 the entity in the adl file and be enclosed by "/**" and "*/". Finally, one can document 
 packages by adding named 'package.html' in the package directory.
+
+SVG figures are automatically generated for definitions when GraphViz is installed and the 'dot'
+executable can be ran from your path. 'dot' is used for .gv to .svg conversion.
+Supported navigators are: any version of Firefox, IE9+. Chrome has some issues with the rendering.
+Intermediate .gv files can be kept for edition/debug with the help of the -keepgv option.
 
 Tags can be used in comments, in package documentations and in the overview page to add links
 and images. The tags currently supported are:
@@ -101,6 +107,20 @@ The syntax is as follow:
   refers to doc-files/my_image.png).
   <width> or <height> are facultative options used to resize the image. The value is in pixels and
   only one option can be used. E.g. "@link image.gif width=100px" 
+  
++ @param to detail what a parameter of a method is useful for, in interfaces definitions.
+The comment is single-line, you must use <br/> or any other html markup of your choice to define
+your desired output if you want it on multiple lines. 
+
+The syntax is as follows:  
+  @param paramName The parameter description (single-line).
+  
++ @return to detail the return type of a method in interfaces definitions.
+The comment is single-line,  you must use <br/> or any other html markup of your choice to define
+your desired output if you want it on multiple lines.
+
+The syntax is as follows:
+  @return The return type description (single-line).
 
 HTML tags are permitted in comments and package documentation.
 

@@ -1,0 +1,5 @@
+import template_test.*;
+
+composite extends_template_test.ExtendedTemplateComposite extends MyTemplateComposite<PrintServerImpl, PrintClientImpl> {
+	
+}

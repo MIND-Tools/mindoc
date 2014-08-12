@@ -1,0 +1,3 @@
+composite extends_test.ExtendedComponent3 extends ExtendedExtendedComponent2 {
+	contains common.PrimitiveServer as server3;
+}

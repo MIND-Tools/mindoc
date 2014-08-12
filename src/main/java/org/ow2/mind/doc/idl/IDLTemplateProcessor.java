@@ -1,28 +1,24 @@
 /**
+ * Copyright (C) 2009 STMicroelectronics
+ *
+ * This file is part of "Mind Compiler".
+ * "Mind Compiler" is a free software tool.
+ * This file is licensed under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Contact: mind@ow2.org
+ *
+ * Authors: Michel Metzger
+ * Contributors:
+ */
+
+/**
    \file com/st/p2012/mind/idl/IDLTemplateProcessor.java
    \brief The class encapsulating the template component for the IDL documentation generator.
-
-
-   <B>
-   \n
-   This file is part of the Platform 2012 program,
-   a cooperation between STMicroelectronics and CEA.\n
-   Redistribution of this file to outside parties is
-   strictly prohibited without the written consent
-   of the module owner indicated below.\n
-   </B>
-
-   \par  Module owner: michel.metzger@st.com
-
-
-   \par  Copyright (C) 2009 STMicroelectronics
-
-   \par  Authors: michel.metzger@st.com
-
-   \par  Id: $Id$
-   \par  Date: $Date$
-   \par  Revision: $Rev$
-
  */
 
 package org.ow2.mind.doc.idl;
@@ -83,7 +79,7 @@ public class IDLTemplateProcessor extends AbstractSourceGenerator
     final File headerFile = outputFileLocatorItf.getCSourceOutputFile(
         getOutputFileName(idl), context);
 
-    CommentProcessor.process(idl);
+    CommentProcessor.process(idl, context);
 
     st.setAttribute("idl", idl);
     st.setAttribute("pathToRoot", getPathToRoot(idl.getName()));
