@@ -47,11 +47,10 @@ public class GraphvizImageConverter {
     if (imageFormat.equals("none"))
       return;
 
-    final String graphVizCommand[] = {"dot", "-T" + imageFormat, dir + name + ".gv"};
+    final String graphVizCommand[] = {"dot", "-T" + imageFormat, dir + name + ".gv", "-o" + dir + name + "." + imageFormat};
 
     // Better than Runtime getRuntime exec !
     final ProcessBuilder builder = new ProcessBuilder(graphVizCommand);
-    builder.redirectOutput(new File(dir + name + "." + imageFormat));
     try {
       //Use the following to track the process: Process graphVizProcess = builder.start();
       builder.start();
