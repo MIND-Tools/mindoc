@@ -126,15 +126,6 @@
     <build>
         <plugins>
             <plugin>
-    			<groupId>org.apache.maven.plugins</groupId>
-    			<artifactId>maven-compiler-plugin</artifactId>
-    			<configuration>
-        			<source>7</source>
-        			<target>7</target>
-        		</configuration>
-        	</plugin>
-            
-            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <!-- Generates binary assemblies at package phase. -->
