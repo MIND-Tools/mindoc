@@ -165,7 +165,7 @@ doc: build_doc
 	fi
 
 # Linklint can be used to check generated documentation (Linklint requires Perl)
-check_doc: 
+check_doc: dependencies doc
 	@if test ! -x $(LINKLINT) && ! (which $(LINKLINT) 2>&1) > /dev/null ; \
 		then echo ' Linklint not found! Set MIND_ROOT environment variable or set 'Mindc location' in Preference page of Eclipse' && exit 1 ; \
 		else $(LINKLINT) -error -warn -root $(docOutputDir) /@ ;\
