@@ -107,8 +107,22 @@ if (navigatorAgent.indexOf("Firefox") != -1) {
 }
 
 //fetches the document for the given embedding_element
-// We'll use the one from svg-preserveaspectratio
-/* function getSubDocument(embedding_element) */
+
+function getSubDocument(embedding_element)
+{
+	if (embedding_element.contentDocument) 
+	{
+		return embedding_element.contentDocument;
+	} 
+	else 
+	{
+		var subdoc = null;
+		try {
+			subdoc = embedding_element.getSVGDocument();
+		} catch(e) {}
+		return subdoc;
+	}
+}
 
 function findSVGElementsForPan()
 {

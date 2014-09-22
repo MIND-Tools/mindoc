@@ -197,6 +197,11 @@ public class Gv2SVGProcessor {
     dotLogger.log(Level.FINE, "Converting " + buildDir.toString() + definition.getName() + ".gv to " + targetDocFilesDirName + shortDefName + ".svg");
     gic.convertGvToImage(buildDir, definition.getName(), targetDocFilesDirName, shortDefName);
 
+    // Fix the generated SVG to add the missing svgFigure's preserveAspectRatio attribute
+    final SVGFixer svgFixer = new SVGFixer();
+    final File svgFile = new File(targetDocFilesDirName + shortDefName + ".svg");
+    svgFixer.fix(svgFile);
+
     // cleanup
     final Boolean keepGVStatus = (Boolean) cont.get("org.ow2.mind.doc.KeepGV");
     if (keepGVStatus != null && !keepGVStatus)
