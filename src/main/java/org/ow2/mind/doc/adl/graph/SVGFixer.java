@@ -45,16 +45,12 @@ import org.xml.sax.SAXException;
  * which is not written by GraphViz during the Dot to SVG conversion. This missing attribute
  * leads to a wrong display of the SVG element in Google Chrome (and Internet Explorer).
  *
- * The desired value is : preserveAspectRatio = "xMinYMin meet"
+ * We navigate in the XML document to find the svg nodes and add the good attribute to the SVG node:
+ * preserveAspectRatio = "xMinYMin meet"
  *
- * We navigate in the XML document to find the svgFigure class elements, get the SVG file
- * inner document, top node, and add the good attribute to the SVG node.
  * We used to do this with javascript, but it didn't work in Google Chrome with local files,
  * the browser only allowing remote URLs for document loading and modification.
  *
- * Solution inspired by:
- * http://stackoverflow.com/questions/8496241/how-to-access-the-content-of-the-embed-tag-in-html
- * http://dahlström.net/svg/html/get-embedded-svg-document-script.html
  */
 public class SVGFixer {
 
@@ -95,16 +91,7 @@ public class SVGFixer {
         currentElement.setAttribute("preserveAspectRatio", "xMinYMin meet");
       }
 
-//      final Transformer transformer = TransformerFactory.newInstance().newTransformer();
-//
-//      // initialize StreamResult with File object to save to file
-//      final StreamResult result = new StreamResult(svgFile);
-//      final DOMSource source = new DOMSource(doc);
-//
-//      // transform and output the result in our source file
-//      transformer.transform(source, result);
-
-      // Using the transformer discards the DTD DocType header, leading to our SVGPan script to fail.
+      // We do not use a Transformer but an LSSerializer since the first discarded the DTD DocType header in the output.
 
       final DOMImplementationLS ls = (DOMImplementationLS)
           DOMImplementationRegistry.newInstance().getDOMImplementation("LS");
