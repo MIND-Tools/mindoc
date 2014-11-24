@@ -4,15 +4,15 @@
 
     <parent>
         <groupId>org.ow2.mind</groupId>
-        <artifactId>mind-parent</artifactId>
-        <version>6</version>
+        <artifactId>mind-compiler</artifactId>
+        <version>2.2-SNAPSHOT</version>
     </parent>
-
-    <artifactId>mindoc</artifactId>
-    <version>2.1-SNAPSHOT</version>
 
     <name>Mind Documentation Generator</name>
     <description>Document generator for MIND</description>
+
+    <artifactId>mindoc</artifactId>
+
 
     <properties>
         <ow2.file.deploy.dir>incoming</ow2.file.deploy.dir>
@@ -80,14 +80,13 @@
                 <version>2.7.7</version>
         </dependency>
         <dependency>
-            <groupId>org.ow2.mind</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>mindc</artifactId>
-            <version>2.1-SNAPSHOT</version>
             <!-- Needed to allow doc generation for user-specific runtime -->
             <exclusions>
             	<exclusion>
+            		<groupId>${project.groupId}</groupId>
             		<artifactId>fractal-runtime</artifactId>
-            		<groupId>org.ow2.mind</groupId>
             	</exclusion>
             </exclusions>
         </dependency>
@@ -102,7 +101,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>fractal-runtime</artifactId>
             <scope>test</scope>
-            <version>2.1-SNAPSHOT</version>
         </dependency>
         
     </dependencies>
