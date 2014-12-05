@@ -105,7 +105,7 @@ public class Launcher {
       ID_PREFIX + "doctitle",
       null, "doctitle",
       "Specifies the title that will be used in the overview page.",
-      "<The title file>");
+      "<The title>");
 
 
   private static final CmdFlag VERBOSE_OPTION = new CmdFlag(
@@ -336,7 +336,7 @@ public class Launcher {
 
   private static void printUsage(final PrintStream ps) {
     ps.println("Usage: " + COMMAND_NAME
-        + " generates documentation for ADL, IDL and implementation files located in <sourcepath>.");
+        + " generates documentation for ADL and IDL files located in <sourcepath>.");
     ps.println(" [OPTION] (<sourcepath>)+");
   }
 

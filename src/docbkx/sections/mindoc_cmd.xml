@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE section[
+<!ENTITY % myents SYSTEM "../shared.ent" >
+%myents;
+]>
+<section xml:id="mindoc_cmd" xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+  <title>The <command>mindoc</command> command</title>
+  <section>
+    <title>Pre-requisites</title>
+    <para>The files: <filename>commons-io*.jar</filename> and <filename>mindoc*.jar</filename> are
+      required in the <filename>ext</filename> sub-directory of the Mind C compiler
+      directory.</para>
+  </section>
+  <section>
+    <title>The <command>mindoc</command> command</title>
+    <para>The <command>mindoc</command> command is used to generate documentation for ADL and IDL
+      files located in a list of source paths.</para>
+    <para/>
+    <para>The <command>mindoc</command> command has the following syntax :<cmdsynopsis>
+        <command>mindoc</command>
+        <arg choice="opt" rep="repeat"><replaceable>OPTIONS</replaceable></arg>
+      </cmdsynopsis></para>
+    <para/>
+    <para>Available options are : <variablelist>
+        <varlistentry>
+          <term><code>[--src-path|-S]</code>=<replaceable>path-list</replaceable></term>
+          <listitem>
+            <para>Set the search path of ADL, IDL and implementation files (default is
+                '<filename>.</filename>').</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><code>[--out-path|-o]</code>=<replaceable>path</replaceable></term>
+          <listitem>
+            <para>Set the directory where generated files are put (default is
+                '<filename>./target/doc</filename>').</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><code>--flatten</code></term>
+          <listitem>
+            <para>Enable architecture tree flattening (remove composite levels).</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><code>--keepGV</code></term>
+          <listitem>
+            <para>Specify to keep the intermediary GraphViz GV files used for SVG generation.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><code>--overview</code>=<replaceable>overview_file</replaceable></term>
+          <listitem>
+            <para>Specify the file that contains the overview documentation.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><code>--doctitle</code>=<replaceable>title</replaceable></term>
+          <listitem>
+            <para>Specify the title that is used in the overview page.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><code>--verbose</code></term>
+          <listitem>
+            <para>Set verbose output.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><code>[--help|-h]</code></term>
+          <listitem>
+            <para>Print help message and exit.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><code>[--version|-v]</code></term>
+          <listitem>
+            <para>Print version number and exit.</para>
+            <para/>
+            <para>The <replaceable>overview_file</replaceable> file is a plain text file, see <xref
+                linkend="Inputs"/> for details about the file format.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist></para>
+  </section>
+  <section>
+    <title>&productName; output</title>
+    <para>The output of the <command>mindoc</command> command is a set of generated HTML pages with
+      pictures in SVG format.</para>
+    <para>The entry point for the documentation is the <filename>index.html</filename> file.</para>
+  </section>
+  <section>
+    <title>&productName; details</title>
+    <section>
+      <title>&productName; output details</title>
+      <para>&productName; generates HTML documentation from ADL and IDL files.</para>
+      <para>The documentation for each component or type definition contains a list of
+        sub-components, interfaces, attributes, implementations and bindings.</para>
+      <para>The documentation for each interface contains the list of its methods.</para>
+      <para>The implementation files are pretty printed.</para>
+      <para>If GraphViz is installed and the <command>dot</command> executable can be run from the
+        path, <filename>SVG</filename> figures are automatically generated for definitions
+          (<command>dot</command> is used to convert <filename>GV</filename> files to
+          <filename>SVG</filename> format).</para>
+      <note>
+        <para>The supported navigators are: any version of Firefox, IE9+. Chrome has some issues
+          with the <filename>SVG</filename> graph rendering.</para>
+      </note>
+    </section>
+    <section xml:id="Inputs">
+      <title>&productName; inputs</title>
+      <para>&productName; parses comments enclosed by <code>/**</code> and <code>*/</code>. To
+      document an entity, the comment must precede the entity in the ADL or IDL file.</para>
+    <para>To document packages, a <filename>package.html</filename> must be provided in the package
+        directory. The format of this file is identical to the overview file : it is composed of a
+        title and a description. The title starts at the beginning of the file and ends at the first
+        '.' found, the rest of the file is the description. </para>
+      <para>Some HTML markups can be used to format the text output. Especially, as the carriage
+        return in the file is not considered, the <code>&lt;br/></code> markup must be used to have
+        a multiple lines output.</para>
+      <para/>
+      <para>To add links and images, some tags can be used in the comments and the package and
+        overview files.</para>
+      <para>The tags currently supported are:</para>
+      <para>
+        <itemizedlist>
+          <listitem>
+            <para><code>@component</code> to add a link to a component or a type definition and its
+              sub-components, interfaces or attributes</para>
+            <para>The syntax is the following :</para>
+            <para>
+              <itemizedlist>
+                <listitem>
+                  <para><code>@component &lt;packageName>.&lt;definition></code> for a link to the
+                    documentation page of a definition, must be a fully qualified name</para>
+                </listitem>
+                <listitem>
+                  <para><code>@component &lt;scope>#components#&lt;subComponentName></code> for a
+                    link to the section documenting a sub-component of a composite component
+                    definition</para>
+                </listitem>
+                <listitem>
+                  <para><code>@component &lt;scope>#interfaces#&lt;interfaceName></code> for a link
+                    to the section documenting an interface of a component or a type
+                    definition</para>
+                </listitem>
+                <listitem>
+                  <para><code>@component &lt;scope>#attributes#&lt;attributeName></code> for a link
+                    to the section documenting an attribute of a primitive component
+                    definition</para>
+                </listitem>
+                <listitem>
+                  <para><code>@component &lt;scope>#[components | interfaces | attributes]</code>
+                    for a link to the summary section listing all the components, interfaces or
+                    attributes of a component definition</para>
+                  <para><code>&lt;scope></code> is either a fully qualified name of a definition or
+                      <code>this</code> to denote the current definition (invalid for package
+                    documentation)</para>
+                </listitem>
+              </itemizedlist>
+            </para>
+          </listitem>
+          <listitem>
+            <para><code>@interface</code> to add a link to an interface definition and its methods
+              and type definitions</para>
+            <para>The syntax is the following :</para>
+            <para>
+              <itemizedlist>
+                <listitem>
+                  <para><code>@interface &lt;scope>#methods#&lt;methodName></code> for a link to the
+                    section documenting a method of an interface</para>
+                </listitem>
+                <listitem>
+                  <para><code>@interface &lt;scope>#typedefs#&lt;typedefName></code> for a link to
+                    the section documenting a typedef of an interface definition</para>
+                </listitem>
+                <listitem>
+                  <para><code>@interface &lt;scope>#structs#&lt;structName></code> for a link to the
+                    section documenting a struct of an interface definition</para>
+                </listitem>
+                <listitem>
+                  <para><code>@interface &lt;scope>#unions#&lt;unionName></code> for a link to the
+                    section documenting a union of an interface definition</para>
+                </listitem>
+                <listitem>
+                  <para><code>@interface &lt;scope>#enums#&lt;enumName></code> for a link to the
+                    section documenting an enum of an interface definition</para>
+                </listitem>
+                <listitem>
+                  <para><code>@interface &lt;scope>#[methods | types]</code> for a link to the
+                    summary section listing all the methods or types of an interface
+                    definition</para>
+                </listitem>
+              </itemizedlist>
+            </para>
+          </listitem>
+          <listitem>
+            <para><code>@figure &lt;path> [width=&lt;width>px | height=&lt;height>px]</code> to
+              include a figure in the documentation</para>
+            <para>
+              <itemizedlist>
+                <listitem>
+                  <para><code>&lt;path></code> must be a relative path to an image file
+                      (<filename>PNG</filename>, <filename>JPG</filename> or
+                      <filename>GIF</filename>)</para>
+                  <para>Images must be stored in the '<filename>doc-files</filename>' sub-directory
+                    of the package where they are used and are copied in the destination directory.
+                    The path used in the tag is relative to this sub-directory. (e.g. '<code>@link
+                      my_image.png</code>' refers to
+                    <filename>doc-files/my_image.png</filename>)</para>
+                </listitem>
+                <listitem>
+                  <para><code>&lt;width></code> or <code>&lt;height></code> are optional parameters
+                    used to resize the image. The value is in pixels and only one option can be used
+                    at a time (e.g. '<code>@link image.gif width=100px</code>')</para>
+                </listitem>
+              </itemizedlist>
+            </para>
+          </listitem>
+          <listitem>
+            <para><code>@param</code> to document a parameter of a method in an interface
+              definition</para>
+            <para>The comment is single-line, <code>&lt;br/></code> or any other HTML markups can be
+              used to define the desired output on multiple lines.</para>
+            <para>The syntax is the following :</para>
+            <para>
+              <itemizedlist>
+                <listitem>
+                  <para><code>@param paramName The parameter description</code>
+                    (single-line).</para>
+                </listitem>
+              </itemizedlist>
+            </para>
+          </listitem>
+          <listitem>
+            <para><code>@return</code> to document the return value of a method in an interface
+              definition</para>
+            <para>The comment is single-line, <code>&lt;br/></code> or any other HTML markups can be
+              used to define the desired output on multiple lines.</para>
+            <para>The syntax is the following :</para>
+            <para>
+              <itemizedlist>
+                <listitem>
+                  <para><code>@return The return type description</code> (single-line)</para>
+                </listitem>
+              </itemizedlist>
+            </para>
+          </listitem>
+        </itemizedlist>
+      </para>
+      <para>The <filename>doc-files</filename> sub-directories are copied as is in the target
+        directory, they contain files referenced by the documentation (pictures, binary files,
+        ...).</para>
+    </section>
+  </section>
+</section>
