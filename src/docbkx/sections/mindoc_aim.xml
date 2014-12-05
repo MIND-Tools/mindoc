@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE section[
+<!ENTITY % myents SYSTEM "../shared.ent" >
+%myents;
+]>
+<section xml:id="mindoc_aim" xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+  <title>Aim of the &productName;</title>
+  <para>The <emphasis>&productName;</emphasis> generates an HTML documentation (similar to Javadoc
+    format) of Mind components.</para>
+  <para>All components in the source paths provided are documented with a graphical view, summary
+    and detail sections.</para>
+  <para>All interfaces in the source paths provided are described with the list of their methods and
+    their detailed descriptions.</para>
+</section>
