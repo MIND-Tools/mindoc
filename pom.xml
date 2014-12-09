@@ -84,10 +84,10 @@
             <artifactId>mindc</artifactId>
             <!-- Needed to allow doc generation for user-specific runtime -->
             <exclusions>
-            	<exclusion>
-            		<groupId>${project.groupId}</groupId>
-            		<artifactId>fractal-runtime</artifactId>
-            	</exclusion>
+                <exclusion>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>fractal-runtime</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -152,10 +152,146 @@
                             </descriptors>
                             <outputDirectory>
                                 ${project.build.directory}
-							</outputDirectory>
+                            </outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- User documentation generation -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>copy-docbook-resources</id>
+                        <!-- here the phase you need -->
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/site/images</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/docbkx/images</directory>
+                                    <includes>
+                                        <include>**/*.png</include>
+                                        <include>**/*.svg</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.agilejava.docbkx</groupId>
+                <artifactId>docbkx-maven-plugin</artifactId>
+                <inherited>false</inherited>
+                <executions>
+                    <!-- User Guide PDF execution -->
+                    <execution>
+                        <id>pdf</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>generate-pdf</goal>
+                        </goals>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <targetDirectory>${project.build.directory}/site</targetDirectory>
+                            <foCustomization>${project.build.directory}/site/xsl/minddoc-fo.xsl</foCustomization>
+                            <draftWatermarkImage>${project.build.directory}/site/images/draft.png</draftWatermarkImage>
+                        </configuration>
+                    </execution>
+                    <!-- User Guide HTML executions -->
+                    <execution>
+                        <id>html-printable</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>generate-html</goal>
+                        </goals>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <targetDirectory>${project.build.directory}/site/printable</targetDirectory>
+                            <imgSrcPath>../</imgSrcPath>
+                            <htmlCustomization>${project.build.directory}/site/xsl/minddoc-html-printable.xsl</htmlCustomization>
+                            <htmlStylesheet>../css/docbook-printable.css</htmlStylesheet>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>userguide-html</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>generate-html</goal>
+                        </goals>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <targetDirectory>${project.build.directory}/site</targetDirectory>
+                            <htmlCustomization>${project.build.directory}/site/xsl/minddoc-html.xsl</htmlCustomization>
+                            <htmlStylesheet>css/docbook.css</htmlStylesheet>
+                            <customizationParameters>
+                                <parameter>
+                                    <name>root.path</name>
+                                    <value>.</value>
+                                </parameter>
+                                <parameter>
+                                    <name>pdf.link</name>
+                                    <value>mindoc.pdf</value>
+                                </parameter>
+                                <parameter>
+                                    <name>chunked.link</name>
+                                    <value>userGuide/mindoc.html</value>
+                                </parameter>
+                                <parameter>
+                                    <name>printable.link</name>
+                                    <value>printable/mindoc.html</value>
+                                </parameter>
+                            </customizationParameters>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>userguide-html-chunked</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>generate-html</goal>
+                        </goals>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <chunkedOutput>true</chunkedOutput>
+                            <targetDirectory>${project.build.directory}/site/userGuide</targetDirectory>
+                            <imgSrcPath>../</imgSrcPath>
+                            <htmlCustomization>${project.build.directory}/site/xsl/minddoc-chunk.xsl</htmlCustomization>
+                            <htmlStylesheet>../css/docbook-chunk.css</htmlStylesheet>
+                            <customizationParameters>
+                                <parameter>
+                                    <name>root.path</name>
+                                    <value>..</value>
+                                </parameter>
+                                <parameter>
+                                    <name>pdf.link</name>
+                                    <value>../mindoc.pdf</value>
+                                </parameter>
+                                <parameter>
+                                    <name>single.link</name>
+                                    <value>../mindoc.html</value>
+                                </parameter>
+                                <parameter>
+                                    <name>printable.link</name>
+                                    <value>../printable/mindoc.html</value>
+                                </parameter>
+                            </customizationParameters>
+                        </configuration>
+                    </execution>
+                    
+                </executions>
+                <configuration>
+                    <sourceDirectory>${basedir}/src/docbkx</sourceDirectory>
+                    <targetDirectory>${project.build.directory}/site</targetDirectory>
+                </configuration>
             </plugin>
 
             <!-- @TODO Transfer this test as a new task in the continuous integration 
@@ -167,16 +303,16 @@
                     <executable>make</executable>
                     <workingDirectory>
                         ${project.build.directory}/${project.build.finalName}-bin/${project.build.finalName}/example
-					</workingDirectory>
+                    </workingDirectory>
                     <arguments>
                         <argument>
                             MINDOC_ROOT=..
-						</argument>
-						
+                        </argument>
+                        
                         <argument>
                             REPORT_ROOT=${basedir}/target/linklint-report
-						</argument>
-						
+                        </argument>
+                        
                         <argument>clean</argument>
                         <argument>all</argument>
                     </arguments>
@@ -195,15 +331,15 @@
 
         <pluginManagement>
             <plugins>
-            	<plugin>
-    				<groupId>org.apache.maven.plugins</groupId>
-    				<artifactId>maven-compiler-plugin</artifactId>
-    				<configuration>
-        				<source>7</source>
-        				<target>7</target>
-        			</configuration>
-        		</plugin>
-        	
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>7</source>
+                        <target>7</target>
+                    </configuration>
+                </plugin>
+
                 <plugin>
                     <artifactId>maven-antrun-plugin</artifactId>
                     <version>1.3</version>
@@ -252,7 +388,7 @@
                 </plugins>
             </build>
         </profile>
-        
+
         <profile>
             <id>release</id>
             <activation>

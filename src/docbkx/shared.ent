@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ENTITY productName "Mindoc tool">
+
+<!ENTITY mindURL "http://mind.ow2.org/mindc">
+<!ENTITY mindPkg "org.ow2.mind">
+<!ENTITY mindJdoc "&mindURL;/apidocs">
+<!ENTITY mindCode "&mindURL;/xref">
+

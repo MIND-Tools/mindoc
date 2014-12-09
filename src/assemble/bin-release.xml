@@ -23,35 +23,9 @@
             <outputDirectory>resources/html</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>src/assemble/resources/examples/doc</directory>
+            <directory>src/assemble/resources/</directory>
             <filtered>false</filtered>
-            <outputDirectory>examples/doc</outputDirectory>
+            <outputDirectory>.</outputDirectory>
         </fileSet>
     </fileSets>
-    <files>
-        <file>
-            <source>src/assemble/resources/linklint-2.3.5</source>
-            <fileMode>0755</fileMode>
-            <outputDirectory>bin</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>src/assemble/resources/mindoc</source>
-            <fileMode>0755</fileMode>
-            <outputDirectory>bin</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>src/assemble/resources/mindoc.bat</source>
-            <fileMode>0755</fileMode>
-            <outputDirectory>bin</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>src/assemble/resources/README_DOC.txt</source>
-            <fileMode>0644</fileMode>
-            <outputDirectory></outputDirectory>
-            <filtered>true</filtered>
-        </file>
-    </files>
 </assembly>
