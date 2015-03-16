@@ -1,10 +1,10 @@
 language: java
 before_install:
-  - "git clone https://github.com/Mind4SE/maven.git"
+  - "git clone https://github.com/MIND-Tools/maven.git"
   - "cd maven/mind-parent"
   - "mvn -U install"
   - "cd ../.."
-  - "git clone https://github.com/StephaneSeyvoz/mind-compiler.git"
+  - "git clone https://github.com/MIND-Tools/mind-compiler.git"
   - "cd mind-compiler"
   - "mvn -U install -DskipTests -PCI-profile"
   - "cd .."
