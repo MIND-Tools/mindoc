@@ -2,14 +2,13 @@
 
 ## Description
 
-An HTML Documentation generatior from ADL and ITF.
+An HTML Documentation generator from ADL and ITF.
 
 # User info
 
-See the README_DOC.txt:
-https://github.com/Mind4SE/mindoc/blob/master/src/assemble/resources/README_DOC.txt
+See src/assemble/resources/README_DOC.txt in the current source repository.
 
-The tool and this README are currently delivered as part of the mind-tools "all-in-one" package.
+Since this tool is now delivered as part of the mind-tools "all-in-one" package, the according README_DOC.txt should be found at the root of the binary package.
 
 ## Developer info
 
