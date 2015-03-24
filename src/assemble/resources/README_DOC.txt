@@ -17,7 +17,7 @@ Installing Mindoc
 
   4) Make sure JAVA_HOME is set to the location of your JRE or JDK
 
-  5) Run "mindoc" to verify that it is correctly installed.
+  5) Run "mindoc -h" to verify that it is correctly installed.
 
 Running Mindoc
 ==================
@@ -33,7 +33,7 @@ Usage: mindoc generates documentation for ADL, IDL and implementation files loca
 Available options are :
 	  -h, --help                      Print the help and exit
 	  -o=<The output path>, --output  The path where the documentation is generated
-	  --keepGV                       Specifies to keep the intermediary GraphViz GV files used for SVG generation.
+	  --keepGV                        Specifies to keep the intermediary GraphViz GV files used for SVG generation.
 	  --overview=<The overview file>  Specifies the file that contains the overview documentation.
 	  --doctitle=<The title file>     Specifies the title that will be used in the overview page.
 	  --verbose                       Verbose output.
