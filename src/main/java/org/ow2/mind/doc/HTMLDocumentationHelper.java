@@ -17,7 +17,7 @@
  * Contact: mind@ow2.org
  *
  * Authors: michel.metzger@st.com
- * Contributors:
+ * Contributors: sseyvoz@assystem.com
  */
 
 package org.ow2.mind.doc;
@@ -118,8 +118,8 @@ public final class HTMLDocumentationHelper {
    * @return
    */
   public static String getPackagePathToRoot(final String name) {
-	if(name == null || name.length() == 0)
-		return "./";
+    if(name == null || name.length() == 0)
+      return "./";
     final int depth = splitName(toValidName(name)).length;
     final StringBuilder sb = new StringBuilder();
     if (depth > 0) {
@@ -273,10 +273,28 @@ public final class HTMLDocumentationHelper {
   }
 
   protected static String getDefinitionName(final String sourceDirectory, final String definitionFileName) throws IOException {
-    final String fileName = PathHelper.removeExtension(definitionFileName);
 
-    final String rootPath[] = sourceDirectory.split(File.separator);
-    final String filePath[] = fileName.split(File.separator);
+    final String fileName;
+    final String rootPath[];
+    final String filePath[];
+
+    if (System.getProperty("os.name").startsWith("Windows")) {
+      // Equivalent implementation for Windows of PathHelper.removeExtension(definitionFileName);
+      final int i = definitionFileName.lastIndexOf('.');
+      final int j = definitionFileName.lastIndexOf('\\');
+      if (i == -1 || j > i)
+        fileName = definitionFileName;
+      else fileName = definitionFileName.substring(0, i);
+
+      rootPath = sourceDirectory.split("\\" + File.separator);
+      filePath = fileName.split("\\" + File.separator);
+    } else {
+      // SSZ TODO: CHECK IF THE REMOVE EXTENSION METHOD HAS BEEN FIXED IN LATER VERSIONS OF THE LIB (1.0/1.1)
+      // HERE IT ONLY WORKS FOR UNIX PATHS
+      fileName = PathHelper.removeExtension(definitionFileName);
+      rootPath = sourceDirectory.split(File.separator);
+      filePath = fileName.split(File.separator);
+    }
 
     int i;
     for(i = 0; i < rootPath.length; i++) {
@@ -291,7 +309,7 @@ public final class HTMLDocumentationHelper {
       sb.append('.');
     }
     if(i < filePath.length) //necessary for empty package name
-    	sb.append(filePath[i]);
+      sb.append(filePath[i]);
 
     return sb.toString();
   }
@@ -338,15 +356,15 @@ public final class HTMLDocumentationHelper {
     String valueString = null;
     if(value != null) {
 
-    if (value instanceof BooleanLiteral) {
-      valueString = ((BooleanLiteral) value).getValue();
-    } else if (value instanceof NumberLiteral) {
-      valueString = ((NumberLiteral) value).getValue();
-    } else if (value instanceof StringLiteral) {
-      valueString = "\"" + ((StringLiteral) value).getValue() + "\"";
-    } else if (value instanceof Reference) {
-      valueString = ((Reference) value).getRef();
-    }
+      if (value instanceof BooleanLiteral) {
+        valueString = ((BooleanLiteral) value).getValue();
+      } else if (value instanceof NumberLiteral) {
+        valueString = ((NumberLiteral) value).getValue();
+      } else if (value instanceof StringLiteral) {
+        valueString = "\"" + ((StringLiteral) value).getValue() + "\"";
+      } else if (value instanceof Reference) {
+        valueString = ((Reference) value).getRef();
+      }
     }
     return valueString;
   }

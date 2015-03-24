@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book[
+<!ENTITY % myents SYSTEM "./shared.ent" >
+%myents;
+]>
+<book status="draft" xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+	<info>
+		<title><emphasis>&productName;</emphasis> User Guide</title>
+		<revhistory>
+			<revision>
+				<revnumber>0.1</revnumber>
+				<date>2014-12-02</date>
+				<author>
+					<personname>
+						<firstname>François</firstname>
+						<surname>DELOYE</surname>
+					</personname>
+				</author>
+				<revremark>First revision of <emphasis>&productName;</emphasis> User
+					Guide</revremark>
+			</revision>
+		</revhistory>
+	</info>
+	<chapter>
+		<title>Introduction</title>
+		<section>
+			<title>Aim of this document</title>
+			<para>This document introduces the <emphasis>&productName;</emphasis>.</para>
+		</section>
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="sections/mindoc_aim.xml"/>
+	</chapter>
+	<chapter>
+		<title>Overview</title>
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="sections/mindoc_cmd.xml"/>
+	</chapter>
+</book>

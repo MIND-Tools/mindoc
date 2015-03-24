@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE section[
+<!ENTITY % myents SYSTEM "../shared.ent" >
+%myents;
+]>
+<section xml:id="mindoc_usage" xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+  <title>The <command>mind-diff</command> command</title>
+  <section>
+    <title>Pre-requisites</title>
+    <para>The file: <filename>mind-visual-diff*.jar</filename> is required in the
+        <filename>ext</filename> sub-directory of the Mind C compiler directory.</para>  
+  </section>
+  <section>
+    <title>The <command>mind-diff</command> command</title>
+    <para>The <command>mind-diff</command> command has the 3 possible following syntaxes :<cmdsynopsis>
+        <command>mind-diff</command>
+      <arg choice="req" rep="repeat">--base-src-path=<replaceable>path&nbsp;list</replaceable></arg>
+      <arg choice="req" rep="repeat">--head-src-path=<replaceable>path&nbsp;list</replaceable></arg>
+        <arg choice="opt" rep="repeat"><replaceable>OPTIONS</replaceable></arg>
+        <arg choice="req"><replaceable>definition</replaceable></arg>
+      </cmdsynopsis></para>
+    <para>Compares <replaceable>definition</replaceable> component between
+        <code>--base-src-path</code> and <code>--head-src-path</code> versions.</para>
+    <para><cmdsynopsis>
+        <command>mind-diff</command>
+      <arg choice="req" rep="repeat">--base-src-path=<replaceable>path&nbsp;list</replaceable></arg>
+      <arg choice="req" rep="repeat">--head-src-path=<replaceable>path&nbsp;list</replaceable></arg>
+        <arg choice="opt" rep="repeat"><replaceable>OPTIONS</replaceable></arg>
+        <arg choice="req"><replaceable>baseDefinition</replaceable></arg>
+        <arg choice="req"><replaceable>headDdefinition</replaceable></arg>
+    </cmdsynopsis></para>
+    <para>Compares <replaceable>baseDefinition</replaceable> component of
+        <code>--base-src-path</code> to <replaceable>headDdefinition</replaceable> component of
+        <code>--head-src-path</code>.</para>
+    <para>
+      <cmdsynopsis>
+        <command>mind-diff</command>
+        <arg choice="req" rep="repeat">--src-path=<replaceable>path list</replaceable></arg>
+        <arg choice="opt" rep="repeat"><replaceable>OPTIONS</replaceable></arg>
+        <arg choice="req"><replaceable>baseDefinition</replaceable></arg>
+        <arg choice="req"><replaceable>headDdefinition</replaceable></arg>
+      </cmdsynopsis>
+    </para>
+    <para>Compares <replaceable>baseDefinition</replaceable> component to
+        <replaceable>headDdefinition</replaceable> component of <code>--src-path</code>.</para>
+    <para/>
+    <para>Available options are : <variablelist>
+      <varlistentry>
+        <term><code>--flatten</code></term>
+        <listitem>
+          <para>Enable architecture tree flattening (remove composite levels).</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><code>[--out-path|-o]</code>=<replaceable>path</replaceable></term>
+        <listitem>
+          <para>Set the directory where generated files are put (default is
+              '<filename>.</filename>').</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><code>[--help|-h]</code></term>
+        <listitem>
+          <para>Print help message and exit.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><code>[--version|-v]</code></term>
+        <listitem>
+          <para>Print version number and exit.</para>
+    
+        </listitem>
+      </varlistentry>
+    </variablelist></para>
+  </section>
+  <section>
+    <title>&productName; output</title>
+    <para>The output of the <command>mind-diff</command> command is a set of
+        <filename>.gv</filename> files similar to the output of the <code>graph</code> target of a
+      Mind project Makefile, with color conventions:</para>
+    <example>
+      <title>Color legend of the &productName; output</title>
+      <mediaobject>
+        <imageobject role="fo">
+          <imagedata align="center" fileref="../images/Legend.svg"
+            format="SVG" width="80%"/>
+        </imageobject>
+      </mediaobject>
+    </example>
+    <para>The entry point for the comparison is the <filename>TopLevel.gv</filename> file.</para>
+    <para>The <filename>.gv</filename> files are visualized using the
+        <command>mindot-viewer</command> command.</para>
+  </section>   <section>
+    <title>Definition of a change</title>
+    <para>An instance is marked as changed if the instance in both source path repository has the
+      same name but different type names.</para>
+  </section>
+
+</section>

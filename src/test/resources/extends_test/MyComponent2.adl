@@ -1,0 +1,3 @@
+composite extends_test.MyComponent2 extends ExtendedComponent1, ExtendedComponent3 {
+
+} 

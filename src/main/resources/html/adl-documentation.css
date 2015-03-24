@@ -58,6 +58,27 @@ img.figure {
     margin-right: auto;
 }
 
+embed.svgFigure {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+   
+   /*
+    border-right-style : dotted;
+	border-right-color : #D0D0D0;
+	border-bottom-style : dotted;
+	border-bottom-color : #D0D0D0;
+	*/
+	
+	box-shadow: 5px 5px 5px #888;
+	
+	min-width: 60%;
+	max-width: 95%;
+	max-height: 600px;
+}
+
 p.no-margin {
 	margin: 0;	
 }
@@ -139,6 +160,16 @@ div.item-details {
 
 p.full-comment {
 	
+}
+
+p.method-parameters {
+	font-size:1em;
+	font-weight: bold;
+}
+
+p.method-returns {
+	font-size:1em;
+	font-weight: bold;
 }
 
 /* Code blocks */

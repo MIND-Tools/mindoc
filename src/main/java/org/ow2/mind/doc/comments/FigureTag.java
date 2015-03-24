@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2009 STMicroelectronics
  *
- * This file is part of "Mind Compiler" is free software: you can redistribute 
- * it and/or modify it under the terms of the GNU Lesser General Public License 
- * as published by the Free Software Foundation, either version 3 of the 
+ * This file is part of "Mind Compiler" is free software: you can redistribute
+ * it and/or modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
  * details.
@@ -17,14 +17,12 @@
  * Contact: mind@ow2.org
  *
  * Authors: michel.metzger@st.com
- * Contributors: 
+ * Contributors: sseyvoz@assystem.com
  */
 
 package org.ow2.mind.doc.comments;
 
 import static org.ow2.mind.doc.Launcher.DOC_FILES_DIRECTORY;
-
-import java.io.File;
 
 import org.ow2.mind.doc.HTMLDocumentationHelper.SourceKind;
 
@@ -69,8 +67,13 @@ public class FigureTag extends CommentTag {
     } else if(height != -1) {
       sizeString = String.format("height=\"%dpx\"", height);
     }
-    return String.format("<img src=\"%s\" class=\"figure\" %s/>",
-        DOC_FILES_DIRECTORY + File.separatorChar + path, sizeString);
+
+    if (path.endsWith(".svg")) {
+      return String.format("<embed src=\"%s\" class=\"svgFigure\" %s type=\"image/svg+xml\"/>",
+          DOC_FILES_DIRECTORY + "/" + path, sizeString);
+    } else
+      return String.format("<img src=\"%s\" class=\"figure\" %s/>",
+          DOC_FILES_DIRECTORY + "/" + path, sizeString);
   }
 
 }

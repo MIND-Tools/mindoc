@@ -1,5 +1,6 @@
 /**
  * Copyright (C) 2009 STMicroelectronics
+ * Copyright (C) 2014 Schneider-Electric
  *
  * This file is part of "Mind Compiler" is free software: you can redistribute
  * it and/or modify it under the terms of the GNU Lesser General Public License
@@ -17,14 +18,23 @@
  * Contact: mind@ow2.org
  *
  * Authors: michel.metzger@st.com
- * Contributors:
+ * Contributors: yteissier@assystem.com
  */
 
 package org.ow2.mind.doc;
 
 import java.io.File;
+import java.io.PrintStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -32,123 +42,216 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.StreamHandler;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
+import org.antlr.stringtemplate.StringTemplateGroupLoader;
+import org.objectweb.fractal.adl.CompilerError;
+import org.objectweb.fractal.adl.error.GenericErrors;
 import org.ow2.mind.inject.GuiceModuleExtensionHelper;
 import org.ow2.mind.plugin.PluginLoaderModule;
 import org.ow2.mind.plugin.PluginManager;
-
+import org.ow2.mind.st.StringTemplateComponentLoader;
+import org.ow2.mind.cli.CmdArgument;
+import org.ow2.mind.cli.CmdFlag;
+import org.ow2.mind.cli.CmdOption;
+import org.ow2.mind.cli.CmdOptionBooleanEvaluator;
+import org.ow2.mind.cli.CmdPathOption;
+import org.ow2.mind.cli.CommandLine;
+import org.ow2.mind.cli.CommandLineOptionExtensionHelper;
+import org.ow2.mind.cli.CommandOptionHandler;
+import org.ow2.mind.cli.InvalidCommandLineException;
+import org.ow2.mind.cli.Options;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 public class Launcher {
-  private static final String  MINDOC_HOME             = "MINDOC_HOME";
+  private static final String  MIND_ROOT             = "MIND_ROOT";
   private static final String  RESOURCE_DIR_NAME       = "resources";
   public static final String   DOC_FILES_DIRECTORY     = "doc-files";
 
   public static final Logger   logger                  = Logger
-                                                           .getAnonymousLogger();
+      .getAnonymousLogger();
 
   private static final String  COMMAND_NAME            = "mindoc";
 
   private static final String  DEFAULT_DESTINATION     = "./target/doc";
   static final String          HTML_RESOURCES_DIR      = "resources/html";
 
+  protected static final String ID_PREFIX              = "org.ow2.mind.doc.";
+
+
+  private static final CmdFlag HELP_OPTION = new CmdFlag(
+      ID_PREFIX + "Help",
+      "h", "help",
+      "Print the help and exit");
+
+  // Disable this if you wish to use other module-contributed command-line options
+  private static final CmdArgument DESTINATION_PATH_OPTION = new CmdArgument(
+      ID_PREFIX + "Output",
+      "o", "output",
+      "The path where the documentation is generated",
+      "<The output path>");
+
+  private static final CmdFlag KEEPGV_OPTION = new CmdFlag(
+      ID_PREFIX + "KeepGV",
+      null, "keepGV",
+      "Specifies to keep the intermediary GraphViz GV files used for SVG generation.");
+
+  private static final CmdArgument OVERVIEW_OPTION = new CmdArgument(
+      ID_PREFIX + "overview",
+      null, "overview",
+      "Specifies the file that contains the overview documentation.",
+      "<The overview file>");
+
+  private static final CmdArgument DOCTITLE_OPTION = new CmdArgument(
+      ID_PREFIX + "doctitle",
+      null, "doctitle",
+      "Specifies the title that will be used in the overview page.",
+      "<The title>");
+
+
+  private static final CmdFlag VERBOSE_OPTION = new CmdFlag(
+      ID_PREFIX + "Verbose",
+      null, "verbose",
+      "Verbose output.");
+
+  private static final CmdPathOption SRC_PATH_HANDLER = new CmdPathOption(
+      ID_PREFIX + "src path",
+      "S",
+      "src-path",
+      "the search path of ADL,IDL and implementation files (list of path separated by ':' on Linux or ';' on Windows)",
+      "<path list>"
+      );
+
   private final static Options options                 = new Options();
-  private static final String  DESTINATION_PATH_OPTION = "d";
-  private static final String  VERBOSE_OPTION          = "v";
-  private static final String  HELP_OPTION             = "help";
-  private static final String  HELP_OPTION_SHORT       = "h";
-  private static final String  OVERVIEW_OPTION         = "overview";
-  private static final String  DOCTITLE_OPTION         = "doctitle";
+
+  final static Map<Object, Object> context = new HashMap<Object, Object>();
+  public static Injector injector = null;
 
   public static void main(final String[] args) {
     initLogger();
 
-    if (System.getenv(MINDOC_HOME) == null) {
+    /**
+     * Developers running the Launcher from Eclipse should define
+     * MIND_ROOT=${project_loc}/src/main in their Java launch configuration,
+     * if it's not ready in the environment.
+     * Computed path will be wrong otherwise (from target/classes/Launcher.class)
+     */
+    if (getMindRoot() == null) {
       logger
-          .severe("MINDOC_HOME variable is not defined. MINDOC_HOME must point to the location where mindoc is installed.");
+      .severe("Could not find compiler base location. MIND_ROOT environment variable must point to the location where mindoc is installed.");
       System.exit(1);
     }
 
-    final Option destinationPathOption = new Option(DESTINATION_PATH_OPTION,
-        true, "The path where the documentation is generated.");
-    // destinationPathOption.setRequired(true);
-
-    final Option verboseOption = new Option(VERBOSE_OPTION, false,
-        "Verbose output.");
-
-    final Option helpDirectoryOption = new Option(HELP_OPTION_SHORT,
-        HELP_OPTION, false, "Print this message and exit.");
-
-    final Option overviewOption = new Option(OVERVIEW_OPTION, true,
-        "Specifies the file that contains the overview documentation.");
-
-    final Option docTitleOption = new Option(DOCTITLE_OPTION, true,
-        "Specifies the title that will be used in the the overview page.");
-
-    options.addOption(destinationPathOption);
-    options.addOption(verboseOption);
-    options.addOption(helpDirectoryOption);
-    options.addOption(overviewOption);
-    options.addOption(docTitleOption);
 
     File sourceDirectories[] = null;
     File targetDirectory = new File(DEFAULT_DESTINATION);
     File overviewFile = null;
     String docTitle = null;
+    boolean keepGV = false;
 
-    final CommandLineParser parser = new PosixParser();
+    /****** Initialization of the PluginManager Component *******/
+
+    final Injector bootStrapPluginManagerInjector = getBootstrapInjector();
+    final PluginManager pluginManager = bootStrapPluginManagerInjector
+        .getInstance(PluginManager.class);
+
+    /** **/
+
+    options.addOptions(HELP_OPTION,
+        DESTINATION_PATH_OPTION,
+        KEEPGV_OPTION,
+        OVERVIEW_OPTION,
+        DOCTITLE_OPTION,
+        VERBOSE_OPTION,
+        SRC_PATH_HANDLER);
+
+    // Enable to allow using other modules command-line options
+    //options.addOptions(CommandLineOptionExtensionHelper
+    //    .getCommandOptions(pluginManager));
 
     try {
-      final CommandLine cmd = parser.parse(options, args);
+      // parse arguments to a CommandLine.
+      final CommandLine cmdLine = CommandLine.parseArgs(options, false, args);
 
-      if (cmd.hasOption(HELP_OPTION)) {
-        printHelp();
+      // very important when using mind plugins with "enableWhen" in their xml descriptor
+      context.put(CmdOptionBooleanEvaluator.CMD_LINE_CONTEXT_KEY, cmdLine);
+
+      // Enable to allow using other modules command-line options
+      //invokeOptionHandlers(pluginManager, cmdLine, context);
+      //checkExclusiveGroups(pluginManager, cmdLine);
+
+
+      // If help is asked, print it and exit.
+      if (HELP_OPTION.isPresent(cmdLine)) {
+        printHelp(System.err);
         System.exit(0);
       }
 
-      if (cmd.hasOption(VERBOSE_OPTION)) logger.setLevel(Level.ALL);
+      // @TODO Use environment variable
+      if (VERBOSE_OPTION.isPresent(cmdLine)) logger.setLevel(Level.ALL);
 
-      if (cmd.getArgs().length >= 1) {
-        final String sourceList[] = cmd.getArgs();
-        sourceDirectories = new File[sourceList.length];
-        for (int i = 0; i < sourceList.length; i++) {
-          final File sourceDirectory = new File(sourceList[i]);
+      List<String> sourceListExtra = null;
+      List<String> sourceList = null;
+
+      if (cmdLine.getArguments().size() >= 1) {
+        sourceListExtra = cmdLine.getArguments();
+      }
+      if (SRC_PATH_HANDLER.isPresent(cmdLine)) {
+        sourceList = SRC_PATH_HANDLER.getPathValue(cmdLine);
+      }
+      sourceDirectories = new File[((sourceList != null)?sourceList.size():0) + ((sourceListExtra != null)?sourceListExtra.size():0)];
+
+      if (sourceList != null) {
+
+        for (int i = 0; i < sourceList.size(); i++) {
+          final File sourceDirectory = new File(sourceList.get(i));
           if (!sourceDirectory.isDirectory() || !sourceDirectory.canRead()) {
-            logger.severe(String.format("Cannot read source path '%s'.",
-                sourceDirectory.getPath()));
+            logger.severe(String.format("Cannot read source path '%s'.", sourceDirectory.getPath()));
             System.exit(2);
           }
           sourceDirectories[i] = sourceDirectory;
         }
-      } else {
+      }
+      if (sourceListExtra != null) {
+        for (int i = 0; i < sourceListExtra.size(); i++) {
+            final File sourceDirectory = new File(sourceListExtra.get(i));
+            if (!sourceDirectory.isDirectory() || !sourceDirectory.canRead()) {
+              logger.severe(String.format("Cannot read source path '%s'.", sourceDirectory.getPath()));
+              System.exit(2);
+            }
+            sourceDirectories[((sourceList != null)?sourceList.size():0) + i] = sourceDirectory;
+          }
+      }
+      if (sourceListExtra == null && sourceList == null) {
         logger.severe("You must specify a source path.");
-        printHelp();
+        printHelp(System.err);
         System.exit(1);
       }
 
-      if (cmd.hasOption(DESTINATION_PATH_OPTION)) {
-        targetDirectory = new File(cmd.getOptionValue(DESTINATION_PATH_OPTION));
+      /**
+       * Comment the block and use the // commented line if you enabled
+       * other modules command-line options, to get pre-handled value:
+       */
+      // targetDirectory = OutPathOptionHandler.getOutPath(context);
+      if (DESTINATION_PATH_OPTION.isPresent(cmdLine)) {
+        targetDirectory = new File(DESTINATION_PATH_OPTION.getValue(cmdLine));
       } else {
         logger
-            .info("Destination directory not specified. Documentation will be generated in default location ("
-                + DEFAULT_DESTINATION + ").");
+        .info("Destination directory not specified. Documentation will be generated in default location ("
+            + DEFAULT_DESTINATION + ").");
       }
 
-      if (cmd.hasOption(OVERVIEW_OPTION)) {
-        overviewFile = new File(cmd.getOptionValue(OVERVIEW_OPTION));
+      if (OVERVIEW_OPTION.isPresent(cmdLine)) {
+        overviewFile = new File(OVERVIEW_OPTION.getValue(cmdLine));
       }
 
-      if (cmd.hasOption(DOCTITLE_OPTION)) {
-        docTitle = cmd.getOptionValue(DOCTITLE_OPTION);
+      if (DOCTITLE_OPTION.isPresent(cmdLine)) {
+        docTitle = DOCTITLE_OPTION.getValue(cmdLine);
       }
-    } catch (final ParseException e) {
+
+      if (KEEPGV_OPTION.isPresent(cmdLine))
+        keepGV = true;
+
+    } catch (final InvalidCommandLineException e) {
       logger.severe("Command line parse error. Reason: " + e.getMessage());
       System.exit(1);
     }
@@ -170,34 +273,32 @@ public class Launcher {
       }
     }
 
-    final Injector pluginManagerInjector = Guice
-        .createInjector(new PluginLoaderModule());
-    final PluginManager pluginManager = pluginManagerInjector
-        .getInstance(PluginManager.class);
-    runGenarators(pluginManager, sourceDirectories, targetDirectory, new File(
-        getMindocHome(), RESOURCE_DIR_NAME), docTitle, overviewFile);
+    runGenerators(pluginManager, sourceDirectories, targetDirectory, docTitle, overviewFile, keepGV);
     ResourceCopier.copyResources(sourceDirectories, targetDirectory);
     logger.info("Documentation generated in " + targetDirectory.getPath());
   }
 
-  private static void runGenarators(final PluginManager pluginManager,
+  private static void runGenerators(final PluginManager pluginManager,
       final File sourceDirectories[], final File targetDirectory,
-      final File resourceDirectory, final String docTitle,
-      final File overviewFile) {
+      /* final File resourceDirectory, */ final String docTitle,
+      final File overviewFile, final boolean keepGV) {
     try {
-      // init context
-      final Map<Object, Object> context = new HashMap<Object, Object>();
-
       // Put this in context to enable mindoc Guice modules.
       context.put("org.ow2.mind.doc.GenrateDoc", Boolean.TRUE);
+      // also put info about keeping GV files or not
+      context.put("org.ow2.mind.doc.KeepGV", new Boolean(keepGV));
 
       // create injector from guice-module extensions
-      final Injector injector = Guice.createInjector(GuiceModuleExtensionHelper
+      injector = Guice.createInjector(GuiceModuleExtensionHelper
           .getModules(pluginManager, context));
 
       logger.fine("Generating indexes...");
+
+      // The compiler ST loader allows us to get StringTemplates resources from our Jar file
+      final StringTemplateGroupLoader stComponentLoaderItf = injector.getInstance(StringTemplateComponentLoader.class);
+
       final DocumentationIndexGenerator indexGenerator = new DocumentationIndexGenerator(
-          sourceDirectories, resourceDirectory, docTitle, overviewFile);
+          sourceDirectories, docTitle, overviewFile, stComponentLoaderItf);
       indexGenerator.generateIndexPages(targetDirectory);
 
       logger.fine("Generating documentation...");
@@ -213,15 +314,55 @@ public class Launcher {
 
   }
 
-  private static void printHelp() {
-    final HelpFormatter formatter = new HelpFormatter();
-    final String header = " generates documentation for ADL, IDL and implementation files located in <sourcepath>.";
-    formatter.printHelp(COMMAND_NAME + " [OPTION] (<sourcepath>)+", header,
-        options, null);
+  private static void printHelp(final PrintStream ps) {
+    printUsage(ps);
+    ps.println();
+    ps.println("Available options are :");
+    int maxCol = 0;
+
+    for (final CmdOption opt : options.getOptions()) {
+      final int col = 2 + opt.getPrototype().length();
+      if (col > maxCol) maxCol = col;
+    }
+    for (final CmdOption opt : options.getOptions()) {
+      final StringBuffer sb = new StringBuffer("  ");
+      sb.append(opt.getPrototype());
+      while (sb.length() < maxCol)
+        sb.append(' ');
+      sb.append("  ").append(opt.getDescription());
+      ps.println(sb);
+    }
   }
 
-  static String getMindocHome() {
-    return System.getenv(MINDOC_HOME);
+  private static void printUsage(final PrintStream ps) {
+    ps.println("Usage: " + COMMAND_NAME
+        + " generates documentation for ADL and IDL files located in <sourcepath>.");
+    ps.println(" [OPTION] (<sourcepath>)+");
+  }
+
+  /**
+   * Developers running the Launcher from Eclipse should define
+   * MIND_ROOT=${project_loc}/src/main in their Java launch configuration,
+   * if it's not ready in the environment.
+   * Computed path will be wrong otherwise (from target/classes/Launcher.class)
+   */
+  public static String getMindRoot() {
+    // default get from env
+    final String env_MIND_ROOT = System.getenv(MIND_ROOT);
+    if (env_MIND_ROOT != null)
+      return env_MIND_ROOT;
+
+    // if env variable doesn't exist, access "to be copied"-resources from the compiler
+    // jars location (careful: this doesn't work for tests from an IDE with classes output !)
+    final URL jarURL = Launcher.class.getProtectionDomain().getCodeSource().getLocation();
+    try {
+      final File jarFile = new File(jarURL.toURI());
+      final File extFolder = jarFile.getParentFile();
+      final File mindRootFolder = extFolder.getParentFile();
+      return mindRootFolder.getAbsolutePath();
+    } catch (final URISyntaxException e) {
+      return null;
+    }
   }
 
   private static void initLogger() {
@@ -254,6 +395,67 @@ public class Launcher {
     public synchronized void publish(final LogRecord arg0) {
       super.publish(arg0);
       flush();
+    }
+  }
+
+  //----------------------------------------------------------------------------
+  // Guice & command-line interface (CLI) methods - (copied from MindC Launcher)
+  // ---------------------------------------------------------------------------
+
+  protected static Injector getBootstrapInjector() {
+    return Guice.createInjector(new PluginLoaderModule());
+  }
+
+  protected static void checkExclusiveGroups(final PluginManager pluginManagerItf,
+      final CommandLine cmdLine) throws InvalidCommandLineException {
+    final Collection<Set<String>> exclusiveGroups = CommandLineOptionExtensionHelper
+        .getExclusiveGroups(pluginManagerItf);
+    for (final Set<String> exclusiveGroup : exclusiveGroups) {
+      CmdOption opt = null;
+      for (final String id : exclusiveGroup) {
+        final CmdOption opt1 = cmdLine.getOptions().getById(id);
+        if (opt1.isPresent(cmdLine)) {
+          if (opt != null) {
+            throw new InvalidCommandLineException("Options '"
+                + opt.getPrototype() + "' and '" + opt1.getPrototype()
+                + "' cannot be specified simultaneously on the command line.",
+                1);
+          }
+          opt = opt1;
+        }
+      }
+    }
+  }
+
+  protected static void invokeOptionHandlers(final PluginManager pluginManagerItf,
+      final CommandLine cmdLine, final Map<Object, Object> context)
+          throws InvalidCommandLineException {
+    final List<CmdOption> toBeExecuted = new LinkedList<CmdOption>(cmdLine
+        .getOptions().getOptions());
+    final Set<String> executedId = new HashSet<String>(toBeExecuted.size());
+    while (!toBeExecuted.isEmpty()) {
+      final int toBeExecutedSize = toBeExecuted.size();
+      final Iterator<CmdOption> iter = toBeExecuted.iterator();
+      while (iter.hasNext()) {
+        final CmdOption option = iter.next();
+        final List<String> precedenceIds = CommandLineOptionExtensionHelper
+            .getPrecedenceIds(option, pluginManagerItf);
+        if (executedId.containsAll(precedenceIds)) {
+          // task ready to be executed
+          for (final CommandOptionHandler handler : CommandLineOptionExtensionHelper
+              .getHandler(option, pluginManagerItf)) {
+            handler.processCommandOption(option, cmdLine, context);
+          }
+          executedId.add(option.getId());
+          iter.remove();
+        }
+      }
+      if (toBeExecutedSize == toBeExecuted.size()) {
+        // nothing has been executed. there is a circular dependency
+        throw new CompilerError(GenericErrors.GENERIC_ERROR,
+            "Circular dependency in command line option handlers: "
+                + toBeExecuted);
+      }
     }
   }
 }
