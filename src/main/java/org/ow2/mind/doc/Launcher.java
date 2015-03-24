@@ -114,7 +114,7 @@ public class Launcher {
       "Verbose output.");
 
   private static final CmdPathOption SRC_PATH_HANDLER = new CmdPathOption(
-      ID_PREFIX + "src parh",
+      ID_PREFIX + "src path",
       "S",
       "src-path",
       "the search path of ADL,IDL and implementation files (list of path separated by ':' on Linux or ';' on Windows)",

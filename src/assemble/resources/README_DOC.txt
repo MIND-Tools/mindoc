@@ -38,6 +38,8 @@ Available options are :
 	  --doctitle=<The title file>     Specifies the title that will be used in the overview page.
 	  --verbose                       Verbose output.
 
+Using the standard --src-path will result in its concatenation to the (<sourcepath>)+ target argument(s).
+The usual mind-compiler options are also available since mindoc is a compiler plugin, however their usage is not recommended.
 
 Document ADL
 ============
